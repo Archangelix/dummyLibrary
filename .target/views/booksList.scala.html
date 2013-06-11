@@ -1,0 +1,61 @@
+@(books: List[Book], myForm: Form[Book])
+
+@import helper._
+
+<html>
+<head>
+<title>Local Library</title>
+<style>
+	table, th, td {
+		border: 1px solid black;
+	}
+	
+	p.error {
+		color: red;
+	}
+
+</style>
+
+<script>
+function removeBook(pBookID) {
+	document.forms[0].bookID = pBookID;
+	document.forms[0].submit();
+}
+</script>
+</head>
+<body>
+	<h1><p align="center">DUMMY LIBRARY</p></h1>
+	<br/>
+	<div align="center">
+	@if(books.isEmpty) {
+		The books are empty!
+	} else {
+		<table class="bookList">
+			<tr>
+				<th>S/No</th>
+				<th>TITLE</th>
+				<th>AUTHOR</th>
+				<th>PUBLISHED YEAR</th>
+				<th>ACTION</th>
+			</tr>
+			@books.zipWithIndex.map { case (book, i) =>
+			<tr>
+				<td align="center">@(i+1)</td>
+				<td>@book.title</td>
+				<td>@book.author</td>
+				<td>@book.publishedYear</td>
+				<td width="30%">
+					<form name="formEdit@book.id" method="POST" action = "@routes.Application.edit(book.id.get.toString)">
+						<a href="javascript:document.forms['formEdit@book.id'].submit()">Edit</a>
+					</form>/
+					<form name="formDelete@book.id" method="POST" action = "@routes.Application.remove(book.id.get.toString)">
+						<a href="javascript:document.forms['formDelete@book.id'].submit()">Remove</a>
+					</form>
+				</td>
+			</tr>
+			}
+		</table>
+	}
+	</div>
+</body>
+</html>

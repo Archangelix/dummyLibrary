@@ -1,0 +1,60 @@
+@(books: List[Book])
+<!-- booksList.scala.html -->
+
+@import helper._
+
+<html>
+<head>
+<title>Local Library</title>
+<style>
+	table, th, td {
+		border: 1px solid black;
+	}
+	
+	p.error {
+		color: red;
+	}
+
+</style>
+
+<script>
+function removeBook(pBookID) {
+	document.forms[0].bookID = pBookID;
+	document.forms[0].submit();
+}
+</script>
+</head>
+<body>
+	<h1><p align="center">DUMMY LIBRARY</p></h1>
+	<br/>
+	<div align="center">
+	@if(books.isEmpty) {
+		The books are empty!
+	} else {
+		<table class="bookList">
+			<tr>
+				<th width="5%">S/No</th>
+				<th width="30%">TITLE</th>
+				<th width="30%">AUTHOR</th>
+				<th width="10%">PUBLISHED YEAR</th>
+				<th width="10%">ACTION</th>
+			</tr>
+			@books.zipWithIndex.map { case (book, i) =>
+			<tr>
+				<td align="center">@(i+1)</td>
+				<td>@book.title</td>
+				<td>@book.author</td>
+				<td>@book.publishedYear</td>
+				<td>
+					<a href="@routes.BookDetail.edit(book.id.get.toString)">Edit</a> /
+					<a href="@routes.Application.remove(book.id.get.toString)">Remove</a>
+				</td>
+			</tr>
+			}
+		</table>
+	}
+	<br/>
+	<a href="/newbook">Add a new book</a>
+	</div>
+</body>
+</html>
