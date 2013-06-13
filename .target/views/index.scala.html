@@ -1,4 +1,5 @@
-@(books: List[Book], myForm: Form[Book])
+@(books: List[Book])
+<!-- booksList.scala.html -->
 
 @import helper._
 
@@ -32,11 +33,11 @@ function removeBook(pBookID) {
 	} else {
 		<table class="bookList">
 			<tr>
-				<th>S/No</th>
-				<th>TITLE</th>
-				<th>AUTHOR</th>
-				<th>PUBLISHED YEAR</th>
-				<th>ACTION</th>
+				<th width="5%">S/No</th>
+				<th width="30%">TITLE</th>
+				<th width="30%">AUTHOR</th>
+				<th width="10%">PUBLISHED YEAR</th>
+				<th width="10%">ACTION</th>
 			</tr>
 			@books.zipWithIndex.map { case (book, i) =>
 			<tr>
@@ -44,46 +45,16 @@ function removeBook(pBookID) {
 				<td>@book.title</td>
 				<td>@book.author</td>
 				<td>@book.publishedYear</td>
-				<td width="30%">
-					<form name="formEdit@book.id" method="POST" action = "@routes.Application.edit(book.id.get.toString)">
-						<a href="javascript:document.forms['formEdit@book.id'].submit()">Edit</a>
-					</form>/
-					<form name="formDelete@book.id" method="POST" action = "@routes.Application.remove(book.id.get.toString)">
-						<a href="javascript:document.forms['formDelete@book.id'].submit()">Remove</a>
-					</form>
+				<td>
+					<a href="@routes.BookDetail.edit(book.id.get.toString)">Edit</a> /
+					<a href="@routes.Application.remove(book.id.get.toString)">Remove</a>
 				</td>
 			</tr>
 			}
 		</table>
 	}
-	<br/><br/>
-	<form action="@routes.Application.index" method="POST">
-		<table>
-			<tr>
-				<td>Title</td>
-				<td>@myInput(myForm("title"), 
-					'placeholder ->"Book title"
-					)
-				</td>
-			</tr>
-			<tr>
-				<td>Author</td>
-				<td>@myInput(myForm("author"), 
-					'placeholder -> "Book author"
-					)
-				</td>
-			</tr>
-			<tr>
-				<td>Published in</td>
-				<td>@myInput(myForm("publishedYear"),
-					'placeholder -> "Published year"
-				)
-				</td>
-			</tr>
-		</table>
-		<br/>
-		<input type="submit" name="addNewBook" value="Add New" onclick="javascript:addNew(@routes.Application.index)"/>
-	</form>
+	<br/>
+	<a href="/newbook">Add a new book</a>
 	</div>
 </body>
 </html>
