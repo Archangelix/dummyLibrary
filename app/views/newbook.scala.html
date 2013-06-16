@@ -11,6 +11,9 @@
 		color: red;
 	}
 
+	ul.error {
+		color: red;
+	}
 </style>
 </head>
 <body>
@@ -24,6 +27,17 @@
 			}
 		</h1>
 		<br/><br/>
+		</div>
+		<div align="left">
+		@if(myForm.errors.size>0) {
+			<ul class="error">
+			@myForm.errors.map { err =>
+				<li>@err.message</li>
+			}
+			</ul>
+			</p>
+		}
+		<input type="hidden" value="@myForm("id").value" name="id"/>
 		<table>
 			<tr>
 				<td>Title</td>

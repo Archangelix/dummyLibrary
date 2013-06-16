@@ -25,7 +25,14 @@ object BookDetail extends Controller {
         val yearFormat = new SimpleDateFormat("yyyy")
         val currentYear = yearFormat.format(currentTime).toInt
         number(min = 0, max = currentYear)
-      })(Book.apply)(Book.unapply))
+      })(Book.apply)(Book.unapply)
+    verifying("Duplicate book found.", {
+      book => book.id==null || {
+        val dbBooks = Book.findDuplicates(book)
+        dbBooks.size==0 || dbBooks.size==1 && dbBooks.get(0).id==book.id
+      }
+    })
+  )
 
   def gotoNewBook() = Action { implicit req =>
     Ok(views.html.newbook(MODE_ADD, bookForm)(session)).withSession(
@@ -40,15 +47,22 @@ object BookDetail extends Controller {
   
   def save = Action { implicit req =>
     val tempForm = bookForm.bindFromRequest()
+    val mode = session.get("mode").getOrElse(MODE_ADD)
 
     tempForm.fold(
       errors => {
-        val mode = session.get("mode").getOrElse(MODE_ADD)
         println("Mode = "+mode)
+        tempForm.errors.map {err => 
+          println(err.message)
+        }
         BadRequest(views.html.newbook(mode, tempForm)(session))
       },
       data => {
-        Book.create(data.title, data.author, data.publishedYear)
+        if (mode.equals(MODE_ADD)) {
+          Book.create(data.title, data.author, data.publishedYear)
+        } else {
+          Book.update(data.id.get, data.title, data.author, data.publishedYear)
+        }
         Redirect(routes.Application.index()).withSession(session - "mode")
       })
   }

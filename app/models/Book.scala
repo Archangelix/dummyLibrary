@@ -36,6 +36,15 @@ object Book {
 	  }
 	}
 	
+	def update(pID:Int, pTitle: String, pAuthor: String, pPublishedYear: Int) = {
+	  DB.withConnection { implicit c => 
+	    SQL("update BOOK set title={title}, author={author}, publishedYear={publishedYear} " +
+	    		"where ID={id}")
+	    	.on('title -> pTitle, 'author -> pAuthor, 'publishedYear -> pPublishedYear, 'id -> pID)
+	    	.executeUpdate()
+	  }
+	}
+	
 	def findByID(pID: Int) = {
 	  DB.withConnection { implicit c =>
 	  	val list = SQL("select * from BOOK where id={id}").on('id -> pID
@@ -43,6 +52,16 @@ object Book {
 	  	list(0)
 	  }
 	}
+	
+	def findDuplicates(pBook: Book) = {
+	  DB.withConnection { implicit c => 
+	    val res = SQL ("select * from BOOK where title={title} and author={author} and publishedYear={publishedYear}")
+	    	.on('title -> pBook.title, 'author -> pBook.author, 'publishedYear -> pBook.publishedYear)
+	    	.as(book *)
+	    if (res==null || res.size==0) None else Some(res)
+	  }
+	}
+	
 	def delete(pID: Int) = {
 	  DB.withConnection { implicit c =>
 	  	SQL("delete from BOOK where id={id}").on('id -> pID
