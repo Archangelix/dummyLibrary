@@ -17,6 +17,7 @@ object BookDetail extends Controller {
     
   val bookForm = Form[Book](
     mapping(
+      "idx" -> optional(of[Int]),
       "id" -> optional(of[Int]),
       "title" -> nonEmptyText,
       "author" -> nonEmptyText,

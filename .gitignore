@@ -2,6 +2,7 @@ logs
 project/project
 project/target
 target
+.target
 tmp
 .history
 dist
@@ -14,5 +15,7 @@ dist
 /RUNNING_PID
 /.settings
 /*~
-/conf/*~
+/conf/**~
 /project/*~
+bin/
+

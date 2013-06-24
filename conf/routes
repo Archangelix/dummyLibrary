@@ -4,6 +4,10 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /first                       controllers.Application.navigateFirst
+GET     /prev                       controllers.Application.navigatePrev
+GET     /next                       controllers.Application.navigateNext
+GET     /last                       controllers.Application.navigateLast
 GET		/:id/edit					controllers.BookDetail.edit(id)
 GET		/:id/delete					controllers.Application.remove(id)
 GET		/newbook					controllers.BookDetail.gotoNewBook

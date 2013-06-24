@@ -1,4 +1,4 @@
-@(books: List[Book])
+@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[Book])
 <!-- booksList.scala.html -->
 
 @import helper._
@@ -27,10 +27,13 @@ function removeBook(pURL) {
 <script src="index.js"></script>
 </head>
 <body>
+	<form action="@routes.Application.index" method="POST">
+	<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
+	<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
 	<h1><p align="center">DUMMY LIBRARY</p></h1>
 	<br/>
 	<div align="center">
-	@if(books.isEmpty) {
+	@if(pList.isEmpty) {
 		The books are empty!
 	} else {
 		<table class="bookList">
@@ -41,9 +44,9 @@ function removeBook(pURL) {
 				<th width="10%">PUBLISHED YEAR</th>
 				<th width="10%">ACTION</th>
 			</tr>
-			@books.zipWithIndex.map { case (book, i) =>
+			@pList.map { book =>
 			<tr>
-				<td align="center">@(i+1)</td>
+				<td align="center">@book.idx</td>
 				<td>@book.title</td>
 				<td>@book.author</td>
 				<td>@book.publishedYear</td>
@@ -56,7 +59,27 @@ function removeBook(pURL) {
 		</table>
 	}
 	<br/>
+	<div align="right">
+		<table>
+			<tr>
+				<td colspan="4" align="right">Page: @pCurrentPageIdx / @pMaxPageIdx</td>
+			</tr>
+			<tr>
+				<td><a href="@routes.Application.navigateFirst">First</a></td>
+				<td><a href="@routes.Application.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a></td>
+				<td><a href="@routes.Application.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a></td>
+				<td><a href="@routes.Application.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a></td>
+			</tr>
+			<tr>
+				<td colspan=4>
+					
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br/>
 	<a href="/newbook">Add a new book</a>
 	</div>
+	</form>
 </body>
 </html>

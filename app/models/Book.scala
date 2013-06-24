@@ -6,25 +6,36 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
-case class Book (id: Option[Int], title: String, author: String, publishedYear: Int)
+case class Book (idx: Option[Int], id: Option[Int], title: String, author: String, publishedYear: Int)
 
 object Book {
+  val PAGE_ROW_CNT = 5
+  
   val book = {
+    get[Int]("idx") ~
     get[Int]("id") ~
     get[String]("title") ~
     get[String]("author") ~
     get[Int]("publishedYear") map {
-      case id~title~author~publishedYear => Book (Some(id), title, author, publishedYear)
+      case idx~id~title~author~publishedYear => Book (Some(idx), Some(id), title, author, publishedYear)
     }
   }
-  
-/*	def unapply(b: Book) = {
-	  Some(Option(b.id), b.title, b.author, b.publishedYear)
-	}
-	
-*/	
+
+  	def partial(pageIdx: Int): (List[Book], Int) = DB.withConnection { implicit c =>
+  	  val startIdx = (pageIdx-1)*PAGE_ROW_CNT+1
+  	  val endIdx = pageIdx*PAGE_ROW_CNT
+  	  val list = SQL("select * from (" +
+  	  					"select rownum idx, * from BOOK" +
+  	  				") where idx<={endIdx} and idx>={startIdx} order by ID")
+  	  				.on ('startIdx -> startIdx, 'endIdx -> endIdx)
+  	  				.as(book *)
+  	  val firstRow = SQL("select COUNT(*) c from BOOK").apply.head
+  	  val cnt = firstRow[Long]("c")
+  	  (list, cnt.toInt)
+  	}
+  	
   	def all(): List[Book] = DB.withConnection { implicit c =>
-	  SQL("select * from BOOK order by ID").as(book *)
+	  SQL("select rownum idx, * from BOOK order by ID").as(book *)
 	}
 	
 	def create(pTitle: String, pAuthor: String, pPublishedYear: Int) = {
