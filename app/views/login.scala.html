@@ -1,0 +1,54 @@
+@(myForm: Form[controllers.Login.FormUser])
+
+<html>
+<head>
+<style>
+	
+	div.error {
+		color: red;
+	}
+
+	ul.error {
+		color: red;
+	}
+</style>
+</head>
+<body>
+	<form action="@routes.Login.loginPage" method="POST">
+	<table>
+	<div align="left">
+		@defining(myForm.errors.filter(_.key.equals(""))) { errors =>
+			@if(errors.size>0) {
+				<ul class="error">
+				@errors.map { error =>
+					<li>@error.message</li>
+				}
+				</ul>
+			}
+		}
+	</div>
+	<table>
+		<tr>
+			<td>Username</td>
+			<td>@myInput(myForm("username"), 
+				'placeholder -> "Username"
+				)
+			</td>
+		</tr>
+		<tr>
+			<td>Password</td>
+			<td>@myInput(myForm("password"), 
+				'placeholder -> "Password",
+				'type -> "password"
+				)
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="submit" name="login" value="Login"/>
+			<td>
+		</tr>
+	</table>
+	</form>
+</body>
+</html>

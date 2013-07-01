@@ -1,0 +1,186 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: book_id_seq; Type: SEQUENCE; Schema: public; Owner: admin
+--
+
+CREATE SEQUENCE book_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.book_id_seq OWNER TO admin;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: book; Type: TABLE; Schema: public; Owner: iwan; Tablespace: 
+--
+
+CREATE TABLE book (
+    id integer DEFAULT nextval('book_id_seq'::regclass) NOT NULL,
+    title character varying(100),
+    author character varying(50),
+    publishedyear integer
+);
+
+
+ALTER TABLE public.book OWNER TO iwan;
+
+--
+-- Name: play_evolutions; Type: TABLE; Schema: public; Owner: admin; Tablespace: 
+--
+
+CREATE TABLE play_evolutions (
+    id integer NOT NULL,
+    hash character varying(255) NOT NULL,
+    applied_at timestamp without time zone NOT NULL,
+    apply_script text,
+    revert_script text,
+    state character varying(255),
+    last_problem text
+);
+
+
+ALTER TABLE public.play_evolutions OWNER TO admin;
+
+--
+-- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: iwan
+--
+
+CREATE SEQUENCE user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_id_seq OWNER TO iwan;
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: iwan; Tablespace: 
+--
+
+CREATE TABLE users (
+    seqno integer DEFAULT nextval('user_id_seq'::regclass) NOT NULL,
+    userid character varying(15),
+    password character varying(30),
+    name character varying(100),
+    address character varying(100),
+    dob date
+);
+
+
+ALTER TABLE public.users OWNER TO iwan;
+
+--
+-- Data for Name: book; Type: TABLE DATA; Schema: public; Owner: iwan
+--
+
+COPY book (id, title, author, publishedyear) FROM stdin;
+2	TWO	STWO	1902
+4	FOUR	SFOUR	1904
+5	FIVE	SFIVE	1905
+6	SIX	SSIX	1906
+7	SEVEN	SSEVEN	1907
+8	EIGHT	SEIGHT	1908
+9	NINE	SNINE	1909
+10	TEN	STEN	1910
+11	ELEVEN	SELEVEN	1911
+12	TWELVE	STWELVE	1912
+13	THIRTEEN	STHIRTEEN	1913
+14	FOURTEEN	SFOURTEEN	1914
+15	FIFTEEN	SFIFTEEN	1915
+16	SIXTEEN	SSIXTEEN	1916
+17	SEVENTEEN	SSEVENTEEN	1917
+18	EIGHTEEN	SEIGHTEEN	1918
+1	ONE	SONEs	1901
+3	THREE333	STHREE	1903
+\.
+
+
+--
+-- Name: book_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('book_id_seq', 19, true);
+
+
+--
+-- Data for Name: play_evolutions; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY play_evolutions (id, hash, applied_at, apply_script, revert_script, state, last_problem) FROM stdin;
+1	8a2f43efacd83afa829414abfd97dfafc24b6fb4	2013-06-30 00:00:00	CREATE SEQUENCE book_id_seq;\n\nCREATE TABLE BOOK (\nid integer not null default nextval('book_id_seq'),\ntitle varchar(100),\nauthor varchar(50),\npublishedYear integer\n);\n\nCREATE SEQUENCE user_id_seq;\n\nCREATE TABLE "USERS" (\nseqno integer not null default nextval('user_id_seq'),\nuserid varchar (15),\npassword varchar (30),\nname varchar (100),\naddress varchar (100),\ndob date\n);	--DROP TABLE BOOK;\n--DROP SEQUENCE book_id_seq;\n\n--DROP TABLE USERS;\n--DROP SEQUENCE user_id_seq;	applying_up	ERROR: relation "book_id_seq" already exists [ERROR:0, SQLSTATE:42P07]
+\.
+
+
+--
+-- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: iwan
+--
+
+SELECT pg_catalog.setval('user_id_seq', 2, true);
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: iwan
+--
+
+COPY users (seqno, userid, password, name, address, dob) FROM stdin;
+1	admin	admin	ADMIN	admin's address	1980-01-12
+2	user	user	USER	user's address	1983-02-28
+\.
+
+
+--
+-- Name: play_evolutions_pkey; Type: CONSTRAINT; Schema: public; Owner: admin; Tablespace: 
+--
+
+ALTER TABLE ONLY play_evolutions
+    ADD CONSTRAINT play_evolutions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
