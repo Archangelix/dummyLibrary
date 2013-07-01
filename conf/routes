@@ -3,8 +3,10 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-GET     /first                       controllers.Application.navigateFirst
+GET		/							controllers.Login.loginPage
+POST	/							controllers.Login.login
+GET     /list                       controllers.Application.index
+GET     /first                      controllers.Application.navigateFirst
 GET     /prev                       controllers.Application.navigatePrev
 GET     /next                       controllers.Application.navigateNext
 GET     /last                       controllers.Application.navigateLast

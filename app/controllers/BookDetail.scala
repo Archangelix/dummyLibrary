@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import models.Book
+import models.postgre.DBBook
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formats._
@@ -17,7 +18,7 @@ object BookDetail extends Controller {
     
   val bookForm = Form[Book](
     mapping(
-      "idx" -> optional(of[Int]),
+      "idx" -> optional(of[Long]),
       "id" -> optional(of[Int]),
       "title" -> nonEmptyText,
       "author" -> nonEmptyText,
@@ -29,7 +30,7 @@ object BookDetail extends Controller {
       })(Book.apply)(Book.unapply)
     verifying("Duplicate book found.", {
       book => book.id==null || {
-        val dbBooks = Book.findDuplicates(book)
+        val dbBooks = DBBook.findDuplicates(book)
         dbBooks.size==0 || dbBooks.size==1 && dbBooks.get(0).id==book.id
       }
     })
@@ -41,7 +42,7 @@ object BookDetail extends Controller {
   }
 
   def edit(pIDStr: String) = Action { implicit req =>
-    val filledForm = bookForm.fill(Book.findByID(pIDStr.toInt))
+    val filledForm = bookForm.fill(DBBook.findByID(pIDStr.toInt))
     Ok(views.html.newbook(MODE_EDIT, filledForm)(session)).withSession(
         session + ("mode" -> MODE_EDIT))
   }
@@ -60,9 +61,9 @@ object BookDetail extends Controller {
       },
       data => {
         if (mode.equals(MODE_ADD)) {
-          Book.create(data.title, data.author, data.publishedYear)
+          DBBook.create(data.title, data.author, data.publishedYear)
         } else {
-          Book.update(data.id.get, data.title, data.author, data.publishedYear)
+          DBBook.update(data.id.get, data.title, data.author, data.publishedYear)
         }
         Redirect(routes.Application.index()).withSession(session - "mode")
       })
