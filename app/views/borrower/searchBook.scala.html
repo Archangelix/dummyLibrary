@@ -1,0 +1,53 @@
+@* newcatalog Template File *@
+@(mode: String, myForm: Form[Catalog])(session: Session)
+
+@import controllers.CatalogDetail._
+
+<html>
+<head>
+<style>
+	
+	div.error {
+		color: red;
+	}
+
+	ul.error {
+		color: red;
+	}
+</style>
+</head>
+<body>
+	<form action="@routes.CatalogDetail.save" method="POST">
+		<div align="left">
+		@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
+			@if(errs.size>0) {
+				<ul class="error">
+				@errs.map { err =>
+					<li>@err.message</li>
+				}
+				</ul>
+			}
+		}
+		<input type="hidden" value="@myForm("id").value" name="id"/>
+		<table>
+			<tr>
+				<td>Title</td>
+				<td>@myInput(myForm("title"), 
+					'placeholder ->"Catalog title"
+					)
+				</td>
+			</tr>
+			<tr>
+				<td>Author</td>
+				<td>@myInput(myForm("author"), 
+					'placeholder -> "Catalog author"
+					)
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<input type="submit" name="searchCatalog" value="Search"/>
+	</form>
+
+</body>
+</html>
