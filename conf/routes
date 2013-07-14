@@ -10,10 +10,10 @@ GET     /first                      controllers.Application.navigateFirst
 GET     /prev                       controllers.Application.navigatePrev
 GET     /next                       controllers.Application.navigateNext
 GET     /last                       controllers.Application.navigateLast
-GET		/:id/edit					controllers.BookDetail.edit(id)
+GET		/:id/edit					controllers.CatalogDetail.edit(id)
 GET		/:id/delete					controllers.Application.remove(id)
-GET		/newbook					controllers.BookDetail.gotoNewBook
-POST	/newbook					controllers.BookDetail.save
+GET		/newcatalog					controllers.CatalogDetail.gotoNewCatalog
+POST	/newcatalog					controllers.CatalogDetail.save
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

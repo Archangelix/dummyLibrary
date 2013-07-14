@@ -1,12 +1,14 @@
 package controllers
 
 import models.User
-import models.postgre.DBUser
+import models.db.DBUser
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.nonEmptyText
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import models.db.DBUserPassword
+import services.DBService
 
 object Login extends Controller {
 
@@ -17,21 +19,10 @@ object Login extends Controller {
           "username" -> nonEmptyText,
           "password" -> nonEmptyText
       )(FormUser.apply)(FormUser.unapply)
-      verifying("Incorrect user / password combination.", {
-    	  user => {
-    	    try {
-    	    	val dbUser = DBUser.findByUserID(user.username)
-    	    	println ("Database password = "+dbUser.password)
-	    		dbUser.password.equals(user.password)
-    	    } catch {
-    	      case e: Exception => {
-    	        println ("User cannot be found.")
-    	        false
-    	      }
-    	    }
-    	  }
-      	}
-      )
+      verifying ("Invalid user / password", { user =>
+        val dbPassword = DBService.getPassword(user.username)
+        dbPassword.equals(user.password)
+      })
   )
   
   def loginPage = Action {
@@ -41,12 +32,21 @@ object Login extends Controller {
   def login = Action { implicit req =>
     val tempForm = loginForm.bindFromRequest
     tempForm.fold (
-        errors => {
-          BadRequest (views.html.login(tempForm))
-        },
-        data => {
-          Redirect(routes.Application.index)
-        }
+      error => {
+        BadRequest (views.html.login(error))
+      },
+      data => {
+	    try {
+	      val formUsername = data.username
+	      val dbUser = DBService.findByUserID(formUsername)
+    	  Redirect(routes.Application.index)
+	    } catch {
+	      case e: Exception => {
+	        e.printStackTrace()
+	        BadRequest (views.html.login(tempForm))
+	      }
+	    }
+      }
     )
   }
   

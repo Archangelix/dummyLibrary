@@ -44,13 +44,13 @@ function removeBook(pURL) {
 				<th width="10%">PUBLISHED YEAR</th>
 				<th width="10%">ACTION</th>
 			</tr>
-			@pList.zipWithIndex.map { case (book, i) =>
+			@pList.map { book =>
 			<tr>
-				<td align="center">@(i+1)</td>
+				<td align="center">@book.idx</td>
 				<td>@book.title</td>
 				<td>@book.author</td>
 				<td>@book.publishedYear</td>
-				<td>
+				<td align="center">
 					<a href="@routes.BookDetail.edit(book.id.get.toString)">Edit</a> /
 					<a href="javascript:removeBook('@routes.Application.remove(book.id.get.toString)')">Remove</a>
 				</td>
@@ -62,10 +62,13 @@ function removeBook(pURL) {
 	<div align="right">
 		<table>
 			<tr>
-				<td><a href="@routes.Application.index?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">First</a></td>
-				<td><a href="@routes.Application.navigatePrev?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Prev</a></td>
+				<td colspan="4" align="right">Page: @pCurrentPageIdx / @pMaxPageIdx</td>
+			</tr>
+			<tr>
+				<td><a href="@routes.Application.navigateFirst">First</a></td>
+				<td><a href="@routes.Application.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a></td>
 				<td><a href="@routes.Application.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a></td>
-				<td><a href="@routes.Application.navigateLast?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Last</a></td>
+				<td><a href="@routes.Application.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a></td>
 			</tr>
 			<tr>
 				<td colspan=4>

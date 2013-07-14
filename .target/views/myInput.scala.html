@@ -16,5 +16,9 @@
 @name = @{ args.toMap.get('name).map(_.toString).getOrElse("") }
 
 @views.html.helper.input(field, args.filter(_._1 != 'type):_*) { (id, name, value, htmlArgs) =>
-    <input type="@inputType" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs)>
+	@if("password".equals(inputType)) {
+    	<input type="@inputType" id="@id" name="@name" value="" @toHtmlArgs(htmlArgs)>
+	} else {
+	    <input type="@inputType" id="@id" name="@name" value="@value" @toHtmlArgs(htmlArgs)>
+	}
 }(MyFieldConstructor, implicitly[Lang])

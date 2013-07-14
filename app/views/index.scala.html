@@ -1,5 +1,5 @@
-@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[Book])
-<!-- booksList.scala.html -->
+@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[Catalog])
+<!-- catalogsList.scala.html -->
 
 @import helper._
 
@@ -18,8 +18,8 @@
 </style>
 
 <script>
-function removeBook(pURL) {
-	if (confirm('Are you sure you want to delete this book?')) {
+function removeCatalog(pURL) {
+	if (confirm('Are you sure you want to delete this catalog?')) {
 		window.location = pURL;
 	}
 }
@@ -34,9 +34,9 @@ function removeBook(pURL) {
 	<br/>
 	<div align="center">
 	@if(pList.isEmpty) {
-		The books are empty!
+		The catalogs are empty!
 	} else {
-		<table class="bookList">
+		<table class="catalogList">
 			<tr>
 				<th width="5%">S/No</th>
 				<th width="30%">TITLE</th>
@@ -44,15 +44,15 @@ function removeBook(pURL) {
 				<th width="10%">PUBLISHED YEAR</th>
 				<th width="10%">ACTION</th>
 			</tr>
-			@pList.map { book =>
+			@pList.map { catalog =>
 			<tr>
-				<td align="center">@book.idx</td>
-				<td>@book.title</td>
-				<td>@book.author</td>
-				<td>@book.publishedYear</td>
-				<td>
-					<a href="@routes.BookDetail.edit(book.id.get.toString)">Edit</a> /
-					<a href="javascript:removeBook('@routes.Application.remove(book.id.get.toString)')">Remove</a>
+				<td align="center">@catalog.idx</td>
+				<td>@catalog.title</td>
+				<td>@catalog.author</td>
+				<td>@catalog.publishedYear</td>
+				<td align="center">
+					<a href="@routes.CatalogDetail.edit(catalog.id.get.toString)">Edit</a> /
+					<a href="javascript:removeCatalog('@routes.Application.remove(catalog.id.get.toString)')">Remove</a>
 				</td>
 			</tr>
 			}
@@ -78,7 +78,7 @@ function removeBook(pURL) {
 		</table>
 	</div>
 	<br/>
-	<a href="/newbook">Add a new book</a>
+	<a href="/newcatalog">Add a new catalog</a>
 	</div>
 	</form>
 </body>

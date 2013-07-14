@@ -1,10 +1,9 @@
 package models
 
-import play.api.db._
-import play.api.Play.current
+import models.db.DBBook
 
-import anorm._
-import anorm.SqlParser._
-import models.h2.DBBook
+case class Book (id: Option[Long], catalogID: Long, remarks: String, isDeleted: Boolean)
 
-case class Book (idx: Option[Long], id: Option[Int], title: String, author: String, publishedYear: Int)
+object Book {
+  def apply(pBook: DBBook): Book = Book(pBook.id, pBook.catalogID, pBook.remarks, pBook.isDeleted)
+}

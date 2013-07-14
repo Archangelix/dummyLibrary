@@ -5,8 +5,8 @@ import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formats._
-import models.Book
-import models.postgre.DBBook
+import models.Catalog
+import models.db.DBCatalog
 import views.html.defaultpages.badRequest
 import play.api.data.FormError
 import play.api.i18n.Messages.Message
@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat
 import scala.collection.mutable.MutableList
 import play.api.cache.Cache
 import play.api.Play.current
+import services.DBService
 
 object Application extends Controller {
   
@@ -34,10 +35,10 @@ object Application extends Controller {
   
   def index = Action { implicit req =>
     val params = listingForm.bindFromRequest
-    val currentPage = Cache.getAs[(List[Book], Int, Int)](CURRENT_PAGE)
+    val currentPage = Cache.getAs[(List[Catalog], Int, Int)](CURRENT_PAGE)
     Cache.remove(CURRENT_PAGE)
     val (list1, rowCount, currentPageIdx) = currentPage.getOrElse {
-      val res = DBBook.partial(1)
+      val res = DBService.partialCatalogs(1)
       (res._1, res._2, 1)
     }
     val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
@@ -45,7 +46,7 @@ object Application extends Controller {
   }
   
   def navigateFirst = Action { implicit req =>
-    val (list1, rowCnt) = DBBook.partial(1)
+    val (list1, rowCnt) = DBService.partialCatalogs(1)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
     Redirect(routes.Application.index)
   }
@@ -53,7 +54,7 @@ object Application extends Controller {
   def navigatePrev = Action { implicit req =>
     val currentPageIdx = req.queryString.get("currentPageIdx").flatMap(_.headOption).get.toInt
     val nextPageIdx = if (currentPageIdx<=1) 1 else currentPageIdx-1
-    val (list1, rowCnt) = DBBook.partial(nextPageIdx)
+    val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
     Redirect(routes.Application.index)
   }
@@ -64,14 +65,14 @@ object Application extends Controller {
     val nextPageIdx = if (currentPageIdx>=maxPage) maxPage else currentPageIdx+1
     println("maxPage = "+maxPage)
     println("nextPage = "+nextPageIdx)
-    val (list1, rowCnt) = DBBook.partial(nextPageIdx)
+    val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
     Redirect(routes.Application.index)
   }
   
   def navigateLast = Action { implicit req =>
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
-    val (list1, rowCnt) = DBBook.partial(maxPage)
+    val (list1, rowCnt) = DBService.partialCatalogs(maxPage)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, maxPage))
     Redirect(routes.Application.index)
   }
@@ -79,7 +80,7 @@ object Application extends Controller {
   def edit(pIDStr: String) = TODO
   
   def remove(pIDStr: String) = Action { implicit req =>
-    DBBook.delete(pIDStr.toInt);
+    DBService.deleteCatalog(pIDStr.toInt)
     Redirect(routes.Application.index())
   }
   
