@@ -1,15 +1,15 @@
 package services
 
-import play.api.db._
-import play.api.Play.current
+import java.util.Date
+
 import anorm._
 import anorm.SqlParser._
 import models.Catalog
-import java.util.Date
-import models.Book
 import models.User
 import models.db._
 import models.exception.UserNotFoundException
+import play.api.Play.current
+import play.api.db._
 
 object DBService {
 
@@ -25,10 +25,11 @@ object DBService {
   
   val dbBookMapping = {
     get[Long]("id") ~
-    get[Long]("catalogID") ~
+    get[Long]("catalog_id") ~
+    get[String]("origin") ~
     get[String]("remarks") ~
-    get[Boolean]("isDeleted") map {
-      case id~catalogID~remarks~isDeleted => DBBook (Some(id), catalogID, remarks, isDeleted)
+    get[Boolean]("is_deleted") map {
+      case id~catalogID~origin~remarks~isDeleted => DBBook (Some(id), catalogID, origin, remarks, isDeleted)
     }
   }
 
@@ -104,20 +105,21 @@ object DBService {
 	  }
 	}
 
-	def createBook(pTitle: String, pAuthor: String, pPublishedYear: Int) = {
+	def createBook(pCatalogID: Long, pBookID: Long, pOrigin: String, pRemarks: String) = {
 	  DB.withConnection { implicit c => 
-	    SQL("insert into BOOK (title, author, publishedYear) values " +
-	    		"({title}, {author}, {publishedYear})"
-	        ).on('title -> pTitle, 'author -> pAuthor, 'publishedYear -> pPublishedYear
+	    SQL("insert into BOOK (catalog_id, id, remarks, is_deleted, origin) values " +
+	    		"({catalogID}, {id}, {remarks}, {isDeleted}, {origin})"
+	        ).on('catalogID -> pCatalogID, 'id -> pBookID, 'remarks -> pRemarks, 'isDeleted -> false, 'origin -> pOrigin
 	    ).executeUpdate()
 	  }
 	}
 	
-	def updateBook(pID: Long, pTitle: String, pAuthor: String, pPublishedYear: Int) = {
+	def updateBook(pCatalogID: Long, pBookID: Long, pOrigin: String, pRemarks: String, pIsDeleted: Boolean) = {
 	  DB.withConnection { implicit c => 
-	    SQL("update BOOK set title={title}, author={author}, publishedYear={publishedYear} " +
-	    		"where ID={id}")
-	    	.on('title -> pTitle, 'author -> pAuthor, 'publishedYear -> pPublishedYear, 'id -> pID)
+	    SQL("update BOOK set remarks={author}, is_deleted={isDeleted}, origin={origin} " +
+	    		"where catalog_id={title} and ID={id}")
+	    	.on('catalogID -> pCatalogID, 'id -> pBookID, 
+	    	    'remarks -> pRemarks, 'isDeleted -> pIsDeleted, 'origin -> pOrigin)
 	    	.executeUpdate()
 	  }
 	}
@@ -132,7 +134,7 @@ object DBService {
 	
 	def deleteBook(pID: Long) = {
 	  DB.withConnection { implicit c =>
-	  	SQL("update BOOK set is_deleted='Y' where id={id}").on('id -> pID
+	  	SQL("update BOOK set is_deleted=true where id={id}").on('id -> pID
 	  			).executeUpdate()
 	  }
 	}
@@ -155,7 +157,7 @@ object DBService {
   		    Catalog(dbCatalog, books)
   		  }), cnt.toInt)
   	  } else {
-  		  (list.map(dbCatalog => Catalog(dbCatalog, None)), cnt.toInt)
+  		  (list.map(dbCatalog => Catalog(dbCatalog, List[DBBook]())), cnt.toInt)
   	  }
   	}
   	
@@ -170,7 +172,7 @@ object DBService {
   		    Catalog(dbCatalog, books)
   		  })
   	  } else {
-  		  list.map(dbCatalog => Catalog(dbCatalog, None))
+  		  list.map(dbCatalog => Catalog(dbCatalog, List[DBBook]()))
   	  }
 	}
 	
@@ -202,18 +204,20 @@ object DBService {
 	  			).as(dbCatalogDetailMapping *)
 	  	val dbCatalog = list(0)
 	  	if (pWithBooks) {
+	  	  println("with books = true")
 	  	  val books = allBooksByCatalogID(dbCatalog.id.get)
+	  	  println("Number of books = "+books.size)
 	  	  Catalog(list(0), books)
 	  	} else {
-	  	  Catalog(dbCatalog, None)
+	  	  Catalog(dbCatalog, List[DBBook]())
 	  	}
 	  }
 	}
 	
-	def findDuplicates(pBook: Catalog) = {
+	def findDuplicates(pCatalog: Catalog) = {
 	  DB.withConnection { implicit c => 
 	    val res = SQL ("select * from CATALOG where title={title} and author={author} and publishedYear={publishedYear}")
-	    	.on('title -> pBook.title, 'author -> pBook.author, 'publishedYear -> pBook.publishedYear)
+	    	.on('title -> pCatalog.title, 'author -> pCatalog.author, 'publishedYear -> pCatalog.publishedYear)
 	    	.as(dbCatalogDetailMapping *)
 	    if (res==null || res.size==0) None else Some(res)
 	  }
@@ -233,4 +237,16 @@ object DBService {
 	  	list
 	  }
 	}
+	
+	def generateNewBookID(pCatalogID: Long): Long = {
+	  DB.withConnection{ implicit c => 
+	    val firstRow = SQL("SELECT max(ID) maxID FROM BOOK WHERE CATALOG_ID={catalogID}")
+	    	.on('catalogID -> pCatalogID).apply().head
+	    if (firstRow==null) {
+	      1
+	    }
+	    firstRow[Long]("maxID")+1
+	  }
+	}
+	
 }

@@ -9,6 +9,7 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import models.db.DBUserPassword
 import services.DBService
+import play.mvc.Http.Session
 
 object Login extends Controller {
 
@@ -39,7 +40,9 @@ object Login extends Controller {
 	    try {
 	      val formUsername = data.username
 	      val dbUser = DBService.findByUserID(formUsername)
-    	  Redirect(routes.Application.index)
+    	  Redirect(routes.Application.index).withSession(
+    	      session + ("username" -> formUsername)
+    	  )
 	    } catch {
 	      case e: Exception => {
 	        e.printStackTrace()
