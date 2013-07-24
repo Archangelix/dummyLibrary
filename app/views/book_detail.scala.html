@@ -1,0 +1,71 @@
+@* newbook Template File *@
+@(mode: String, myForm: Form[form.FormBook], pCatalogID: String, pOrigins: List[(String, String)])
+
+@import views.html.helper._
+
+<html>
+<head>
+<style>
+	
+	div.error {
+		color: red;
+	}
+
+	ul.error {
+		color: red;
+	}
+</style>
+</head>
+<body>
+	<form action="@routes.BookDetailAction.saveNew(pCatalogID)" method="POST">
+		<div align="center">
+		<h1>
+			@if(mode.equals(BookDetailAction.MODE_ADD)) { 
+			  ADD A NEW BOOK 
+			} else { 
+			  EDIT A BOOK 
+			}
+		</h1>
+		<br/><br/>
+		</div>
+		<div align="left">
+		@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
+			@if(errs.size>0) {
+				<ul class="error">
+				@errs.map { err =>
+					<li>@err.message</li>
+				}
+				</ul>
+			}
+		}
+		<input type="hidden" value="@myForm("id").value" name="@myForm("id").name"/>
+		<input type="hidden" value="@pCatalogID" name="@myForm("catalogID").name"/>
+		<table border="1">
+			<tr>
+				<td>Origin</td>
+				<td>@select(
+					  myForm("origin"),
+					  pOrigins.map{ t =>
+					    t._1 -> t._2
+					  },
+					  '_label -> "",
+					  '_default -> "Please select"
+					)(MyFieldConstructor, implicitly[Lang])
+				</td>
+			</tr>
+			<tr>
+				<td>Remarks</td>
+				<td>@myInput(myForm("remarks"), 
+					'placeholder -> "Remarks"
+					)
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<input type="submit" name="addNewBook" value="Save"/>
+		<input type="button" name="btnCancel" value="Cancel" onclick="javascript:window.location='/list'"/>
+		</div>
+	</form>
+
+</body>
+</html>
