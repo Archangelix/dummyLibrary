@@ -1,4 +1,0 @@
-function addNew() {
-  document.myForm.action="";
-  document.myForm.submit();
-}
