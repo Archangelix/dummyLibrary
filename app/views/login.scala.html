@@ -1,4 +1,4 @@
-@(myForm: Form[controllers.Login.FormUser])
+@(myForm: Form[controllers.LoginAction.FormUser])
 
 <html>
 <head>
@@ -14,7 +14,7 @@
 </style>
 </head>
 <body>
-	<form action="@routes.Login.loginPage" method="POST">
+	<form action="@routes.LoginAction.loginPage" method="POST">
 	<table>
 	<div align="left">
 		@defining(myForm.errors.filter(_.key.equals(""))) { errors =>

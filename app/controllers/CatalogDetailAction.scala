@@ -15,7 +15,7 @@ import models.form.FormBook
 import models.form.FormCatalog
 import controllers.util.MySession
 
-object CatalogDetail extends Controller {
+object CatalogDetailAction extends Controller {
 
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
@@ -72,10 +72,7 @@ object CatalogDetail extends Controller {
         tempForm.errors.map {err => 
           println(err.message)
         }
-        val formBooks = flashBooks match {
-          case books: List[FormBook] => books
-          case _ => throw new ClassCastException
-        }
+        val formBooks = flashBooks.asInstanceOf[List[FormBook]]
         BadRequest(views.html.newCatalog(mode, tempForm, formBooks)(session))
       },
       data => {
@@ -84,7 +81,7 @@ object CatalogDetail extends Controller {
         } else {
           DBService.updateCatalog(data.id.get, data.title, data.author, data.publishedYear)
         }
-        Redirect(routes.Application.index()).withSession(session - "mode")
+        Redirect(routes.CatalogListAction.index()).withSession(session - "mode")
       })
   }
 

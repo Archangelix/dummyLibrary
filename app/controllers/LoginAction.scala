@@ -11,7 +11,7 @@ import models.db.DBUserPassword
 import services.DBService
 import play.mvc.Http.Session
 
-object Login extends Controller {
+object LoginAction extends Controller {
 
   case class FormUser(username: String, password: String)
   
@@ -40,7 +40,7 @@ object Login extends Controller {
 	    try {
 	      val formUsername = data.username
 	      val dbUser = DBService.findByUserID(formUsername)
-    	  Redirect(routes.Application.index).withSession(
+    	  Redirect(routes.CatalogListAction.index).withSession(
     	      session + ("username" -> formUsername)
     	  )
 	    } catch {

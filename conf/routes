@@ -3,17 +3,17 @@
 # ~~~~
 
 # Home page
-GET		/										controllers.Login.loginPage
-POST	/										controllers.Login.login
-GET     /list                       			controllers.Application.index
-GET     /first                      			controllers.Application.navigateFirst
-GET     /prev                       			controllers.Application.navigatePrev
-GET     /next                       			controllers.Application.navigateNext
-GET     /last                       			controllers.Application.navigateLast
-GET		/:id/edit								controllers.CatalogDetail.edit(id)
-GET		/:id/delete								controllers.Application.remove(id)
-GET		/newcatalog								controllers.CatalogDetail.gotoNewCatalog
-POST	/newcatalog								controllers.CatalogDetail.save
+GET		/										controllers.LoginAction.loginPage
+POST	/										controllers.LoginAction.login
+GET     /list                       			controllers.CatalogListAction.index
+GET     /first                      			controllers.CatalogListAction.navigateFirst
+GET     /prev                       			controllers.CatalogListAction.navigatePrev
+GET     /next                       			controllers.CatalogListAction.navigateNext
+GET     /last                       			controllers.CatalogListAction.navigateLast
+GET		/:id/edit								controllers.CatalogDetailAction.edit(id)
+GET		/:id/delete								controllers.CatalogListAction.remove(id)
+GET		/newcatalog								controllers.CatalogDetailAction.gotoNewCatalog
+POST	/newcatalog								controllers.CatalogDetailAction.save
 GET		/bookdetail/:catalogid/new				controllers.BookDetailAction.newBook(catalogid)
 POST	/bookdetail/:catalogid/new/save			controllers.BookDetailAction.saveNew(catalogid)
 GET		/bookdetail/:catalogid/:bookid			controllers.BookDetailAction.view(catalogid, bookid)

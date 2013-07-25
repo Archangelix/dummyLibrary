@@ -18,7 +18,7 @@ import play.api.cache.Cache
 import play.api.Play.current
 import services.DBService
 
-object Application extends Controller {
+object CatalogListAction extends Controller {
   
   val CURRENT_PAGE = "currentPage"
   val CURRENT_PAGE_IDX = "currentPageIdx"
@@ -48,7 +48,7 @@ object Application extends Controller {
   def navigateFirst = Action { implicit req =>
     val (list1, rowCnt) = DBService.partialCatalogs(1)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
-    Redirect(routes.Application.index)
+    Redirect(routes.CatalogListAction.index)
   }
   
   def navigatePrev = Action { implicit req =>
@@ -56,7 +56,7 @@ object Application extends Controller {
     val nextPageIdx = if (currentPageIdx<=1) 1 else currentPageIdx-1
     val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
-    Redirect(routes.Application.index)
+    Redirect(routes.CatalogListAction.index)
   }
   
   def navigateNext = Action { implicit req =>
@@ -67,21 +67,21 @@ object Application extends Controller {
     println("nextPage = "+nextPageIdx)
     val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
-    Redirect(routes.Application.index)
+    Redirect(routes.CatalogListAction.index)
   }
   
   def navigateLast = Action { implicit req =>
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
     val (list1, rowCnt) = DBService.partialCatalogs(maxPage)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, maxPage))
-    Redirect(routes.Application.index)
+    Redirect(routes.CatalogListAction.index)
   }
   
   def edit(pIDStr: String) = TODO
   
   def remove(pIDStr: String) = Action { implicit req =>
     DBService.deleteCatalog(pIDStr.toInt)
-    Redirect(routes.Application.index())
+    Redirect(routes.CatalogListAction.index())
   }
   
   def isBlank(str: String) = str==null || str.trim().equals("")
