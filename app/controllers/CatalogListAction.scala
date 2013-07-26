@@ -18,6 +18,10 @@ import play.api.cache.Cache
 import play.api.Play.current
 import services.DBService
 
+/**
+ * Action to handle the catalog listing section. A catalog can be removed
+ * from this listing page.
+ */
 object CatalogListAction extends Controller {
   
   val CURRENT_PAGE = "currentPage"
@@ -33,6 +37,9 @@ object CatalogListAction extends Controller {
     )
   )
   
+  /**
+   * Displaying the list of catalogs for a corresponding page index.
+   */
   def index = Action { implicit req =>
     val params = listingForm.bindFromRequest
     val currentPage = Cache.getAs[(List[Catalog], Int, Int)](CURRENT_PAGE)
@@ -45,12 +52,18 @@ object CatalogListAction extends Controller {
     Ok(views.html.index(currentPageIdx, maxPage, list1))
   }
   
+  /**
+   * Displaying the first page of the catalog list.
+   */
   def navigateFirst = Action { implicit req =>
     val (list1, rowCnt) = DBService.partialCatalogs(1)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
     Redirect(routes.CatalogListAction.index)
   }
   
+  /**
+   * Displaying the previous page of the catalog list.
+   */
   def navigatePrev = Action { implicit req =>
     val currentPageIdx = req.queryString.get("currentPageIdx").flatMap(_.headOption).get.toInt
     val nextPageIdx = if (currentPageIdx<=1) 1 else currentPageIdx-1
@@ -59,6 +72,9 @@ object CatalogListAction extends Controller {
     Redirect(routes.CatalogListAction.index)
   }
   
+  /**
+   * Displaying the next page of the catalog list.
+   */
   def navigateNext = Action { implicit req =>
     val currentPageIdx = req.queryString.get("currentPageIdx").flatMap(_.headOption).get.toInt
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
@@ -70,6 +86,9 @@ object CatalogListAction extends Controller {
     Redirect(routes.CatalogListAction.index)
   }
   
+  /**
+   * Displaying the last page of the catalog list.
+   */
   def navigateLast = Action { implicit req =>
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
     val (list1, rowCnt) = DBService.partialCatalogs(maxPage)
@@ -79,6 +98,9 @@ object CatalogListAction extends Controller {
   
   def edit(pIDStr: String) = TODO
   
+  /**
+   * Removing a particular catalog from the listing page.
+   */
   def remove(pIDStr: String) = Action { implicit req =>
     DBService.deleteCatalog(pIDStr.toInt)
     Redirect(routes.CatalogListAction.index())

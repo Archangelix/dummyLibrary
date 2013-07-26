@@ -5,6 +5,9 @@ import models.db.DBCatalog
 import models.form.FormBook
 import models.form.FormCatalog
 
+/**
+ * Catalog business object. This is the object used for all business processes.
+ */
 class Catalog(
   val idx: Option[Long],
   val id: Option[Long],

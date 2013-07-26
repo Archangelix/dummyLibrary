@@ -11,11 +11,17 @@ import java.text.SimpleDateFormat
 import services.DBService
 import models.Book
 
+/**
+ * Action to handle the book section, including the add, update, delete, and view.
+ */
 object BookDetailAction extends Controller {
 
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
   
+    /**
+     * Dropdown items for the 'Origin' type.
+     */
   val ddItemOriginList = List[(String, String)](
 		  ("new" -> "New"),
 		  ("old" -> "Old")
@@ -31,6 +37,9 @@ object BookDetailAction extends Controller {
 
   val bookForm = Form[FormBook] (formBookMapping)
 
+  /**
+   * Displaying the book detail page with blank information.
+   */
   def newBook(pCatalogID: String) = Action { implicit req => 
     // Flashing works only for redirect.
     // Ok(views.html.book_detail(MODE_EDIT, bookForm, pCatalogID)).flashing("catalogID" -> pCatalogID)
@@ -39,20 +48,17 @@ object BookDetailAction extends Controller {
     )
   }
 
+  /**
+   * Saving the details of the new book.
+   */
   def saveNew(pCatalogID: String) = Action { implicit req =>
     val filledForm = bookForm.bindFromRequest
     filledForm.fold(
       error => {
-        println("New book failed")
-                filledForm.errors.map {err => 
-          println("err.key = "+err.key+"; err.message = "+err.message)
-        }
-
         val mode = session.get("bookMode").getOrElse(MODE_ADD)
         BadRequest(views.html.book_detail(mode, error, pCatalogID, ddItemOriginList))
       },
       data => {
-        println("New book successful")
         val newBookID = DBService.generateNewBookID(pCatalogID.toInt)
         val newBook = Book(data)
         DBService.createBook(newBook.catalogID, newBookID, newBook.origin, newBook.remarks)
@@ -61,16 +67,27 @@ object BookDetailAction extends Controller {
     )
   }
   
+  /**
+   * IN PROGRESS
+   * Viewing the book details. The page will be uneditable.
+   */
   def view(pCatalogID: String, pBookID: String) = Action { implicit req => 
     Ok(views.html.book_detail(MODE_ADD, bookForm, pCatalogID, ddItemOriginList))
   }
 
+  /**
+   * Displaying the book detail page with pre-populated book information.
+   */
   def edit(pCatalogID: String, pBookID: String) = Action { implicit req => 
     Ok(views.html.book_detail(MODE_ADD, bookForm, pCatalogID, ddItemOriginList)).withSession(
         session + ("bookMode" -> MODE_EDIT)
     )
   }
 
+  /**
+   * IN PROGRESS
+   * Saving the details of an existing new book.
+   */
   def saveUpdate(pCatalogID: String, pBookID: String) = Action { implicit req => 
     Ok(views.html.book_detail(MODE_ADD, bookForm, pCatalogID, ddItemOriginList))
   }

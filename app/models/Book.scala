@@ -3,6 +3,9 @@ package models
 import models.db.DBBook
 import models.form.FormBook
 
+/**
+ * Book business object. This is the object used for all business processes.
+ */
 case class Book (id: Option[Long], catalogID: Long, origin: String, remarks: String, isDeleted: Boolean)
 
 object Book {

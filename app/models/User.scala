@@ -3,6 +3,9 @@ package models
 import java.util.Date
 import models.db.DBUser
 
+/**
+ * User model business object. This is the object used for all business processes.
+ */
 case class User (
     seqNo: Option[Long], 
     userID: String, 

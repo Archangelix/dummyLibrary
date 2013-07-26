@@ -11,6 +11,9 @@ import models.db.DBUserPassword
 import services.DBService
 import play.mvc.Http.Session
 
+/**
+ * Action to handle the logging section.
+ */
 object LoginAction extends Controller {
 
   case class FormUser(username: String, password: String)
@@ -26,10 +29,16 @@ object LoginAction extends Controller {
       })
   )
   
+  /**
+   * Displaying the login page.
+   */
   def loginPage = Action {
     Ok(views.html.login(loginForm))
   }
   
+  /**
+   * Login authentication.
+   */
   def login = Action { implicit req =>
     val tempForm = loginForm.bindFromRequest
     tempForm.fold (

@@ -18,3 +18,4 @@ dist
 /conf/**~
 bin/
 conf/application*.conf
+*.dump

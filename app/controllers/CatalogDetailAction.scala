@@ -15,6 +15,9 @@ import models.form.FormBook
 import models.form.FormCatalog
 import controllers.util.MySession
 
+/**
+ * Action to handle the catalog section, including the add, update, delete, and view.
+ */
 object CatalogDetailAction extends Controller {
 
   val MODE_ADD = "ADD"
@@ -37,16 +40,23 @@ object CatalogDetailAction extends Controller {
     formCatalogMapping verifying ("Duplicate catalog found.", {
       formCatalog =>
         formCatalog.id == null || {
+          // There shouldn't be any duplicate catalogs in the database.
           val dbCatalogs = DBService.findDuplicates(Catalog(formCatalog, List()))
           dbCatalogs.size == 0 || dbCatalogs.size == 1 && dbCatalogs.get(0).id == formCatalog.id
         }
     }))
 
+  /**
+   * Displaying the catalog detail page with blank information.
+   */
   def gotoNewCatalog() = Action { implicit req =>
     Ok(views.html.newCatalog(MODE_ADD, catalogForm, List())(session)).withSession(
         session + ("mode" -> MODE_ADD))
   }
 
+  /**
+   * Displaying the book detail page with pre-populated catalog information.
+   */
   def edit(pIDStr: String) = Action { implicit req =>
     val catalog = DBService.findCatalogByID(pIDStr.toInt, true)
     val formCatalog = FormCatalog(catalog)
@@ -61,6 +71,9 @@ object CatalogDetailAction extends Controller {
         session + ("mode" -> MODE_EDIT))
   }
   
+  /**
+   * Saving the catalog details.
+   */
   def save = Action { implicit req =>
     val tempForm = catalogForm.bindFromRequest()
     val mode = session.get("mode").getOrElse(MODE_ADD)
