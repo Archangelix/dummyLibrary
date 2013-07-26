@@ -16,8 +16,6 @@ import play.mvc.Http.Session
  */
 object LoginAction extends Controller {
 
-  case class FormUser(username: String, password: String)
-  
   val loginForm = Form[FormUser](
       mapping (
           "username" -> nonEmptyText,

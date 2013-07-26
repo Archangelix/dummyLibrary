@@ -19,3 +19,4 @@ dist
 bin/
 conf/application*.conf
 *.dump
+*~
