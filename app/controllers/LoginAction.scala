@@ -2,6 +2,7 @@ package controllers
 
 import models.User
 import models.db.DBUser
+import models.form.FormUserPassword
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.nonEmptyText
@@ -16,11 +17,11 @@ import play.mvc.Http.Session
  */
 object LoginAction extends Controller {
 
-  val loginForm = Form[FormUser](
+  val loginForm = Form[FormUserPassword](
       mapping (
           "username" -> nonEmptyText,
           "password" -> nonEmptyText
-      )(FormUser.apply)(FormUser.unapply)
+      )(FormUserPassword.apply)(FormUserPassword.unapply)
       verifying ("Invalid user / password", { user =>
         val dbPassword = DBService.getPassword(user.username)
         dbPassword.equals(user.password)

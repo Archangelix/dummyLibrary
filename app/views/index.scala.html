@@ -1,4 +1,4 @@
-@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[Catalog])
+@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[form.FormCatalog])
 <!-- catalogsList.scala.html -->
 
 @import helper._
@@ -27,7 +27,7 @@ function removeCatalog(pURL) {
 <script src="index.js"></script>
 </head>
 <body>
-	<form action="@routes.Application.index" method="POST">
+	<form action="@routes.CatalogListAction.index" method="POST">
 	<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
 	<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
 	<h1><p align="center">DUMMY LIBRARY</p></h1>
@@ -51,8 +51,8 @@ function removeCatalog(pURL) {
 				<td>@catalog.author</td>
 				<td>@catalog.publishedYear</td>
 				<td align="center">
-					<a href="@routes.CatalogDetail.edit(catalog.id.get.toString)">Edit</a> /
-					<a href="javascript:removeCatalog('@routes.Application.remove(catalog.id.get.toString)')">Remove</a>
+					<a href="@routes.CatalogDetailAction.edit(catalog.id.get.toString)">Edit</a> /
+					<a href="javascript:removeCatalog('@routes.CatalogListAction.remove(catalog.id.get.toString)')">Remove</a>
 				</td>
 			</tr>
 			}
@@ -65,10 +65,10 @@ function removeCatalog(pURL) {
 				<td colspan="4" align="right">Page: @pCurrentPageIdx / @pMaxPageIdx</td>
 			</tr>
 			<tr>
-				<td><a href="@routes.Application.navigateFirst">First</a></td>
-				<td><a href="@routes.Application.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a></td>
-				<td><a href="@routes.Application.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a></td>
-				<td><a href="@routes.Application.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a></td>
+				<td><a href="@routes.CatalogListAction.navigateFirst">First</a></td>
+				<td><a href="@routes.CatalogListAction.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a></td>
+				<td><a href="@routes.CatalogListAction.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a></td>
+				<td><a href="@routes.CatalogListAction.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a></td>
 			</tr>
 			<tr>
 				<td colspan=4>

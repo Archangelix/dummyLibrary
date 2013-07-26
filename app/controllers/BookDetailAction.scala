@@ -62,7 +62,7 @@ object BookDetailAction extends Controller {
         val newBookID = DBService.generateNewBookID(pCatalogID.toInt)
         val newBook = Book(data)
         DBService.createBook(newBook.catalogID, newBookID, newBook.origin, newBook.remarks)
-    	Redirect(routes.CatalogDetail.edit(pCatalogID))
+    	Redirect(routes.CatalogDetailAction.edit(pCatalogID))
       }
     )
   }

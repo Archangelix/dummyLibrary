@@ -43,8 +43,9 @@ object DBService {
     get[Long]("id") ~
     get[String]("title") ~
     get[String]("author") ~
-    get[Int]("publishedYear") map {
-      case idx~id~title~author~publishedYear => DBCatalog (Some(idx), Some(id), title, author, publishedYear)
+    get[Int]("publishedYear") ~
+    get[Boolean]("is_deleted") map {
+      case idx~id~title~author~publishedYear~isDeleted => DBCatalog (Some(idx), Some(id), title, author, publishedYear, isDeleted)
     }
   }
 
@@ -52,8 +53,9 @@ object DBService {
     get[Long]("id") ~
     get[String]("title") ~
     get[String]("author") ~
-    get[Int]("publishedYear") map {
-      case id~title~author~publishedYear => DBCatalog (None, Some(id), title, author, publishedYear)
+    get[Int]("publishedYear") ~
+    get[Boolean]("is_deleted") map {
+      case id~title~author~publishedYear~isDeleted => DBCatalog (None, Some(id), title, author, publishedYear, isDeleted)
     }
   }
 
@@ -63,9 +65,10 @@ object DBService {
 	  get[String]("name") ~
 	  get[String]("address") ~
 	  get[Date]("dob") ~ 
-	  get[Long]("user_role_id") map {
-	    case seqNo ~ userID ~ name ~ address ~ dob ~ userRoleID =>
-	      DBUser(Some(seqNo), userID, name, address, dob, userRoleID)
+	  get[Long]("user_role_id") ~
+	  get[Boolean]("is_deleted") map {
+	    case seqNo~userID~name~address~dob~userRoleID~isDeleted =>
+	      DBUser(Some(seqNo), userID, name, address, dob, userRoleID, isDeleted)
 	  }
 	}
 	

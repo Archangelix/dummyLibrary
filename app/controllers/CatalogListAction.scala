@@ -7,6 +7,7 @@ import play.api.data.Forms._
 import play.api.data.format.Formats._
 import models.Catalog
 import models.db.DBCatalog
+import models.form.FormCatalog
 import views.html.defaultpages.badRequest
 import play.api.data.FormError
 import play.api.i18n.Messages.Message
@@ -49,7 +50,7 @@ object CatalogListAction extends Controller {
       (res._1, res._2, 1)
     }
     val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
-    Ok(views.html.index(currentPageIdx, maxPage, list1))
+    Ok(views.html.index(currentPageIdx, maxPage, list1.map(catalog => FormCatalog(catalog))))
   }
   
   /**

@@ -12,5 +12,6 @@ case class DBUser (
     name: String, 
     address: String, 
     dob: Date,
-    userRoleID: Long
+    userRoleID: Long,
+    isDeleted: Boolean
 )

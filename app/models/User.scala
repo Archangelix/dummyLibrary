@@ -12,9 +12,11 @@ case class User (
     name: String, 
     address: String, 
     dob: Date,
-    userRoleID: Long
+    userRoleID: Long,
+    isDeleted: Boolean
 )
 
 object User {
-  def apply(pUser: DBUser): User = User(pUser.seqNo, pUser.userID, pUser.name, pUser.address, pUser.dob, pUser.userRoleID)
+  def apply(pUser: DBUser): User = User(pUser.seqNo, pUser.userID, pUser.name, pUser.address, pUser.dob, pUser.userRoleID,
+      pUser.isDeleted)
 }
