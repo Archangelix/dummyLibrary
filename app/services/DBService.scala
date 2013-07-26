@@ -370,12 +370,11 @@ object DBService {
 	 */
 	def generateNewBookID(pCatalogID: Long): Long = {
 	  DB.withConnection{ implicit c => 
-	    val firstRow = SQL("SELECT max(ID) maxID FROM BOOK WHERE CATALOG_ID={catalogID}")
+	    val firstRow = SQL("SELECT coalesce(max(ID), 0) maxID FROM BOOK WHERE CATALOG_ID={catalogID}")
 	    	.on('catalogID -> pCatalogID).apply().head
-	    if (firstRow==null) {
-	      1
-	    }
-	    firstRow[Long]("maxID")+1
+	    println("firstRow = "+firstRow)
+	    val dbMaxID = firstRow[Long]("maxID")
+    	dbMaxID+1
 	  }
 	}
 	
