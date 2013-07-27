@@ -1,5 +1,4 @@
-@* newbook Template File *@
-@(mode: String, myForm: Form[form.FormBook], pCatalogID: String, pOrigins: List[(String, String)])
+@(mode: String, myForm: Form[form.FormBook], pCatalogID: String, pOrigins: List[(String, String)])(implicit session: Session)
 
 @import views.html.helper._
 
@@ -17,6 +16,7 @@
 </style>
 </head>
 <body>
+	@header(session)
 	<form action="@routes.BookDetailAction.saveNew(pCatalogID)" method="POST">
 		<div align="center">
 		<h1>

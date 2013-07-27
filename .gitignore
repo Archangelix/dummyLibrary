@@ -20,3 +20,4 @@ bin/
 conf/application*.conf
 *.dump
 *~
+hs_err*

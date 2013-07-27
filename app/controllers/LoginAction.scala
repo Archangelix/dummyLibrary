@@ -62,7 +62,7 @@ object LoginAction extends Controller {
   }
   
   def logout = Action { implicit req =>
-    Redirect(routes.LoginAction.loginPage).withNewSession
+    Redirect(routes.LoginAction.loginPage).withNewSession.flashing("message" -> "Log out successful.")
   }
   
 }

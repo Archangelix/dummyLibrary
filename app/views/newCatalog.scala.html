@@ -1,7 +1,7 @@
-@* newbook Template File *@
-@(mode: String, myForm: Form[form.FormCatalog], books: List[form.FormBook])(session: Session)
+@(mode: String, myForm: Form[form.FormCatalog], books: List[form.FormBook])(implicit session: Session)
 
-@import controllers.CatalogDetailAction._
+@import controllers.CatalogDetailAction.MODE_ADD
+@import controllers.CatalogDetailAction.MODE_EDIT
 
 <html>
 <head>
@@ -17,6 +17,7 @@
 </style>
 </head>
 <body>
+	@header(session)
 	<form action="@routes.CatalogDetailAction.save" method="POST">
 		<div align="center">
 		<h1>

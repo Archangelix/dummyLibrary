@@ -43,8 +43,7 @@ object CatalogListAction extends Controller with TSecured {
       (res._1, res._2, 1)
     }
     val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
-    Ok(views.html.index(currentPageIdx, maxPage, list1.map(catalog => FormCatalog(catalog)),
-        session.get(Security.username).getOrElse("")))
+    Ok(views.html.index(currentPageIdx, maxPage, list1.map(catalog => FormCatalog(catalog)))(session))
   }
   
   /**
