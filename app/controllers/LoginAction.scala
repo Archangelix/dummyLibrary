@@ -11,6 +11,7 @@ import play.api.mvc.Controller
 import models.db.DBUserPassword
 import services.DBService
 import play.mvc.Http.Session
+import play.api.mvc.Security
 
 /**
  * Action to handle the logging section.
@@ -46,11 +47,10 @@ object LoginAction extends Controller {
       },
       data => {
 	    try {
+	      session.get("abc")
 	      val formUsername = data.username
 	      val dbUser = DBService.findByUserID(formUsername)
-    	  Redirect(routes.CatalogListAction.index).withSession(
-    	      session + ("username" -> formUsername)
-    	  )
+    	  Redirect(routes.CatalogListAction.index).withSession(Security.username -> formUsername)
 	    } catch {
 	      case e: Exception => {
 	        e.printStackTrace()
@@ -59,6 +59,10 @@ object LoginAction extends Controller {
 	    }
       }
     )
+  }
+  
+  def logout = Action { implicit req =>
+    Redirect(routes.LoginAction.loginPage).withNewSession
   }
   
 }

@@ -14,7 +14,7 @@ import models.Book
 /**
  * Action to handle the book section, including the add, update, delete, and view.
  */
-object BookDetailAction extends Controller {
+object BookDetailAction extends Controller with TSecured {
 
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
@@ -40,7 +40,7 @@ object BookDetailAction extends Controller {
   /**
    * Displaying the book detail page with blank information.
    */
-  def newBook(pCatalogID: String) = Action { implicit req => 
+  def newBook(pCatalogID: String) = withAuth {username => implicit req => 
     // Flashing works only for redirect.
     // Ok(views.html.book_detail(MODE_EDIT, bookForm, pCatalogID)).flashing("catalogID" -> pCatalogID)
     Ok(views.html.book_detail(MODE_ADD, bookForm, pCatalogID, ddItemOriginList)).withSession(
@@ -51,7 +51,7 @@ object BookDetailAction extends Controller {
   /**
    * Saving the details of the new book.
    */
-  def saveNew(pCatalogID: String) = Action { implicit req =>
+  def saveNew(pCatalogID: String) = withAuth {username => implicit req =>
     val filledForm = bookForm.bindFromRequest
     filledForm.fold(
       error => {
@@ -71,14 +71,14 @@ object BookDetailAction extends Controller {
    * IN PROGRESS
    * Viewing the book details. The page will be uneditable.
    */
-  def view(pCatalogID: String, pBookID: String) = Action { implicit req => 
+  def view(pCatalogID: String, pBookID: String) = withAuth {username => implicit req => 
     Ok(views.html.book_detail(MODE_ADD, bookForm, pCatalogID, ddItemOriginList))
   }
 
   /**
    * Displaying the book detail page with pre-populated book information.
    */
-  def edit(pCatalogID: String, pBookID: String) = Action { implicit req => 
+  def edit(pCatalogID: String, pBookID: String) = withAuth {username => implicit req => 
     Ok(views.html.book_detail(MODE_ADD, bookForm, pCatalogID, ddItemOriginList)).withSession(
         session + ("bookMode" -> MODE_EDIT)
     )
@@ -88,7 +88,7 @@ object BookDetailAction extends Controller {
    * IN PROGRESS
    * Saving the details of an existing new book.
    */
-  def saveUpdate(pCatalogID: String, pBookID: String) = Action { implicit req => 
+  def saveUpdate(pCatalogID: String, pBookID: String) = withAuth {username => implicit req => 
     Ok(views.html.book_detail(MODE_ADD, bookForm, pCatalogID, ddItemOriginList))
   }
 

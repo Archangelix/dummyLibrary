@@ -18,7 +18,7 @@ import controllers.util.MySession
 /**
  * Action to handle the catalog section, including the add, update, delete, and view.
  */
-object CatalogDetailAction extends Controller {
+object CatalogDetailAction extends Controller with TSecured {
 
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
@@ -49,7 +49,7 @@ object CatalogDetailAction extends Controller {
   /**
    * Displaying the catalog detail page with blank information.
    */
-  def gotoNewCatalog() = Action { implicit req =>
+  def gotoNewCatalog() = withAuth {username => implicit req =>
     Ok(views.html.newCatalog(MODE_ADD, catalogForm, List())(session)).withSession(
         session + ("mode" -> MODE_ADD))
   }
@@ -57,7 +57,7 @@ object CatalogDetailAction extends Controller {
   /**
    * Displaying the book detail page with pre-populated catalog information.
    */
-  def edit(pIDStr: String) = Action { implicit req =>
+  def edit(pIDStr: String) = withAuth {username => implicit req =>
     val catalog = DBService.findCatalogByID(pIDStr.toInt, true)
     val formCatalog = FormCatalog(catalog)
     val filledForm = catalogForm.fill(formCatalog)
@@ -74,7 +74,7 @@ object CatalogDetailAction extends Controller {
   /**
    * Saving the catalog details.
    */
-  def save = Action { implicit req =>
+  def save = withAuth {username => implicit req =>
     val tempForm = catalogForm.bindFromRequest()
     val mode = session.get("mode").getOrElse(MODE_ADD)
     val username = session.get("username").getOrElse("")

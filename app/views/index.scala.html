@@ -1,4 +1,4 @@
-@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[form.FormCatalog])
+@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[form.FormCatalog], pUsername: String)
 <!-- catalogsList.scala.html -->
 
 @import helper._
@@ -27,6 +27,7 @@ function removeCatalog(pURL) {
 <script src="index.js"></script>
 </head>
 <body>
+	@header(pUsername)
 	<form action="@routes.CatalogListAction.index" method="POST">
 	<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
 	<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>

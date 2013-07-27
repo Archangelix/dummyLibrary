@@ -5,6 +5,7 @@
 # Home page
 GET		/										controllers.LoginAction.loginPage
 POST	/										controllers.LoginAction.login
+GET		/logout									controllers.LoginAction.logout
 GET     /list                       			controllers.CatalogListAction.index
 GET     /first                      			controllers.CatalogListAction.navigateFirst
 GET     /prev                       			controllers.CatalogListAction.navigatePrev
