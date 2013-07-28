@@ -8,19 +8,29 @@ import play.api.mvc.Result
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 
-
+/**
+ * The authentication template to be used in all pages that need authentication.
+ */
 trait TSecured {
 	def username(request: RequestHeader) = {
-	  val s = request.session.get(Security.username)
-	  println("Entering function username = "+s)
-	  s
+	  val username = request.session.get(Security.username)
+	  username
 	}
 	
+	/**
+	 * Redirect the user to the login page if the user is not yet authenticated.
+	 * @param request The request header.
+	 */
 	def onAuthorized(request: RequestHeader) = {
 	  println("User not authorized")
-	  Results.Redirect(routes.LoginAction.loginPage)
+	  Results.Redirect(routes.ABLogin.loginPage)
 	}
 	
+	/**
+	 * The template used to activate the authentication.
+	 * 
+	 * @param f The param object used in every method called from the request.
+	 */
 	def withAuth(f: => String => Request[AnyContent] => Result) = {
 	  Security.Authenticated(username, onAuthorized) {user =>
 	    println("Entering withAuth")

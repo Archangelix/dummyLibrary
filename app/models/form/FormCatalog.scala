@@ -1,6 +1,6 @@
 package models.form
 
-import models.Catalog
+import models.OBCatalog
 
 /**
  * Catalog form object. A business object has to be mapped to / from this form object 
@@ -19,7 +19,7 @@ case class FormCatalog(
 )
 
 object FormCatalog {
-  def apply(pCatalog: Catalog): FormCatalog = {
+  def apply(pCatalog: OBCatalog): FormCatalog = {
     FormCatalog(pCatalog.idx, pCatalog.id, pCatalog.title, pCatalog.author, 
         pCatalog.publishedYear)
   }

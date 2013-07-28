@@ -1,7 +1,7 @@
 @(mode: String, myForm: Form[form.FormCatalog], books: List[form.FormBook])(implicit session: Session)
 
-@import controllers.CatalogDetailAction.MODE_ADD
-@import controllers.CatalogDetailAction.MODE_EDIT
+@import controllers.ABCatalogDetail.MODE_ADD
+@import controllers.ABCatalogDetail.MODE_EDIT
 
 <html>
 <head>
@@ -18,7 +18,7 @@
 </head>
 <body>
 	@header(session)
-	<form action="@routes.CatalogDetailAction.save" method="POST">
+	<form action="@routes.ABCatalogDetail.save" method="POST">
 		<div align="center">
 		<h1>
 			@if(mode.equals(MODE_ADD)) { 

@@ -3,23 +3,23 @@
 # ~~~~
 
 # Home page
-GET		/										controllers.LoginAction.loginPage
-POST	/										controllers.LoginAction.login
-GET		/logout									controllers.LoginAction.logout
-GET     /list                       			controllers.CatalogListAction.index
-GET     /first                      			controllers.CatalogListAction.navigateFirst
-GET     /prev                       			controllers.CatalogListAction.navigatePrev
-GET     /next                       			controllers.CatalogListAction.navigateNext
-GET     /last                       			controllers.CatalogListAction.navigateLast
-GET		/:id/edit								controllers.CatalogDetailAction.edit(id)
-GET		/:id/delete								controllers.CatalogListAction.remove(id)
-GET		/newcatalog								controllers.CatalogDetailAction.gotoNewCatalog
-POST	/newcatalog								controllers.CatalogDetailAction.save
-GET		/bookdetail/:catalogid/new				controllers.BookDetailAction.newBook(catalogid)
-POST	/bookdetail/:catalogid/new/save			controllers.BookDetailAction.saveNew(catalogid)
-GET		/bookdetail/:catalogid/:bookid			controllers.BookDetailAction.view(catalogid, bookid)
-GET		/bookdetail/:catalogid/:bookid/edit		controllers.BookDetailAction.edit(catalogid, bookid)
-POST	/bookdetail/:catalogid/:bookid/save		controllers.BookDetailAction.saveUpdate(catalogid, bookid)
+GET		/										controllers.ABLogin.loginPage
+POST	/										controllers.ABLogin.login
+GET		/logout									controllers.ABLogin.logout
+GET     /list                       			controllers.ABCatalogList.index
+GET     /first                      			controllers.ABCatalogList.navigateFirst
+GET     /prev                       			controllers.ABCatalogList.navigatePrev
+GET     /next                       			controllers.ABCatalogList.navigateNext
+GET     /last                       			controllers.ABCatalogList.navigateLast
+GET		/:id/edit								controllers.ABCatalogDetail.edit(id)
+GET		/:id/delete								controllers.ABCatalogList.remove(id)
+GET		/newcatalog								controllers.ABCatalogDetail.gotoNewCatalog
+POST	/newcatalog								controllers.ABCatalogDetail.save
+GET		/bookdetail/:catalogid/new				controllers.ABBookDetail.newBook(catalogid)
+POST	/bookdetail/:catalogid/new/save			controllers.ABBookDetail.saveNew(catalogid)
+GET		/bookdetail/:catalogid/:bookid			controllers.ABBookDetail.view(catalogid, bookid)
+GET		/bookdetail/:catalogid/:bookid/edit		controllers.ABBookDetail.edit(catalogid, bookid)
+POST	/bookdetail/:catalogid/:bookid/save		controllers.ABBookDetail.saveUpdate(catalogid, bookid)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

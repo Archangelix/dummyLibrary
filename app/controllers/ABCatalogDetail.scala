@@ -2,7 +2,7 @@ package controllers
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import models.Catalog
+import models.OBCatalog
 import models.db.DBCatalog
 import play.api.data.Form
 import play.api.data.Forms._
@@ -18,7 +18,7 @@ import controllers.util.MySession
 /**
  * Action to handle the catalog section, including the add, update, delete, and view.
  */
-object CatalogDetailAction extends Controller with TSecured {
+object ABCatalogDetail extends Controller with TSecured {
 
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
@@ -41,7 +41,7 @@ object CatalogDetailAction extends Controller with TSecured {
       formCatalog =>
         formCatalog.id == null || {
           // There shouldn't be any duplicate catalogs in the database.
-          val dbCatalogs = DBService.findDuplicates(Catalog(formCatalog, List()))
+          val dbCatalogs = DBService.findDuplicates(OBCatalog(formCatalog, List()))
           dbCatalogs.size == 0 || dbCatalogs.size == 1 && dbCatalogs.get(0).id == formCatalog.id
         }
     }))
@@ -94,7 +94,7 @@ object CatalogDetailAction extends Controller with TSecured {
         } else {
           DBService.updateCatalog(data.id.get, data.title, data.author, data.publishedYear)
         }
-        Redirect(routes.CatalogListAction.index()).withSession(session - "mode")
+        Redirect(routes.ABCatalogList.index()).withSession(session - "mode")
       })
   }
 

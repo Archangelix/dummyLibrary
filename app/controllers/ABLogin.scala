@@ -1,6 +1,6 @@
 package controllers
 
-import models.User
+import models.OBUser
 import models.db.DBUser
 import models.form.FormUserPassword
 import play.api.data.Form
@@ -16,7 +16,7 @@ import play.api.mvc.Security
 /**
  * Action to handle the logging section.
  */
-object LoginAction extends Controller {
+object ABLogin extends Controller {
 
   val loginForm = Form[FormUserPassword](
       mapping (
@@ -50,7 +50,7 @@ object LoginAction extends Controller {
 	      session.get("abc")
 	      val formUsername = data.username
 	      val dbUser = DBService.findByUserID(formUsername)
-    	  Redirect(routes.CatalogListAction.index).withSession(Security.username -> formUsername)
+    	  Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
 	    } catch {
 	      case e: Exception => {
 	        e.printStackTrace()
@@ -62,7 +62,7 @@ object LoginAction extends Controller {
   }
   
   def logout = Action { implicit req =>
-    Redirect(routes.LoginAction.loginPage).withNewSession.flashing("message" -> "Log out successful.")
+    Redirect(routes.ABLogin.loginPage).withNewSession.flashing("message" -> "Log out successful.")
   }
   
 }

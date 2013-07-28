@@ -9,12 +9,12 @@ import java.util.Calendar
 import play.api.data.Form
 import java.text.SimpleDateFormat
 import services.DBService
-import models.Book
+import models.OBBook
 
 /**
  * Action to handle the book section, including the add, update, delete, and view.
  */
-object BookDetailAction extends Controller with TSecured {
+object ABBookDetail extends Controller with TSecured {
 
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
@@ -60,9 +60,9 @@ object BookDetailAction extends Controller with TSecured {
       },
       data => {
         val newBookID = DBService.generateNewBookID(pCatalogID.toInt)
-        val newBook = Book(data)
+        val newBook = OBBook(data)
         DBService.createBook(newBook.catalogID, newBookID, newBook.origin, newBook.remarks)
-    	Redirect(routes.CatalogDetailAction.edit(pCatalogID))
+    	Redirect(routes.ABCatalogDetail.edit(pCatalogID))
       }
     )
   }

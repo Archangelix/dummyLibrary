@@ -28,7 +28,7 @@ function removeCatalog(pURL) {
 </head>
 <body>
 	@header(session)
-	<form action="@routes.CatalogListAction.index" method="POST">
+	<form action="@routes.ABCatalogList.index" method="POST">
 	<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
 	<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
 	<h1><p align="center">DUMMY LIBRARY</p></h1>
@@ -52,8 +52,8 @@ function removeCatalog(pURL) {
 				<td>@catalog.author</td>
 				<td>@catalog.publishedYear</td>
 				<td align="center">
-					<a href="@routes.CatalogDetailAction.edit(catalog.id.get.toString)">Edit</a> /
-					<a href="javascript:removeCatalog('@routes.CatalogListAction.remove(catalog.id.get.toString)')">Remove</a>
+					<a href="@routes.ABCatalogDetail.edit(catalog.id.get.toString)">Edit</a> /
+					<a href="javascript:removeCatalog('@routes.ABCatalogList.remove(catalog.id.get.toString)')">Remove</a>
 				</td>
 			</tr>
 			}
@@ -66,10 +66,10 @@ function removeCatalog(pURL) {
 				<td colspan="4" align="right">Page: @pCurrentPageIdx / @pMaxPageIdx</td>
 			</tr>
 			<tr>
-				<td><a href="@routes.CatalogListAction.navigateFirst">First</a></td>
-				<td><a href="@routes.CatalogListAction.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a></td>
-				<td><a href="@routes.CatalogListAction.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a></td>
-				<td><a href="@routes.CatalogListAction.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a></td>
+				<td><a href="@routes.ABCatalogList.navigateFirst">First</a></td>
+				<td><a href="@routes.ABCatalogList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a></td>
+				<td><a href="@routes.ABCatalogList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a></td>
+				<td><a href="@routes.ABCatalogList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a></td>
 			</tr>
 			<tr>
 				<td colspan=4>

@@ -17,10 +17,10 @@
 </head>
 <body>
 	@header(session)
-	<form action="@routes.BookDetailAction.saveNew(pCatalogID)" method="POST">
+	<form action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST">
 		<div align="center">
 		<h1>
-			@if(mode.equals(BookDetailAction.MODE_ADD)) { 
+			@if(mode.equals(ABBookDetail.MODE_ADD)) { 
 			  ADD A NEW BOOK 
 			} else { 
 			  EDIT A BOOK 

@@ -1,6 +1,6 @@
 package controllers
 
-import models.Catalog
+import models.OBCatalog
 import models.form.FormCatalog
 import play.api.Play.current
 import play.api.cache.Cache
@@ -16,7 +16,7 @@ import services.DBService
  * Action to handle the catalog listing section. A catalog can be removed
  * from this listing page.
  */
-object CatalogListAction extends Controller with TSecured {
+object ABCatalogList extends Controller with TSecured {
   
   val CURRENT_PAGE = "currentPage"
   val CURRENT_PAGE_IDX = "currentPageIdx"
@@ -36,7 +36,7 @@ object CatalogListAction extends Controller with TSecured {
    */
   def index = withAuth {username => implicit req =>
     val params = listingForm.bindFromRequest
-    val currentPage = Cache.getAs[(List[Catalog], Int, Int)](CURRENT_PAGE)
+    val currentPage = Cache.getAs[(List[OBCatalog], Int, Int)](CURRENT_PAGE)
     Cache.remove(CURRENT_PAGE)
     val (list1, rowCount, currentPageIdx) = currentPage.getOrElse {
       val res = DBService.partialCatalogs(1)
@@ -52,7 +52,7 @@ object CatalogListAction extends Controller with TSecured {
   def navigateFirst = withAuth {username => implicit req =>
     val (list1, rowCnt) = DBService.partialCatalogs(1)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
-    Redirect(routes.CatalogListAction.index)
+    Redirect(routes.ABCatalogList.index)
   }
   
   /**
@@ -63,7 +63,7 @@ object CatalogListAction extends Controller with TSecured {
     val nextPageIdx = if (currentPageIdx<=1) 1 else currentPageIdx-1
     val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
-    Redirect(routes.CatalogListAction.index)
+    Redirect(routes.ABCatalogList.index)
   }
   
   /**
@@ -77,7 +77,7 @@ object CatalogListAction extends Controller with TSecured {
     println("nextPage = "+nextPageIdx)
     val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
-    Redirect(routes.CatalogListAction.index)
+    Redirect(routes.ABCatalogList.index)
   }
   
   /**
@@ -87,7 +87,7 @@ object CatalogListAction extends Controller with TSecured {
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
     val (list1, rowCnt) = DBService.partialCatalogs(maxPage)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, maxPage))
-    Redirect(routes.CatalogListAction.index)
+    Redirect(routes.ABCatalogList.index)
   }
   
   def edit(pIDStr: String) = TODO
@@ -97,7 +97,7 @@ object CatalogListAction extends Controller with TSecured {
    */
   def remove(pIDStr: String) = withAuth {username => implicit req =>
     DBService.deleteCatalog(pIDStr.toInt)
-    Redirect(routes.CatalogListAction.index())
+    Redirect(routes.ABCatalogList.index())
   }
   
   def isBlank(str: String) = str==null || str.trim().equals("")

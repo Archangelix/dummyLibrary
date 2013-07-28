@@ -4,15 +4,16 @@ import java.util.Date
 
 import anorm._
 import anorm.SqlParser._
-import models.Catalog
-import models.User
+import models.OBCatalog
+import models.OBUser
 import models.db._
 import models.exception.UserNotFoundException
 import play.api.Play.current
 import play.api.db._
 
 /**
- * Within this service layer the user will process all the database request. 
+ * This object serves as a bridge between the Business layer and Database layer.
+ * Within this service object the user will process all the database request. 
  * All the results returned from this layer will already be in forms of 
  * Business Object instead of Database object.
  */
@@ -88,7 +89,7 @@ object DBService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findByUserID(pUserID: String): User = {
+	def findByUserID(pUserID: String): OBUser = {
 	  DB.withConnection{ implicit c => 
 	    val list = SQL("SELECT * FROM USERS WHERE userid={userID}")
 	    	.on('userID -> pUserID).as(dbUserMapping *)
@@ -96,7 +97,7 @@ object DBService {
 	      println("User "+pUserID+" cannot be found!")
 	      throw UserNotFoundException(pUserID)
 	    }
-	    User(list(0))
+	    OBUser(list(0))
 	  }
 	}
 	
@@ -126,10 +127,10 @@ object DBService {
   	 * 
   	 * @return The list of all User business objects.
   	 */
-	def all(): List[User] = {
+	def all(): List[OBUser] = {
 	  DB.withConnection{ implicit c => 
 	    val list = SQL("SELECT * FROM USERS").as(dbUserMapping *)
-	    list.map(dbUser => User(dbUser))
+	    list.map(dbUser => OBUser(dbUser))
 	  }
 	}
 
@@ -201,7 +202,7 @@ object DBService {
 	 * @param pageIDX The page index.
 	 * @return The list of catalogs for a particular page without the books information.
 	 */
-	def partialCatalogs(pageIdx: Int): (List[Catalog], Int) = partialCatalogs(pageIdx, false)
+	def partialCatalogs(pageIdx: Int): (List[OBCatalog], Int) = partialCatalogs(pageIdx, false)
 	
 	/**
 	 * Fetches the list of catalogs for a particular page with / without the books information.
@@ -210,7 +211,7 @@ object DBService {
 	 * @param pWithBooks The indicator whether to get the books detail as well or not.
 	 * @return The list of catalogs for a particular page with / without the books information.
 	 */
-	def partialCatalogs(pageIdx: Int, pWithBooks: Boolean): (List[Catalog], Int) = DB.withConnection { implicit c =>
+	def partialCatalogs(pageIdx: Int, pWithBooks: Boolean): (List[OBCatalog], Int) = DB.withConnection { implicit c =>
   	  val startIdx = (pageIdx-1)*PAGE_ROW_CNT+1
   	  val endIdx = pageIdx*PAGE_ROW_CNT
   	  val list = SQL("select * from (" +
@@ -223,10 +224,10 @@ object DBService {
   	  if (pWithBooks) {
   		  (list.map(dbCatalog => {
   		    val books = allBooksByCatalogID(dbCatalog.id.get)
-  		    Catalog(dbCatalog, books)
+  		    OBCatalog(dbCatalog, books)
   		  }), cnt.toInt)
   	  } else {
-  		  (list.map(dbCatalog => Catalog(dbCatalog, List[DBBook]())), cnt.toInt)
+  		  (list.map(dbCatalog => OBCatalog(dbCatalog, List[DBBook]())), cnt.toInt)
   	  }
   	}
   	
@@ -236,7 +237,7 @@ object DBService {
 	 * @param pageIDX The page index.
 	 * @return The list of all catalogs without the books information.
 	 */
-  	def allCatalogs(): List[Catalog] = allCatalogs(false)
+  	def allCatalogs(): List[OBCatalog] = allCatalogs(false)
   	  
 	/**
 	 * Fetches the list of all catalogs without the books information.
@@ -245,16 +246,16 @@ object DBService {
 	 * @param pWithBooks The indicator whether to get the books detail as well or not.
 	 * @return The list of all catalogs.
 	 */
-  	def allCatalogs(pWithBooks: Boolean): List[Catalog] = DB.withConnection { implicit c =>
+  	def allCatalogs(pWithBooks: Boolean): List[OBCatalog] = DB.withConnection { implicit c =>
 	  val list = SQL("select * from (select row_number() over() idx, * from CATALOG) " +
 	  		"order by idx").as(dbCatalogListMapping *)
 	  if (pWithBooks) {
   		  list.map(dbCatalog => {
   		    val books = allBooksByCatalogID(dbCatalog.id.get)
-  		    Catalog(dbCatalog, books)
+  		    OBCatalog(dbCatalog, books)
   		  })
   	  } else {
-  		  list.map(dbCatalog => Catalog(dbCatalog, List[DBBook]()))
+  		  list.map(dbCatalog => OBCatalog(dbCatalog, List[DBBook]()))
   	  }
 	}
 	
@@ -297,7 +298,7 @@ object DBService {
 	 * @param pID The catalog ID to be fetched.
 	 * @return The queried catalog.
 	 */
-	def findCatalogByID(pID: Long): Catalog = {
+	def findCatalogByID(pID: Long): OBCatalog = {
 	  findCatalogByID(pID, false)
 	}
 	
@@ -309,7 +310,7 @@ object DBService {
 	 * @param pWithBooks The indicator whether to get the books detail as well or not.
 	 * @return The queried catalog.
 	 */
-	def findCatalogByID(pID: Long, pWithBooks: Boolean): Catalog = {
+	def findCatalogByID(pID: Long, pWithBooks: Boolean): OBCatalog = {
 	  DB.withConnection { implicit c =>
 	  	val list = SQL("select * from CATALOG where id={id}").on('id -> pID
 	  			).as(dbCatalogDetailMapping *)
@@ -318,9 +319,9 @@ object DBService {
 	  	  println("with books = true")
 	  	  val books = allBooksByCatalogID(dbCatalog.id.get)
 	  	  println("Number of books = "+books.size)
-	  	  Catalog(list(0), books)
+	  	  OBCatalog(list(0), books)
 	  	} else {
-	  	  Catalog(dbCatalog, List[DBBook]())
+	  	  OBCatalog(dbCatalog, List[DBBook]())
 	  	}
 	  }
 	}
@@ -332,7 +333,7 @@ object DBService {
 	 * @return <code>None</code> if no duplicates are found. Otherwise it returns the
 	 * list of duplicates.
 	 */
-	def findDuplicates(pCatalog: Catalog) = {
+	def findDuplicates(pCatalog: OBCatalog) = {
 	  DB.withConnection { implicit c => 
 	    val res = SQL ("select * from CATALOG where title={title} and author={author} and publishedYear={publishedYear}")
 	    	.on('title -> pCatalog.title, 'author -> pCatalog.author, 'publishedYear -> pCatalog.publishedYear)

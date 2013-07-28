@@ -1,6 +1,6 @@
 package models.form
 
-import models.Book
+import models.OBBook
 
 /**
  * Book form object. A business object has to be mapped to / from this form object 
@@ -13,7 +13,7 @@ import models.Book
 case class FormBook(idx: Option[Long], id: Option[Long], catalogID: Long, origin: String, remarks: String)
 
 object FormBook {
-  def apply(pBook: Book): FormBook = {
+  def apply(pBook: OBBook): FormBook = {
     FormBook(None, pBook.id, pBook.catalogID, pBook.origin, pBook.remarks)
   }
 }
