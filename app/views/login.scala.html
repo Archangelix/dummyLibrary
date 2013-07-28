@@ -1,4 +1,4 @@
-@(myForm: Form[form.FormUserPassword])
+@(myForm: Form[form.FormUserPassword])(implicit flash: Flash)
 
 <html>
 <head>
@@ -14,6 +14,12 @@
 </style>
 </head>
 <body>
+@defining(flash.get("message")) { message =>
+	@if(message != None) {
+		@message
+		<br/><br/>
+	}
+}
 	<form action="@routes.ABLogin.loginPage" method="POST">
 	<table>
 	<div align="left">
@@ -30,7 +36,7 @@
 	<table>
 		<tr>
 			<td>Username</td>
-			<td>@myInput(myForm("username"), 
+			<td>@input(myForm("username"), 
 				'placeholder -> "Username"
 				)
 			</td>

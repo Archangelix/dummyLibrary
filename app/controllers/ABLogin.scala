@@ -12,6 +12,8 @@ import models.db.DBUserPassword
 import services.DBService
 import play.mvc.Http.Session
 import play.api.mvc.Security
+import play.api.mvc.Flash
+import play.api.mvc.WithHeaders
 
 /**
  * Action to handle the logging section.
@@ -32,7 +34,7 @@ object ABLogin extends Controller {
   /**
    * Displaying the login page.
    */
-  def loginPage = Action {
+  def loginPage = Action { implicit req =>
     Ok(views.html.login(loginForm))
   }
   
@@ -62,7 +64,7 @@ object ABLogin extends Controller {
   }
   
   def logout = Action { implicit req =>
-    Redirect(routes.ABLogin.loginPage).withNewSession.flashing("message" -> "Log out successful.")
+    Redirect(routes.ABLogin.loginPage).withNewSession.flashing("message" -> "Log out successful!")
   }
   
 }
