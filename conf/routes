@@ -6,7 +6,7 @@
 GET		/										controllers.ABLogin.loginPage
 POST	/										controllers.ABLogin.login
 GET		/logout									controllers.ABLogin.logout
-GET     /list                       			controllers.ABCatalogList.index
+GET     /cataloglist                   			controllers.ABCatalogList.index
 GET     /first                      			controllers.ABCatalogList.navigateFirst
 GET     /prev                       			controllers.ABCatalogList.navigatePrev
 GET     /next                       			controllers.ABCatalogList.navigateNext

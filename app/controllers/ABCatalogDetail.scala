@@ -50,7 +50,7 @@ object ABCatalogDetail extends Controller with TSecured {
    * Displaying the catalog detail page with blank information.
    */
   def gotoNewCatalog() = withAuth {username => implicit req =>
-    Ok(views.html.newCatalog(MODE_ADD, catalogForm, List())(session)).withSession(
+    Ok(views.html.catalog_detail(MODE_ADD, catalogForm, List())(session)).withSession(
         session + ("mode" -> MODE_ADD))
   }
 
@@ -67,7 +67,7 @@ object ABCatalogDetail extends Controller with TSecured {
     
     val username = session.get("username").getOrElse("")
     MySession.put(username, "formBooks", formBooks)
-    Ok(views.html.newCatalog(MODE_EDIT, filledForm, formBooks)(session)).withSession(
+    Ok(views.html.catalog_detail(MODE_EDIT, filledForm, formBooks)(session)).withSession(
         session + ("mode" -> MODE_EDIT))
   }
   
@@ -86,7 +86,7 @@ object ABCatalogDetail extends Controller with TSecured {
           println(err.message)
         }
         val formBooks = flashBooks.asInstanceOf[List[FormBook]]
-        BadRequest(views.html.newCatalog(mode, tempForm, formBooks)(session))
+        BadRequest(views.html.catalog_detail(mode, tempForm, formBooks)(session))
       },
       data => {
         if (mode.equals(MODE_ADD)) {
