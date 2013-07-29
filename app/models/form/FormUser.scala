@@ -12,7 +12,7 @@ import java.util.Date
  * In this layer by default <code>isDeleted</code> attribute is always <code>false</code>.
  */
 case class FormUser(
-    rowIdx: Long,
+    rowIdx: Option[Long],
     seqNo: Option[Long], 
     userID: String, 
     name: String, 

@@ -61,6 +61,20 @@ object DBService {
   }
 
 	val dbUserMapping = {
+	  get[Long]("seqNo") ~
+	  get[String]("userID") ~
+	  get[String]("name") ~
+	  get[String]("address") ~
+	  get[Date]("dob") ~ 
+	  get[Long]("user_role_id") ~
+	  get[String]("user_role.name") ~
+	  get[Boolean]("is_deleted") map {
+	    case seqNo~userID~name~address~dob~userRoleID~userRoleName~isDeleted =>
+	      DBUser(None, Some(seqNo), userID, name, address, dob, userRoleID, userRoleName, isDeleted)
+	  }
+	}
+	
+	val dbUserListMapping = {
 	  get[Long]("rowIdx") ~
 	  get[Long]("seqNo") ~
 	  get[String]("userID") ~
@@ -71,7 +85,7 @@ object DBService {
 	  get[String]("user_role_name") ~
 	  get[Boolean]("is_deleted") map {
 	    case rowIdx~seqNo~userID~name~address~dob~userRoleID~userRoleName~isDeleted =>
-	      DBUser(rowIdx, Some(seqNo), userID, name, address, dob, userRoleID, userRoleName, isDeleted)
+	      DBUser(Some(rowIdx), Some(seqNo), userID, name, address, dob, userRoleID, userRoleName, isDeleted)
 	  }
 	}
 	
@@ -93,7 +107,7 @@ object DBService {
 	 */
 	def findByUserID(pUserID: String): OBUser = {
 	  DB.withConnection{ implicit c => 
-	    val list = SQL("SELECT USERS.* " +
+	    val list = SQL("SELECT USERS.*, USER_ROLE.* " +
 	    		"FROM USERS, USER_ROLE " +
 	    		"WHERE USERS.USER_ROLE_ID = USER_ROLE.ID AND userid={userID}")
 	    	.on('userID -> pUserID).as(dbUserMapping *)
@@ -400,7 +414,7 @@ object DBService {
   	  				") tempUser " +
   	  				"where rowIdx<={endIdx} and rowIdx>={startIdx} order by rowIdx")
   	  				.on ('startIdx -> startIdx, 'endIdx -> endIdx)
-  	  				.as(dbUserMapping *)
+  	  				.as(dbUserListMapping *)
   	  val firstRow = SQL("select COUNT(*) c from USERS").apply.head
   	  val cnt = firstRow[Long]("c")
   	  

@@ -7,7 +7,7 @@ import models.db.DBUser
  * User model business object. This is the object used for all business processes.
  */
 case class OBUser (
-    rowIdx: Long,
+    rowIdx: Option[Long],
     seqNo: Option[Long], 
     userID: String, 
     name: String, 

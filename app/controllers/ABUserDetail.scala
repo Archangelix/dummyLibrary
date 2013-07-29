@@ -24,7 +24,7 @@ object ABUserDetail extends Controller with TSecured {
   val MODE_EDIT = "EDIT"
   
   val formUserMapping = mapping(
-      "rowIdx" -> of[Long],
+      "rowIdx" -> optional(of[Long]),
       "seqNo" -> optional(of[Long]),
       "userID" -> nonEmptyText,
       "name" -> nonEmptyText,
