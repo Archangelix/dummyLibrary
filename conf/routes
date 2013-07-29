@@ -21,6 +21,10 @@ GET		/bookdetail/:catalogid/:bookid			controllers.ABBookDetail.view(catalogid, b
 GET		/bookdetail/:catalogid/:bookid/edit		controllers.ABBookDetail.edit(catalogid, bookid)
 POST	/bookdetail/:catalogid/:bookid/save		controllers.ABBookDetail.saveUpdate(catalogid, bookid)
 GET     /useradmin                   			controllers.ABUserList.listUsers
+GET     /firstUser                     			controllers.ABUserList.navigateFirst
+GET     /prevUser                      			controllers.ABUserList.navigatePrev
+GET     /nextUser                      			controllers.ABUserList.navigateNext
+GET     /lastUser                      			controllers.ABUserList.navigateLast
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

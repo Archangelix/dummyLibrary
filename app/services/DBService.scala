@@ -1,7 +1,6 @@
 package services
 
 import java.util.Date
-
 import anorm._
 import anorm.SqlParser._
 import models.OBCatalog
@@ -10,6 +9,7 @@ import models.db._
 import models.exception.UserNotFoundException
 import play.api.Play.current
 import play.api.db._
+import models.OBUserRole
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -61,15 +61,17 @@ object DBService {
   }
 
 	val dbUserMapping = {
+	  get[Long]("rowIdx") ~
 	  get[Long]("seqNo") ~
 	  get[String]("userID") ~
 	  get[String]("name") ~
 	  get[String]("address") ~
 	  get[Date]("dob") ~ 
 	  get[Long]("user_role_id") ~
+	  get[String]("user_role_name") ~
 	  get[Boolean]("is_deleted") map {
-	    case seqNo~userID~name~address~dob~userRoleID~isDeleted =>
-	      DBUser(Some(seqNo), userID, name, address, dob, userRoleID, isDeleted)
+	    case rowIdx~seqNo~userID~name~address~dob~userRoleID~userRoleName~isDeleted =>
+	      DBUser(rowIdx, Some(seqNo), userID, name, address, dob, userRoleID, userRoleName, isDeleted)
 	  }
 	}
 	
@@ -91,13 +93,16 @@ object DBService {
 	 */
 	def findByUserID(pUserID: String): OBUser = {
 	  DB.withConnection{ implicit c => 
-	    val list = SQL("SELECT * FROM USERS WHERE userid={userID}")
+	    val list = SQL("SELECT USERS.* " +
+	    		"FROM USERS, USER_ROLE " +
+	    		"WHERE USERS.USER_ROLE_ID = USER_ROLE.ID AND userid={userID}")
 	    	.on('userID -> pUserID).as(dbUserMapping *)
 	    if (list==null || list.size==0) {
 	      println("User "+pUserID+" cannot be found!")
 	      throw UserNotFoundException(pUserID)
 	    }
-	    OBUser(list(0))
+	    val dbUser = list(0)
+	    OBUser(dbUser, OBUserRole(dbUser.userRoleID, dbUser.userRoleName))
 	  }
 	}
 	
@@ -126,13 +131,13 @@ object DBService {
   	 * Getting the list of all users.
   	 * 
   	 * @return The list of all User business objects.
-  	 */
+  	 *
 	def all(): List[OBUser] = {
 	  DB.withConnection{ implicit c => 
 	    val list = SQL("SELECT * FROM USERS").as(dbUserMapping *)
 	    list.map(dbUser => OBUser(dbUser))
 	  }
-	}
+	}*/
 
 	/**
 	 * Insert a new book.
@@ -318,7 +323,6 @@ object DBService {
 	  	if (pWithBooks) {
 	  	  println("with books = true")
 	  	  val books = allBooksByCatalogID(dbCatalog.id.get)
-	  	  println("Number of books = "+books.size)
 	  	  OBCatalog(list(0), books)
 	  	} else {
 	  	  OBCatalog(dbCatalog, List[DBBook]())
@@ -379,4 +383,30 @@ object DBService {
 	  }
 	}
 	
+	/**
+	 * Fetches the list of users for a particular page.
+	 * 
+	 * @param pageIDX The page index.
+	 * @return The list of users for a particular page.
+	 */
+	def partialUsers(pageIdx: Int): (List[OBUser], Int) = DB.withConnection { implicit c =>
+  	  val startIdx = (pageIdx-1)*PAGE_ROW_CNT+1
+  	  val endIdx = pageIdx*PAGE_ROW_CNT
+  	  val list = SQL("select * from (" +
+  	  					"select row_number() over(order by USERS.SEQNO) as rowIdx, " +
+  	  					"	USERS.*, USER_ROLE.ID, USER_ROLE.NAME USER_ROLE_NAME " +
+  	  					"from USERS, USER_ROLE " +
+  	  					"where USERS.USER_ROLE_ID = USER_ROLE.id" +
+  	  				") tempUser " +
+  	  				"where rowIdx<={endIdx} and rowIdx>={startIdx} order by rowIdx")
+  	  				.on ('startIdx -> startIdx, 'endIdx -> endIdx)
+  	  				.as(dbUserMapping *)
+  	  val firstRow = SQL("select COUNT(*) c from USERS").apply.head
+  	  val cnt = firstRow[Long]("c")
+  	  
+  	  (list.map(dbUser => OBUser(dbUser, 
+  	      OBUserRole(dbUser.userRoleID, dbUser.userRoleName))
+  	  ), cnt.toInt)
+  	}
+  	
 }

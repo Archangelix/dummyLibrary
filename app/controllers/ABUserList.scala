@@ -1,7 +1,7 @@
 package controllers
 
-import models.OBCatalog
-import models.form.FormCatalog
+import models.OBUser
+import models.form.FormUser
 import play.api.Play.current
 import play.api.cache.Cache
 import play.api.data.Form
@@ -14,10 +14,9 @@ import services.DBService
 
 object ABUserList extends Controller with TSecured {
   
-  val CURRENT_PAGE = "currentPage"
-  val CURRENT_PAGE_IDX = "currentPageIdx"
+  val CURRENT_PAGE = "userCurrentPage"
+  val CURRENT_PAGE_IDX = "userCurrentPageIdx"
   val MAX_PAGE_IDX = "maxPageIdx"
-  val CURRENT_LIST = "currentList"
   val ITEMS_PER_VIEW = 5 
     
   val listingForm = Form (
@@ -28,32 +27,42 @@ object ABUserList extends Controller with TSecured {
   )
   
   /**
-   * Displaying the list of catalogs for a corresponding page index.
+   * Displaying the list of users for a corresponding page index.
    */
-  def listUsers = TODO
-  
-  /**
-   * Displaying the first page of the catalog list.
-   */
-  def navigateFirst = withAuth {username => implicit req =>
-    val (list1, rowCnt) = DBService.partialCatalogs(1)
-    Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
-    Redirect(routes.ABCatalogList.index)
+  def listUsers = withAuth {username => implicit req => 
+    val params = listingForm.bindFromRequest
+    val currentPage = Cache.getAs[(List[OBUser], Int, Int)](CURRENT_PAGE)
+    Cache.remove(CURRENT_PAGE)
+    val (list1, rowCount, currentPageIdx) = currentPage.getOrElse {
+      val res = DBService.partialUsers(1)
+      (res._1, res._2, 1)
+    }
+    val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
+    Ok(views.html.user_list(currentPageIdx, maxPage, list1.map(user => FormUser(user)))(session))
   }
   
   /**
-   * Displaying the previous page of the catalog list.
+   * Displaying the first page of the user list.
+   */
+  def navigateFirst = withAuth {username => implicit req =>
+    val (list1, rowCnt) = DBService.partialUsers(1)
+    Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
+    Redirect(routes.ABUserList.listUsers())
+  }
+  
+  /**
+   * Displaying the previous page of the user list.
    */
   def navigatePrev = withAuth {username => implicit req =>
     val currentPageIdx = req.queryString.get("currentPageIdx").flatMap(_.headOption).get.toInt
     val nextPageIdx = if (currentPageIdx<=1) 1 else currentPageIdx-1
-    val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
+    val (list1, rowCnt) = DBService.partialUsers(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
-    Redirect(routes.ABCatalogList.index)
+    Redirect(routes.ABUserList.listUsers())
   }
   
   /**
-   * Displaying the next page of the catalog list.
+   * Displaying the next page of the user list.
    */
   def navigateNext = withAuth {username => implicit req =>
     val currentPageIdx = req.queryString.get("currentPageIdx").flatMap(_.headOption).get.toInt
@@ -61,30 +70,25 @@ object ABUserList extends Controller with TSecured {
     val nextPageIdx = if (currentPageIdx>=maxPage) maxPage else currentPageIdx+1
     println("maxPage = "+maxPage)
     println("nextPage = "+nextPageIdx)
-    val (list1, rowCnt) = DBService.partialCatalogs(nextPageIdx)
+    val (list1, rowCnt) = DBService.partialUsers(nextPageIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
-    Redirect(routes.ABCatalogList.index)
+    Redirect(routes.ABUserList.listUsers())
   }
   
   /**
-   * Displaying the last page of the catalog list.
+   * Displaying the last page of the user list.
    */
   def navigateLast = withAuth {username => implicit req =>
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
-    val (list1, rowCnt) = DBService.partialCatalogs(maxPage)
+    val (list1, rowCnt) = DBService.partialUsers(maxPage)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, maxPage))
-    Redirect(routes.ABCatalogList.index)
+    Redirect(routes.ABUserList.listUsers())
   }
-  
-  def edit(pIDStr: String) = TODO
   
   /**
-   * Removing a particular catalog from the listing page.
+   * Removing a particular user from the listing page.
    */
-  def remove(pIDStr: String) = withAuth {username => implicit req =>
-    DBService.deleteCatalog(pIDStr.toInt)
-    Redirect(routes.ABCatalogList.index())
-  }
+  def remove(pIDStr: String) = TODO
   
   def isBlank(str: String) = str==null || str.trim().equals("")
 }

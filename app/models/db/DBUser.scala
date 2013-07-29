@@ -7,11 +7,13 @@ import java.util.Date
  * in order to communicate with the database.
  */
 case class DBUser (
+    rowIdx: Long,
     seqNo: Option[Long], 
     userID: String, 
     name: String, 
     address: String, 
     dob: Date,
     userRoleID: Long,
+    userRoleName: String,
     isDeleted: Boolean
 )

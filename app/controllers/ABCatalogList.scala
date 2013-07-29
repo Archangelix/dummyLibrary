@@ -90,8 +90,6 @@ object ABCatalogList extends Controller with TSecured {
     Redirect(routes.ABCatalogList.index)
   }
   
-  def edit(pIDStr: String) = TODO
-  
   /**
    * Removing a particular catalog from the listing page.
    */

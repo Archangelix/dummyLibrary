@@ -1,0 +1,93 @@
+@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[form.FormUser])(implicit session: Session)
+<!-- usersList.scala.html -->
+
+@import helper._
+
+<html>
+<head>
+<title>Local Library</title>
+<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
+
+<script>
+function removeUser(pURL) {
+	if (confirm('Are you sure you want to delete this user?')) {
+		window.location = pURL;
+	}
+}
+</script>
+<script src="index.js"></script>
+</head>
+<body>
+	<table id="layout">
+		<col width="10%"/>
+		<col width="90%"/>
+		<tr height="10%">
+			<td colspan="2" align="center">
+				@header("LIST OF USERS", session)
+			</td>
+		</tr>
+		<tr valign="top">
+			<td width="10%">
+				@sidebar()
+			</td>
+			<td width="90%">
+				<form action="@routes.ABUserList.listUsers" method="POST">
+				<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
+				<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
+				<br/>
+				<div align="center">
+				@if(pList.isEmpty) {
+					The users are empty!
+				} else {
+					<table class="singlebordertable">
+						<tr>
+							<th width="5%">S/No</th>
+							<th width="25%">NAME</th>
+							<th width="35%">ADDRESS</th>
+							<th width="10%">DOB</th>
+							<th width="15%">ROLE</th>
+							<th width="10%">ACTION</th>
+						</tr>
+						@pList.map { user =>
+						<tr>
+							<td align="center">@user.rowIdx</td>
+							<td>@user.name</td>
+							<td>@user.address</td>
+							<td>@user.dob</td>
+							<td>@user.userRoleName</td>
+							<td align="center">
+								<a href="">Edit</a> /
+								<a href="">Remove</a>
+							</td>
+						</tr>
+						}
+					</table>
+				}
+				<br/>
+				<div align="center">
+					Page: @pCurrentPageIdx / @pMaxPageIdx
+					<table>
+						<tr>
+							<td align="center">
+								<a href="@routes.ABUserList.navigateFirst">First</a> |
+								<a href="@routes.ABUserList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a> |
+								<a href="@routes.ABUserList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a> |
+								<a href="@routes.ABUserList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=4>
+								
+							</td>
+						</tr>
+					</table>
+				</div>
+				<br/>
+				<a href="">Add a new user</a>
+				</div>
+				</form>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -7,16 +7,18 @@ import models.db.DBUser
  * User model business object. This is the object used for all business processes.
  */
 case class OBUser (
+    rowIdx: Long,
     seqNo: Option[Long], 
     userID: String, 
     name: String, 
     address: String, 
     dob: Date,
-    userRoleID: Long,
+    role: OBUserRole,
     isDeleted: Boolean
 )
 
 object OBUser {
-  def apply(pUser: DBUser): OBUser = OBUser(pUser.seqNo, pUser.userID, pUser.name, pUser.address, pUser.dob, pUser.userRoleID,
-      pUser.isDeleted)
+  def apply(pUser: DBUser, pUserRole: OBUserRole): OBUser = 
+    OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, pUser.address, 
+        pUser.dob, pUserRole, pUser.isDeleted)
 }
