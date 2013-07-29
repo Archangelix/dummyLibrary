@@ -1,10 +1,5 @@
-@(implicit session: Session)
+@(pPageTitle: String, session: Session)
 @import play.api.mvc.Security
 
-<table>
-	<tr>
-		<td align="right">
-			Hi, @session.get(Security.username).getOrElse("")! (<a href="/logout">Sign out</a>)
-		</td>
-	</tr>
-</table>
+<p align="right">Hi, @session.get(Security.username).getOrElse("")! (<a href="/logout">Sign out</a>)</p>
+<h1><p align="center">@pPageTitle</p></h1>

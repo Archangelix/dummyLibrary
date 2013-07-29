@@ -4,68 +4,63 @@
 
 <html>
 <head>
-<style>
-	
-	div.error {
-		color: red;
-	}
-
-	ul.error {
-		color: red;
-	}
-</style>
+<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
 </head>
 <body>
-	@header(session)
-	<form action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST">
-		<div align="center">
-		<h1>
-			@if(mode.equals(ABBookDetail.MODE_ADD)) { 
-			  ADD A NEW BOOK 
-			} else { 
-			  EDIT A BOOK 
-			}
-		</h1>
-		<br/><br/>
-		</div>
-		<div align="left">
-		@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
-			@if(errs.size>0) {
-				<ul class="error">
-				@errs.map { err =>
-					<li>@err.message</li>
-				}
-				</ul>
-			}
-		}
-		<input type="hidden" value="@myForm("id").value" name="@myForm("id").name"/>
-		<input type="hidden" value="@pCatalogID" name="@myForm("catalogID").name"/>
-		<table border="1">
-			<tr>
-				<td>Origin</td>
-				<td>@select(
-					  myForm("origin"),
-					  pOrigins.map{ t =>
-					    t._1 -> t._2
-					  },
-					  '_label -> "",
-					  '_default -> "Please select"
-					)(MyFieldConstructor, implicitly[Lang])
-				</td>
-			</tr>
-			<tr>
-				<td>Remarks</td>
-				<td>@myInput(myForm("remarks"), 
-					'placeholder -> "Remarks"
-					)
-				</td>
-			</tr>
-		</table>
-		<br/>
-		<input type="submit" name="addNewBook" value="Save"/>
-		<input type="button" name="btnCancel" value="Cancel" onclick="javascript:window.location='/cataloglist'"/>
-		</div>
-	</form>
-
+	<table id="layout">
+		<col width="10%"/>
+		<col width="90%"/>
+		<tr height="10%">
+			<td colspan="2" align="center">
+				@header("LIST OF CATALOGS", session)
+			</td>
+		</tr>
+		<tr valign="top">
+			<td width="10%">
+				@sidebar()
+			</td>
+			<td width="90%">
+				<form action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST">
+					<div align="left">
+					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
+						@if(errs.size>0) {
+							<ul class="error">
+							@errs.map { err =>
+								<li>@err.message</li>
+							}
+							</ul>
+						}
+					}
+					<input type="hidden" value="@myForm("id").value" name="@myForm("id").name"/>
+					<input type="hidden" value="@pCatalogID" name="@myForm("catalogID").name"/>
+					<table border="1">
+						<tr>
+							<td>Origin</td>
+							<td>@select(
+								  myForm("origin"),
+								  pOrigins.map{ t =>
+								    t._1 -> t._2
+								  },
+								  '_label -> "",
+								  '_default -> "Please select"
+								)(MyFieldConstructor, implicitly[Lang])
+							</td>
+						</tr>
+						<tr>
+							<td>Remarks</td>
+							<td>@myInput(myForm("remarks"), 
+								'placeholder -> "Remarks"
+								)
+							</td>
+						</tr>
+					</table>
+					<br/>
+					<input type="submit" name="addNewBook" value="Save"/>
+					<input type="button" name="btnCancel" value="Cancel" onclick="javascript:window.location='/cataloglist'"/>
+					</div>
+				</form>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>

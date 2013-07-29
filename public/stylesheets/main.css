@@ -1,0 +1,45 @@
+table {
+	border: 0px;
+	width:100%;
+}
+
+table.outbordertable {
+	border: 1px solid black;
+	border-collapse: collapse;
+	margin: 0;
+	padding: 5px;
+}
+
+table.outbordertable td {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 5px;
+}
+
+table.singlebordertable {
+	border: 1px solid black;
+	border-collapse: collapse;
+	margin: 0;
+}
+
+table.singlebordertable th {
+	border: 1px solid black;
+	border-collapse: collapse;
+	margin: 0;
+}
+
+table.singlebordertable td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	margin: 0;
+	padding: 5px;
+}
+
+p.error {
+	color: red;
+}
+body {
+ margin:0;
+ padding:0;
+}
+

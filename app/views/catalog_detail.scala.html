@@ -5,98 +5,111 @@
 
 <html>
 <head>
-<style>
-	
-	div.error {
-		color: red;
-	}
-
-	ul.error {
-		color: red;
-	}
-</style>
+<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
 </head>
 <body>
-	@header(session)
-	<form action="@routes.ABCatalogDetail.save" method="POST">
-		<div align="center">
-		<h1>
-			@if(mode.equals(MODE_ADD)) { 
-			  ADD A NEW CATALOG 
-			} else { 
-			  EDIT A CATALOG 
+	<table id="layout">
+		<col width="10%"/>
+		<col width="90%"/>
+		<tr height="10%">
+			<td colspan="2" align="center">
+			@defining(if(mode.equals(MODE_ADD)) 
+				"ADD A NEW CATALOG" else "EDIT A CATALOG") { pPageTitle =>
+					@header(pPageTitle, session)
 			}
-		</h1>
-		<br/><br/>
-		</div>
-		<div align="left">
-		@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
-			@if(errs.size>0) {
-				<ul class="error">
-				@errs.map { err =>
-					<li>@err.message</li>
-				}
-				</ul>
-			}
-		}
-		<input type="hidden" value="@myForm("id").value" name="id"/>
-		<table>
-			<tr>
-				<td>Title</td>
-				<td>@myInput(myForm("title"), 
-					'placeholder ->"Catalog title"
-					)
-				</td>
-			</tr>
-			<tr>
-				<td>Author</td>
-				<td>@myInput(myForm("author"), 
-					'placeholder -> "Catalog author"
-					)
-				</td>
-			</tr>
-			<tr>
-				<td>Published in</td>
-				<td>@myInput(myForm("publishedYear"),
-					'placeholder -> "Published year"
-				)
-				</td>
-			</tr>
-		</table>
-		<br/>
-		<input type="submit" name="addNewCatalog" value="Save"/>
-		<input type="button" name="btnCancel" value="Cancel" onclick="javascript:window.location='/cataloglist'"/>
-		</div>
-		<br/>
-		<div align="left">
-		@if(books.size==0) {
-			No registered books yet.
-			@if(mode.equals(MODE_EDIT)) { 
-				<a href="/bookdetail/@myForm("id").value/new">Do you want to add one?</a>
-			} else {
-				Create the catalog first.
-			}
-		} else {
-			<table>
-				<tr>
-					<td align="right"><a href="/bookdetail/@myForm("id").value/new">Add a new book</a></td>
-				</tr>
-			</table>
-			<table border="1">
-				<tr>
-					<th width="10%">S/No</th>
-					<th width="90%">Remarks</th>
-				</tr>
-				@books.zipWithIndex.map { item => 
-					<tr>
-						<td align="center">@item._2</td>
-						<td>@item._1.remarks</td>
-					</tr>
-				}
-			</table>
-		}
-		</div>
-	</form>
-
+			</td>
+		</tr>
+		<tr valign="top">
+			<td width="10%">
+				@sidebar()
+			</td>
+			<td width="90%">
+				<form action="@routes.ABCatalogDetail.save" method="POST">
+					<div align="center">
+					<h1>
+					</h1>
+					<br/><br/>
+					</div>
+					<div align="left">
+					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
+						@if(errs.size>0) {
+							<ul class="error">
+							@errs.map { err =>
+								<li>@err.message</li>
+							}
+							</ul>
+						}
+					}
+					<input type="hidden" value="@myForm("id").value" name="id"/>
+					<table class="outbordertable">
+						<col width="30%"/>
+						<col width="70%"/>
+						<tr>
+							<td>Title</td>
+							<td>@myInput(myForm("title"), 
+								'placeholder ->"Catalog title"
+								)
+							</td>
+						</tr>
+						<tr>
+							<td>Author</td>
+							<td>@myInput(myForm("author"), 
+								'placeholder -> "Catalog author"
+								)
+							</td>
+						</tr>
+						<tr>
+							<td>Published in</td>
+							<td>@myInput(myForm("publishedYear"),
+								'placeholder -> "Published year"
+							)
+							</td>
+						</tr>
+						<tr><td>&nbsp;</td></tr>
+						<tr>
+							<td colspan="2" align="center">
+								<input type="submit" name="addNewCatalog" value="Save"/>
+								<input type="button" name="btnCancel" value="Cancel" 
+									onclick="javascript:window.location='/cataloglist'"/>
+							</td>
+						</tr>
+					</table>
+					<br/>
+					</div>
+					<br/>
+					<div align="left">
+					@if(books.size==0) {
+						No registered books yet.
+						@if(mode.equals(MODE_EDIT)) { 
+							<a href="/bookdetail/@myForm("id").value/new">Do you want to add one?</a>
+						} else {
+							Create the catalog first.
+						}
+					} else {
+						<table>
+							<tr>
+								<td align="right"><a href="/bookdetail/@myForm("id").value/new">Add a new book</a></td>
+							</tr>
+						</table>
+						<table class="singlebordertable">
+							<col width="5%"/>
+							<col width="95%"/>
+							<tr>
+								<th>S/No</th>
+								<th>Remarks</th>
+							</tr>
+							@books.zipWithIndex.map { item => 
+								<tr>
+									<td align="center">@item._2</td>
+									<td>@item._1.remarks</td>
+								</tr>
+							}
+						</table>
+					}
+					</div>
+				</form>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>
