@@ -100,7 +100,7 @@
 							</tr>
 							@books.zipWithIndex.map { item => 
 								<tr>
-									<td align="center">@item._2</td>
+									<td align="center">@(item._2+1)</td>
 									<td>@item._1.remarks</td>
 								</tr>
 							}
