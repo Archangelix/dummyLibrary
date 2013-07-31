@@ -12,7 +12,7 @@
 		<col width="90%"/>
 		<tr height="10%">
 			<td colspan="2" align="center">
-				@header("LIST OF CATALOGS", session)
+				@header("BOOK DETAIL", session)
 			</td>
 		</tr>
 		<tr valign="top">
@@ -37,7 +37,7 @@
 						<tr>
 							<td>Origin</td>
 							<td>@select(
-								  myForm("origin"),
+								  myForm("originCode"),
 								  pOrigins.map{ t =>
 								    t._1 -> t._2
 								  },

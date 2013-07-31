@@ -10,6 +10,7 @@ import models.exception.UserNotFoundException
 import play.api.Play.current
 import play.api.db._
 import models.OBUserRole
+import models.common.DDBookOriginType
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -86,6 +87,14 @@ object DBService {
 	  get[Boolean]("is_deleted") map {
 	    case rowIdx~seqNo~userID~name~address~dob~userRoleID~userRoleName~isDeleted =>
 	      DBUser(Some(rowIdx), Some(seqNo), userID, name, address, dob, userRoleID, userRoleName, isDeleted)
+	  }
+	}
+	
+	val dbOriginTypeMapping = {
+	  get[String]("code") ~
+	  get[String]("Description") map {
+	    case code~description =>
+	      DDBookOriginType(code, description)
 	  }
 	}
 	
@@ -423,4 +432,11 @@ object DBService {
   	  ), cnt.toInt)
   	}
   	
+	def getBookOriginTypeMap: Map[String, String] = DB.withConnection { implicit c => 
+	  val list = SQL("SELECT * FROM MASTER_BOOK_ORIGIN_TYPE")
+	  	.as(dbOriginTypeMapping *)
+	  	
+	  // Convert from List to Map.
+	  Map((list map {s => (s.code, s.desc)}) : _*)
+	}
 }

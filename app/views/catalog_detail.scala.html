@@ -25,11 +25,6 @@
 			</td>
 			<td width="90%">
 				<form action="@routes.ABCatalogDetail.save" method="POST">
-					<div align="center">
-					<h1>
-					</h1>
-					<br/><br/>
-					</div>
 					<div align="left">
 					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
 						@if(errs.size>0) {
@@ -97,11 +92,13 @@
 							<tr>
 								<th>S/No</th>
 								<th>Remarks</th>
+								<th>Origin</th>
 							</tr>
 							@books.zipWithIndex.map { item => 
 								<tr>
 									<td align="center">@(item._2+1)</td>
 									<td>@item._1.remarks</td>
+									<td>@item._1.originDesc</td>
 								</tr>
 							}
 						</table>

@@ -35,9 +35,10 @@ table.singlebordertable td {
 	padding: 5px;
 }
 
-p.error {
+.error {
 	color: red;
 }
+
 body {
  margin:0;
  padding:0;

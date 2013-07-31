@@ -31,7 +31,8 @@ object ABBookDetail extends Controller with TSecured {
       "idx" -> optional(of[Long]),
       "id" -> optional(of[Long]),
       "catalogID" -> of[Long],
-      "origin" -> nonEmptyText,
+      "originCode" -> nonEmptyText,
+      "originDesc" -> optional(text),
       "remarks" -> nonEmptyText
     )(FormBook.apply)(FormBook.unapply)
 
@@ -55,13 +56,16 @@ object ABBookDetail extends Controller with TSecured {
     val filledForm = bookForm.bindFromRequest
     filledForm.fold(
       error => {
+        println("validation failed.")
         val mode = session.get("bookMode").getOrElse(MODE_ADD)
+        error.errors.foreach(err => println(err.key + ": "+err.message))
         BadRequest(views.html.book_detail(mode, error, pCatalogID, ddItemOriginList))
       },
       data => {
+        println("validation successful.")
         val newBookID = DBService.generateNewBookID(pCatalogID.toInt)
         val newBook = OBBook(data)
-        DBService.createBook(newBook.catalogID, newBookID, newBook.origin, newBook.remarks)
+        DBService.createBook(newBook.catalogID, newBookID, newBook.originType.code, newBook.remarks)
     	Redirect(routes.ABCatalogDetail.edit(pCatalogID))
       }
     )
