@@ -11,6 +11,7 @@ import play.api.Play.current
 import play.api.db._
 import models.OBUserRole
 import models.common.DDBookOriginType
+import models.common.DDCountry
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -98,6 +99,14 @@ object DBService {
 	  }
 	}
 	
+	val dbCountryMapping = {
+	  get[Int]("id") ~
+	  get[String]("name") map {
+	    case id~name =>
+	      DDCountry(id.toString, name)
+	  }
+	}
+	
   /**
    * END -- All database mappings.
    */
@@ -141,12 +150,12 @@ object DBService {
 	def getPassword(pUserID: String): String = {
 	  DB.withConnection{ implicit c => 
 	    val firstRow = SQL("SELECT password FROM USER_SECURITY WHERE userid={userID}")
-	    	.on('userID -> pUserID).apply().head
-	    if (firstRow==null) {
+	    	.on('userID -> pUserID).apply()
+	    if (firstRow.size==0) {
 	      println("User "+pUserID+" cannot be found!")
 	      throw UserNotFoundException(pUserID)
 	    }
-	    firstRow[String]("password")
+	    firstRow.head[String]("password")
 	  }
 	}
 	
@@ -439,4 +448,15 @@ object DBService {
 	  // Convert from List to Map.
 	  Map((list map {s => (s.code, s.desc)}) : _*)
 	}
+	
+	def getCountryMap: Map[String, String] = DB.withConnection { implicit c => 
+	  val list = SQL("SELECT * FROM COUNTRY order by NAME")
+	  	.as(dbCountryMapping *)
+	  	
+	  // Convert from List to Map.
+	  val res = Map((list map {s => (s.code, s.desc)}) : _*)
+	  println("Size of countries = "+res.size)
+	  res
+	}
+
 }

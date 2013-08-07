@@ -14,6 +14,7 @@ import play.mvc.Http.Session
 import play.api.mvc.Security
 import play.api.mvc.Flash
 import play.api.mvc.WithHeaders
+import models.exception.UserNotFoundException
 
 /**
  * Action to handle the logging section.
@@ -26,8 +27,12 @@ object ABLogin extends Controller {
           "password" -> nonEmptyText
       )(FormUserPassword.apply)(FormUserPassword.unapply)
       verifying ("Invalid user / password", { user =>
-        val dbPassword = DBService.getPassword(user.username)
-        dbPassword.equals(user.password)
+        try {
+        	val dbPassword = DBService.getPassword(user.username)
+  			dbPassword.equals(user.password)
+        } catch {
+        case e: UserNotFoundException => false
+        }
       })
   )
   

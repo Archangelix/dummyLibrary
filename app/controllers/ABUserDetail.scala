@@ -14,6 +14,7 @@ import play.api.data.Forms
 import models.form.FormBook
 import models.form.FormUser
 import controllers.util.MySession
+import models.common.DDCountry
 
 /**
  * Action to handle the user section, including the add, update, delete, and view.
@@ -22,6 +23,8 @@ object ABUserDetail extends Controller with TSecured {
 
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
+  
+  val seqCountries = DDCountry.all
   
   val formUserMapping = mapping(
       "rowIdx" -> optional(of[Long]),
@@ -37,9 +40,12 @@ object ABUserDetail extends Controller with TSecured {
   val userForm = Form[FormUser](formUserMapping)
 
   /**
-   * Displaying the user detail page with blank information.
+   * Displaying the catalog detail page with blank information.
    */
-  def gotoNewUser() = TODO
+  def gotoNewUser() = withAuth {username => implicit req =>
+    Ok(views.html.user_detail(MODE_ADD, userForm, seqCountries)(session)).withSession(
+        session + ("mode" -> MODE_ADD))
+  }
 
   /**
    * Displaying the book detail page with pre-populated user information.
@@ -47,7 +53,7 @@ object ABUserDetail extends Controller with TSecured {
   def edit(pIDStr: String) = TODO
   
   /**
-   * Saving the user details.
+   * Saving the catalog details.
    */
   def save = TODO
 

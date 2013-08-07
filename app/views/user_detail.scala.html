@@ -1,0 +1,90 @@
+@(mode: String, myForm: Form[form.FormUser], pCountries: Seq[(String, String)])(implicit session: Session)
+
+@import controllers.ABUserDetail.MODE_ADD
+@import controllers.ABUserDetail.MODE_EDIT
+
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
+</head>
+<body>
+	<table id="layout">
+		<col width="10%"/>
+		<col width="90%"/>
+		<tr height="10%">
+			<td colspan="2" align="center">
+			@defining(if(mode.equals(MODE_ADD)) 
+				"ADD A NEW USER" else "EDIT A USER") { pPageTitle =>
+					@header(pPageTitle, session)
+			}
+			</td>
+		</tr>
+		<tr valign="top">
+			<td width="10%">
+				@sidebar()
+			</td>
+			<td width="90%">
+				<form action="@routes.ABUserDetail.save" method="POST">
+					<div align="left">
+					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
+						@if(errs.size>0) {
+							<ul class="error">
+							@errs.map { err =>
+								<li>@err.message</li>
+							}
+							</ul>
+						}
+					}
+					<input type="hidden" value="@myForm("id").value" name="id"/>
+					<table class="outbordertable">
+						<col width="30%"/>
+						<col width="70%"/>
+						<tr>
+							<td>Title</td>
+							<td>@myInput(myForm("Name"), 
+								'placeholder ->"Name"
+								)
+							</td>
+						</tr>
+						<tr>
+							<td>Gender</td>
+							<td align="left">@helper.inputRadioGroup(myForm("gender"),
+								options = Seq("M" -> "Male", "F" -> "Female"),
+								'_label -> ""
+							)
+							</td>
+						</tr>
+						<tr>
+							<td>ID Number</td>
+							<td>@myInput(myForm("idNumber"),
+								'placeholder -> "ID Number"
+							)
+							</td>
+						</tr>
+						<tr>
+							<td>Nationality</td>
+							<td>@helper.select(
+								  myForm("country"),
+								  pCountries,
+								  '_label -> "",
+								  '_default -> "Please select"
+								)(MyFieldConstructor, implicitly[Lang])
+							</td>
+						</tr>
+						<tr><td>&nbsp;</td></tr>
+						<tr>
+							<td colspan="2" align="center">
+								<input type="submit" name="addNewUser" value="Save"/>
+								<input type="button" name="btnCancel" value="Cancel" 
+									onclick="javascript:window.location='/cataloglist'"/>
+							</td>
+						</tr>
+					</table>
+					<br/>
+					</div>
+				</form>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
