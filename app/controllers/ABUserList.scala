@@ -88,7 +88,11 @@ object ABUserList extends Controller with TSecured {
   /**
    * Removing a particular user from the listing page.
    */
-  def remove(pIDStr: String) = TODO
+  def removeUser(pSeqNo: String) = withAuth { username => implicit req => 
+    DBService.softDeleteUser(pSeqNo.toInt)
+    Redirect(routes.ABUserList.listUsers())
+  }
+  
   
   def isBlank(str: String) = str==null || str.trim().equals("")
 }

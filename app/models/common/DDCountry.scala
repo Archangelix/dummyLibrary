@@ -11,5 +11,5 @@ object DDCountry {
     DDCountry(pCode, items(pCode))
   }
   
-  def all = DBService.getCountryMap.toList
+  def all = items.toList.sortBy(_._2)
 }

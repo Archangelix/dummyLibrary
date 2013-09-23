@@ -11,8 +11,8 @@ GET     /first                      			controllers.ABCatalogList.navigateFirst
 GET     /prev                       			controllers.ABCatalogList.navigatePrev
 GET     /next                       			controllers.ABCatalogList.navigateNext
 GET     /last                       			controllers.ABCatalogList.navigateLast
-GET		/:id/edit								controllers.ABCatalogDetail.edit(id)
-GET		/:id/delete								controllers.ABCatalogList.remove(id)
+GET		/catalog/:id/edit						controllers.ABCatalogDetail.edit(id)
+GET		/catalog/:id/delete						controllers.ABCatalogList.remove(id)
 GET		/newcatalog								controllers.ABCatalogDetail.gotoNewCatalog
 POST	/newcatalog								controllers.ABCatalogDetail.save
 GET		/bookdetail/:catalogid/new				controllers.ABBookDetail.newBook(catalogid)
@@ -27,6 +27,8 @@ GET     /nextUser                      			controllers.ABUserList.navigateNext
 GET     /lastUser                      			controllers.ABUserList.navigateLast
 GET		/newuser								controllers.ABUserDetail.gotoNewUser
 POST	/newuser								controllers.ABUserDetail.save
+GET		/user/:id/edit							controllers.ABUserDetail.edit(id)
+GET		/user/:id/delete						controllers.ABUserList.removeUser(id)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

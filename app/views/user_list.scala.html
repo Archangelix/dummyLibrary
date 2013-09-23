@@ -53,11 +53,11 @@ function removeUser(pURL) {
 							<td align="center">@user.rowIdx</td>
 							<td>@user.name</td>
 							<td>@user.address</td>
-							<td>@user.dob</td>
+							<td>@user.dob_date-@user.dob_month-@user.dob_year</td>
 							<td>@user.userRoleName</td>
 							<td align="center">
-								<a href="">Edit</a> /
-								<a href="">Remove</a>
+								<a href="@routes.ABUserDetail.edit(user.seqNo.get.toString)">Edit</a> /
+								<a href="javascript:removeUser(@routes.ABUserList.removeUser(user.seqNo.get.toString))">Remove</a>
 							</td>
 						</tr>
 						}

@@ -11,9 +11,12 @@ case class DBUser (
     seqNo: Option[Long], 
     userID: String, 
     name: String, 
+    gender: Boolean, 
+    idNumber: String, 
     address: String, 
     dob: Date,
     userRoleID: Long,
     userRoleName: String,
+    nationality: Long,
     isDeleted: Boolean
 )

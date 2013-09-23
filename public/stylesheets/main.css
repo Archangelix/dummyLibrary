@@ -44,3 +44,11 @@ body {
  padding:0;
 }
 
+dd, dt {
+	margin: 0;
+	padding: 0;
+}
+
+dd.info, dt label {
+	display: none;
+}
