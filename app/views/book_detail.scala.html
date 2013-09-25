@@ -43,12 +43,12 @@
 								  },
 								  '_label -> "",
 								  '_default -> "Please select"
-								)(MyFieldConstructor, implicitly[Lang])
+								)
 							</td>
 						</tr>
 						<tr>
 							<td>Remarks</td>
-							<td>@myInput(myForm("remarks"), 
+							<td>@helper.inputText(myForm("remarks"), 
 								'placeholder -> "Remarks"
 								)
 							</td>

@@ -1,0 +1,12 @@
+@(showLoginInfo: Boolean)(implicit session: Session)
+<!-- banner.scala.html -->
+<div id="banner" class="clearfix">
+	@if(showLoginInfo) {
+		<div id="loginInfo">
+			Hi, @session.get(Security.username).getOrElse("")! (<a href="/logout">Sign out</a>)
+		</div>
+	}
+	<div id="companyTitle">
+		DUMMY LIBRARY
+	</div>
+</div>

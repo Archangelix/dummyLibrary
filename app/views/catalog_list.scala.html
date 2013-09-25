@@ -6,7 +6,9 @@
 <html>
 <head>
 <title>Local Library</title>
-<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
 
 <script>
 function removeCatalog(pURL) {
@@ -18,74 +20,70 @@ function removeCatalog(pURL) {
 <script src="index.js"></script>
 </head>
 <body>
-	<table id="layout">
-		<col width="10%"/>
-		<col width="90%"/>
-		<tr height="10%">
-			<td colspan="2" align="center">
-				@header("LIST OF CATALOGS", session)
-			</td>
-		</tr>
-		<tr valign="top">
-			<td width="10%">
-				@sidebar()
-			</td>
-			<td width="90%">
-				<form action="@routes.ABCatalogList.index" method="POST">
-				<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
-				<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
-				<br/>
-				<div align="center">
-				@if(pList.isEmpty) {
-					The catalogs are empty!
-				} else {
-					<table class="singlebordertable">
-						<tr>
-							<th width="5%">S/No</th>
-							<th width="30%">TITLE</th>
-							<th width="30%">AUTHOR</th>
-							<th width="10%">PUBLISHED YEAR</th>
-							<th width="10%">ACTION</th>
-						</tr>
-						@pList.map { catalog =>
-						<tr>
-							<td align="center">@catalog.idx</td>
-							<td>@catalog.title</td>
-							<td>@catalog.author</td>
-							<td>@catalog.publishedYear</td>
-							<td align="center">
-								<a href="@routes.ABCatalogDetail.edit(catalog.id.get.toString)">Edit</a> /
-								<a href="javascript:removeCatalog('@routes.ABCatalogList.remove(catalog.id.get.toString)')">Remove</a>
-							</td>
-						</tr>
-						}
-					</table>
-				}
-				<br/>
-				<div align="center">
-					Page: @pCurrentPageIdx / @pMaxPageIdx
-					<table>
-						<tr>
-							<td align="center">
-								<a href="@routes.ABCatalogList.navigateFirst">First</a> |
-								<a href="@routes.ABCatalogList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a> |
-								<a href="@routes.ABCatalogList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a> |
-								<a href="@routes.ABCatalogList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a>
-							</td>
-						</tr>
-						<tr>
-							<td colspan=4>
-								
-							</td>
-						</tr>
-					</table>
-				</div>
-				<br/>
-				<a href="/newcatalog">Add a new catalog</a>
-				</div>
-				</form>
-			</td>
-		</tr>
-	</table>
+	<div id="container">
+		@banner(true)
+		<div id="menubar">
+			<ul>
+			<li><a href="/useradmin">User</a></li>
+			<li><a href="/cataloglist">Catalog</a></li>
+			</ul>
+		</div>
+		<div id="content">
+			<h1 class="pageTitle">LIST OF CATALOGS</h1>
+			<form action="@routes.ABCatalogList.index" method="POST">
+			<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
+			<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
+			<br/>
+			<div align="center">
+			@if(pList.isEmpty) {
+				The catalogs are empty!
+			} else {
+				<table class="list">
+					<tr>
+						<th width="5%">S/No</th>
+						<th width="30%">TITLE</th>
+						<th width="30%">AUTHOR</th>
+						<th width="10%">PUBLISHED YEAR</th>
+						<th width="10%">ACTION</th>
+					</tr>
+					@pList.map { catalog =>
+					<tr>
+						<td align="center">@catalog.idx</td>
+						<td>@catalog.title</td>
+						<td>@catalog.author</td>
+						<td>@catalog.publishedYear</td>
+						<td align="center">
+							<a href="@routes.ABCatalogDetail.edit(catalog.id.get.toString)">Edit</a> /
+							<a href="javascript:removeCatalog('@routes.ABCatalogList.remove(catalog.id.get.toString)')">Remove</a>
+						</td>
+					</tr>
+					}
+				</table>
+			}
+			<br/>
+			<div align="center">
+				Page: @pCurrentPageIdx / @pMaxPageIdx
+				<table>
+					<tr>
+						<td align="center">
+							<a href="@routes.ABCatalogList.navigateFirst">First</a> |
+							<a href="@routes.ABCatalogList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a> |
+							<a href="@routes.ABCatalogList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a> |
+							<a href="@routes.ABCatalogList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=4>
+							
+						</td>
+					</tr>
+				</table>
+			</div>
+			<br/>
+			<a href="/newcatalog">Add a new catalog</a>
+			</div>
+			</form>
+		</div>
+	</div>
 </body>
 </html>

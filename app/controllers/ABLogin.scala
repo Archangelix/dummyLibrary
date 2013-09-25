@@ -50,7 +50,7 @@ object ABLogin extends Controller {
     val tempForm = loginForm.bindFromRequest
     tempForm.fold (
       error => {
-        BadRequest (views.html.login(error))
+        BadRequest(views.html.login(error))
       },
       data => {
 	    try {

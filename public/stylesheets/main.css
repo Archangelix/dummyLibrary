@@ -1,47 +1,99 @@
+body {
+	font-family: Helvetica, Arial;
+}
+
+#banner {
+	background-color: grey;
+}
+
+#companyTitle {
+	font-size: 4em;
+}
+
+#loginInfo {
+	float: right;
+}
+
+#banner, #menubar, ul, li {
+	margin: 0;
+	padding: .2em 0;
+}
+
+#menubar {
+	background-color: lightgrey;
+}
+
+#menubar ul {
+	margin-left: 5%;
+}
+
+#menubar li {
+	display: inline;
+	padding-right: 20px;
+}
+
 table {
-	border: 0px;
-	width:100%;
+	border-collapse: collapse;
 }
 
-table.outbordertable {
-	border: 1px solid black;
-	border-collapse: collapse;
-	margin: 0;
-	padding: 5px;
+table.list, table.list th, table.list td {
+	border: 1px solid;
 }
 
-table.outbordertable td {
-	border-collapse: collapse;
-	margin: 0;
-	padding: 5px;
+#content {
+	position: relative;
+	left: 5%;
+	width: 90%;
 }
 
-table.singlebordertable {
-	border: 1px solid black;
-	border-collapse: collapse;
+h1.pageTitle {
+	text-align: center;
 	margin: 0;
-}
-
-table.singlebordertable th {
-	border: 1px solid black;
-	border-collapse: collapse;
-	margin: 0;
-}
-
-table.singlebordertable td {
-	border: 1px solid black;
-	border-collapse: collapse;
-	margin: 0;
-	padding: 5px;
 }
 
 .error {
 	color: red;
 }
 
+dd.info, dt label {
+	display: none;
+}
+
+
+/*
+body, #container {
+	margin:0;
+	padding:0;
+}
+
 body {
- margin:0;
- padding:0;
+	font-family: Times New Roman, Helvetica, Arial;
+}
+
+#banner {
+	background-color: grey;
+	padding: 0;
+	margin-top: 11px;
+}
+
+#companyTitle {
+	font-size: 3em;
+	float: left;
+}
+
+#loginInfo {
+	text-align: right;
+}
+
+#content {
+	position: absolute;
+	left: 10%;
+	width: 80%;
+	border: 1px solid;
+}
+
+.error {
+	color: red;
 }
 
 dd, dt {
@@ -49,6 +101,4 @@ dd, dt {
 	padding: 0;
 }
 
-dd.info, dt label {
-	display: none;
-}
+*/

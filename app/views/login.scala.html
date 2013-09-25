@@ -1,88 +1,80 @@
-@(myForm: Form[form.FormUserPassword])(implicit flash: Flash)
+@(myForm: Form[form.FormUserPassword])(implicit session: Session, flash: Flash)
 
 <html>
 <head>
-<style>
-	
-	div.error {
-		color: red;
-	}
-
-	ul.error {
-		color: red;
-	}
-</style>
+<title>Local Library</title>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
 </head>
 <body>
-@defining(flash.get("message")) { message =>
-	@if(message != None) {
-		@message
-		<br/><br/>
-	}
-}
-	<form action="@routes.ABLogin.loginPage" method="POST">
-	<table>
-	<div align="left">
-		@defining(myForm.errors.filter(_.key.equals(""))) { errors =>
-			@if(errors.size>0) {
-				<ul class="error">
-				@errors.map { error =>
-					<li>@error.message</li>
+	<div id="container">
+		@banner(false)
+		<div id="content">
+			<form action="@routes.ABLogin.loginPage" method="POST">
+				@defining(myForm.errors.filter(_.key.equals(""))) { errors =>
+					@if(errors.size>0) {
+						<div align="left">
+							<ul class="error">
+							@errors.map { error =>
+								<li>@error.message</li>
+							}
+							</ul>
+						</div>
+					}
 				}
-				</ul>
-			}
-		}
+				<table>
+					<tr>
+						<td>Username</td>
+						<td>@helper.inputText(myForm("username"), 
+							'placeholder -> "Username"
+							)
+						</td>
+					</tr>
+					<tr>
+						<td>Password</td>
+						<td>@helper.inputText(myForm("password"), 
+							'placeholder -> "Password",
+							'type -> "password"
+							)
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<input type="submit" name="login" value="Login"/>
+						<td>
+					</tr>
+				</table>
+			</form>
+			<br/>
+			<table border="1">
+				<tr>
+					<td colspan="2" align="center"><b>ADMIN ROLE</b></td>
+				</tr>
+				<tr>
+					<td>User</td>
+					<td>Password</td>
+				</tr>
+				<tr>
+					<td>admin</td>
+					<td>admin</td>
+				</tr>
+			</table>
+			<br/>
+			<table border="1">
+				<tr>
+					<td colspan="2" align="center"><b>USER ROLE</b></td>
+				</tr>
+				<tr>
+					<td>User</td>
+					<td>Password</td>
+				</tr>
+				<tr>
+					<td>user</td>
+					<td>user</td>
+				</tr>
+			</table>
+		</div>
 	</div>
-	<table>
-		<tr>
-			<td>Username</td>
-			<td>@myInput(myForm("username"), 
-				'placeholder -> "Username"
-				)
-			</td>
-		</tr>
-		<tr>
-			<td>Password</td>
-			<td>@myInput(myForm("password"), 
-				'placeholder -> "Password",
-				'type -> "password"
-				)
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<input type="submit" name="login" value="Login"/>
-			<td>
-		</tr>
-	</table>
-	</form>
-	<br/>
-	<table border="1">
-		<tr>
-			<td colspan="2" align="center"><b>ADMIN ROLE</b></td>
-		</tr>
-		<tr>
-			<td>User</td>
-			<td>Password</td>
-		</tr>
-		<tr>
-			<td>admin</td>
-			<td>admin</td>
-		</tr>
-	</table>
-	<br/>
-	<table border="1">
-		<tr>
-			<td colspan="2" align="center"><b>USER ROLE</b></td>
-		</tr>
-		<tr>
-			<td>User</td>
-			<td>Password</td>
-		</tr>
-		<tr>
-			<td>user</td>
-			<td>user</td>
-		</tr>
-	</table>
 </body>
 </html>

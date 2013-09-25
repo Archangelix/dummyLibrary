@@ -50,7 +50,7 @@
 						</tr>
 						<tr>
 							<td>Name</td>
-							<td>@myInput(myForm("name"), 
+							<td>@helper.inputText(myForm("name"), 
 								'placeholder ->"Name"
 								)
 							</td>
@@ -60,7 +60,7 @@
 							<td align="left">@helper.inputRadioGroup(myForm("gender"),
 								options = Seq("M" -> "Male", "F" -> "Female"),
 								'_label -> ""
-							)(MyFieldConstructor, implicitly[Lang])
+							)
 							</td>
 						</tr>
 						<tr>
@@ -70,19 +70,19 @@
 								  for(i<-1 to 31) yield (i.toString, i.toString),
 								  '_label -> "",
 								  '_default -> "--"
-								)(MyFieldConstructor, implicitly[Lang])
+								)
 								@helper.select(
 								  myForm("dob_month"),
 								  for(i<-1 to 12) yield (i.toString, i.toString),
 								  '_label -> "",
 								  '_default -> "--"
-								)(MyFieldConstructor, implicitly[Lang])
+								)
 								@helper.select(
 								  myForm("dob_year"),
 								  for(i<-1900 to 2013) yield (i.toString, i.toString),
 								  '_label -> "",
 								  '_default -> "--"
-								)(MyFieldConstructor, implicitly[Lang])
+								)
 								<p class="error">
 								@myForm.errors.filter(_.key=="").map{ err =>
 									@err.message
@@ -92,7 +92,7 @@
 						</tr>
 						<tr>
 							<td>ID Number</td>
-							<td>@myInput(myForm("idNumber"),
+							<td>@helper.inputText(myForm("idNumber"),
 								'placeholder -> "ID Number"
 							)
 							</td>
@@ -103,7 +103,7 @@
 								'rows -> 3,
 								'cols -> 50,
 								'placeholder ->"Address"
-								)(MyFieldConstructor, implicitly[Lang])
+								)
 							</td>
 						</tr>
 						<tr>
@@ -113,7 +113,7 @@
 								  pUserRoles,
 								  '_label -> "",
 								  '_default -> "Please select"
-								)(MyFieldConstructor, implicitly[Lang])
+								)
 							</td>
 						</tr>
 						<tr>
@@ -123,7 +123,7 @@
 								  pCountries,
 								  '_label -> "",
 								  '_default -> "Please select"
-								)(MyFieldConstructor, implicitly[Lang])
+								)
 							</td>
 						</tr>
 						<tr><td>&nbsp;</td></tr>
