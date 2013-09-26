@@ -1,20 +1,22 @@
 package services
 
 import java.util.Date
+
 import anorm._
 import anorm.SqlParser._
 import models.OBCatalog
 import models.OBUser
-import models.db._
-import models.exception.UserNotFoundException
-import play.api.Play.current
-import play.api.db._
 import models.OBUserRole
 import models.common.DDBookOriginType
 import models.common.DDCountry
 import models.common.DDUserRoles
-import models.db._
 import models.common.Gender
+import models.db._
+import models.db._
+import models.exception.UserNotFoundException
+import models.form.FormSearchCatalog
+import play.api.Play.current
+import play.api.db._
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -563,4 +565,33 @@ object DBService {
 	  res
 	}
 
+	def findCatalogs(pCat: FormSearchCatalog, pIsCaseSensitive: Boolean) = {
+	  val author = pCat.author
+	  val title = pCat.title
+	  val paramAuthor = if (isBlank(author)) "%%" else 
+	    if (pIsCaseSensitive) "%"+author+"%"
+	    else "%"+author.toUpperCase()+"%"
+	  val paramTitle = if (isBlank(title)) "%%" else 
+	    if (pIsCaseSensitive) "%"+title+"%"
+	    else "%"+title.toUpperCase()+"%"
+
+	  DB.withConnection { implicit c => 
+	    	val authorField = if (pIsCaseSensitive) "AUTHOR" else "UPPER(AUTHOR)"
+	    	val titleField = if (pIsCaseSensitive) "TITLE" else "UPPER(TITLE)"
+			val res = SQL (
+			    "select row_number() over (order by id) idx, * " +
+			    "from CATALOG where "+authorField+" LIKE {author} AND "+titleField+" LIKE {title} ")
+			    .on('title -> paramTitle, 
+				   'author -> paramAuthor)
+			    .as(dbCatalogListMapping *)
+			    
+			if (res==null || res.size==0) {
+			  List() 
+			} else {
+			  res.map (OBCatalog(_, List()))
+			}
+	  }
+	}
+	
+	def isBlank(str: String) = str==null || str.trim().equals("")
 }

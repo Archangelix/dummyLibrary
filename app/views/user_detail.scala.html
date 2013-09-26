@@ -6,25 +6,26 @@
 
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
 </head>
 <body>
-	<table id="layout">
-		<col width="10%"/>
-		<col width="90%"/>
-		<tr height="10%">
-			<td colspan="2" align="center">
-			@defining(if(mode.equals(MODE_ADD)) 
-				"ADD A NEW USER" else "EDIT A USER") { pPageTitle =>
-					@header(pPageTitle, session)
-			}
-			</td>
-		</tr>
-		<tr valign="top">
-			<td width="10%">
-				@sidebar()
-			</td>
-			<td width="90%">
+	<div id="container">
+		@banner(true)
+		<div id="menubar">
+			<ul>
+			<li><a href="/useradmin">User</a></li>
+			<li><a href="/cataloglist">Catalog</a></li>
+			</ul>
+		</div>
+		<div id="content">
+			<h1 class="pageTitle">
+				@if(mode.equals(MODE_ADD)) { 
+					ADD A NEW USER
+				} else {
+					EDIT A USER
+				}
 				<form action="@routes.ABUserDetail.save" method="POST">
 					<div align="left">
 					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
@@ -138,8 +139,8 @@
 					<br/>
 					</div>
 				</form>
-			</td>
-		</tr>
-	</table>
+			</h1>
+		</div>
+	</div>
 </body>
 </html>

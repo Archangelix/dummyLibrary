@@ -4,22 +4,23 @@
 
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
 </head>
 <body>
-	<table id="layout">
-		<col width="10%"/>
-		<col width="90%"/>
-		<tr height="10%">
-			<td colspan="2" align="center">
-				@header("BOOK DETAIL", session)
-			</td>
-		</tr>
-		<tr valign="top">
-			<td width="10%">
-				@sidebar()
-			</td>
-			<td width="90%">
+	<div id="container">
+		@banner(true)
+		<div id="menubar">
+			<ul>
+			<li><a href="/useradmin">User</a></li>
+			<li><a href="/cataloglist">Catalog</a></li>
+			</ul>
+		</div>
+		<div id="content">
+			<h1 class="pageTitle">
+				BOOK DETAIL
+			</h1>
 				<form action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST">
 					<div align="left">
 					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
@@ -59,8 +60,7 @@
 					<input type="button" name="btnCancel" value="Cancel" onclick="javascript:window.location='/cataloglist'"/>
 					</div>
 				</form>
-			</td>
-		</tr>
-	</table>
+		</div>
+	</div>
 </body>
 </html>

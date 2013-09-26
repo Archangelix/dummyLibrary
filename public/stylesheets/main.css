@@ -44,6 +44,7 @@ table.list, table.list th, table.list td {
 	position: relative;
 	left: 5%;
 	width: 90%;
+	margin-top: 1em;
 }
 
 h1.pageTitle {
@@ -59,46 +60,13 @@ dd.info, dt label {
 	display: none;
 }
 
-
-/*
-body, #container {
-	margin:0;
-	padding:0;
-}
-
-body {
-	font-family: Times New Roman, Helvetica, Arial;
-}
-
-#banner {
-	background-color: grey;
-	padding: 0;
-	margin-top: 11px;
-}
-
-#companyTitle {
-	font-size: 3em;
-	float: left;
-}
-
-#loginInfo {
-	text-align: right;
-}
-
-#content {
-	position: absolute;
-	left: 10%;
-	width: 80%;
-	border: 1px solid;
-}
-
-.error {
-	color: red;
-}
-
-dd, dt {
+dd, dt, dl {
 	margin: 0;
 	padding: 0;
+	display: inline;
 }
 
-*/
+div.divCatResult em {
+	display: block;
+	font-size: .9em;
+}

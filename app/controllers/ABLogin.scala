@@ -1,20 +1,19 @@
 package controllers
 
 import models.OBUser
-import models.db.DBUser
+import models.OBUserRole
+import models.exception.UserNotFoundException
 import models.form.FormUserPassword
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.nonEmptyText
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import models.db.DBUserPassword
-import services.DBService
-import play.mvc.Http.Session
-import play.api.mvc.Security
 import play.api.mvc.Flash
+import play.api.mvc.Security
 import play.api.mvc.WithHeaders
-import models.exception.UserNotFoundException
+import play.mvc.Http.Session
+import services.DBService
 
 /**
  * Action to handle the logging section.
@@ -57,7 +56,12 @@ object ABLogin extends Controller {
 	      session.get("abc")
 	      val formUsername = data.username
 	      val dbUser = DBService.findByUserID(formUsername)
-    	  Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
+	      val role = dbUser.role
+	      if (role.equals(OBUserRole.ADMIN)) {
+	    	Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
+	      } else {
+	    	Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
+	      }
 	    } catch {
 	      case e: Exception => {
 	        e.printStackTrace()

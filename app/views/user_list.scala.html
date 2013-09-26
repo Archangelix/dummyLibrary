@@ -6,8 +6,9 @@
 <html>
 <head>
 <title>Local Library</title>
-<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/main.css")"/>
-
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
+<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
 <script>
 function removeUser(pURL) {
 	if (confirm('Are you sure you want to delete this user?')) {
@@ -18,20 +19,17 @@ function removeUser(pURL) {
 <script src="index.js"></script>
 </head>
 <body>
-	<table id="layout">
-		<col width="10%"/>
-		<col width="90%"/>
-		<tr height="10%">
-			<td colspan="2" align="center">
-				@header("LIST OF USERS", session)
-			</td>
-		</tr>
-		<tr valign="top">
-			<td width="10%">
-				@sidebar()
-			</td>
-			<td width="90%">
-				<form action="@routes.ABUserList.listUsers" method="POST">
+	<div id="container">
+		@banner(true)
+		<div id="menubar">
+			<ul>
+			<li><a href="/useradmin">User</a></li>
+			<li><a href="/cataloglist">Catalog</a></li>
+			</ul>
+		</div>
+		<div id="content">
+			<h1 class="pageTitle">LIST OF USERS</h1>
+			<form action="@routes.ABUserList.listUsers" method="POST">
 				<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
 				<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
 				<br/>
@@ -39,7 +37,7 @@ function removeUser(pURL) {
 				@if(pList.isEmpty) {
 					The users are empty!
 				} else {
-					<table class="singlebordertable">
+					<table class="list">
 						<tr>
 							<th width="5%">S/No</th>
 							<th width="25%">NAME</th>
@@ -85,9 +83,8 @@ function removeUser(pURL) {
 				<br/>
 				<a href="/newuser">Add a new user</a>
 				</div>
-				</form>
-			</td>
-		</tr>
-	</table>
+			</form>
+		</div>
+	</div>
 </body>
 </html>
