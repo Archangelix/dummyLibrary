@@ -1,7 +1,6 @@
 package services
 
 import java.util.Date
-
 import anorm._
 import anorm.SqlParser._
 import models.OBCatalog
@@ -17,6 +16,8 @@ import models.exception.UserNotFoundException
 import models.form.FormSearchCatalog
 import play.api.Play.current
 import play.api.db._
+import models.OBTag
+import models.exception.TagNotFoundException
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -126,6 +127,13 @@ object DBService {
 	  }
 	}
 	
+  val dbTagListMapping = {
+    get[Long]("seqno") ~
+    get[String]("name") map {
+      case seqno~name => OBTag(Some(seqno), name)
+    }
+  }
+
   /**
    * END -- All database mappings.
    */
@@ -576,20 +584,75 @@ object DBService {
 	    else "%"+title.toUpperCase()+"%"
 
 	  DB.withConnection { implicit c => 
-	    	val authorField = if (pIsCaseSensitive) "AUTHOR" else "UPPER(AUTHOR)"
-	    	val titleField = if (pIsCaseSensitive) "TITLE" else "UPPER(TITLE)"
-			val res = SQL (
-			    "select row_number() over (order by id) idx, * " +
-			    "from CATALOG where "+authorField+" LIKE {author} AND "+titleField+" LIKE {title} ")
-			    .on('title -> paramTitle, 
-				   'author -> paramAuthor)
-			    .as(dbCatalogListMapping *)
-			    
-			if (res==null || res.size==0) {
-			  List() 
-			} else {
-			  res.map (OBCatalog(_, List()))
-			}
+    	val authorField = if (pIsCaseSensitive) "AUTHOR" else "UPPER(AUTHOR)"
+    	val titleField = if (pIsCaseSensitive) "TITLE" else "UPPER(TITLE)"
+		val res = SQL (
+		    "select row_number() over (order by id) idx, * " +
+		    "from CATALOG where "+authorField+" LIKE {author} AND "+titleField+" LIKE {title} ")
+		    .on('title -> paramTitle, 
+			   'author -> paramAuthor)
+		    .as(dbCatalogListMapping *)
+		    
+		if (res==null || res.size==0) {
+		  List() 
+		} else {
+		  res.map (OBCatalog(_, List()))
+		}
+	  }
+	}
+
+	def listAllTags() = { 
+	  DB.withConnection { implicit c => 
+		val res = SQL ("select * from TAGS order by seqno")
+		    .as(dbTagListMapping *)
+		    
+		if (res==null || res.size==0) {
+		  List() 
+		} else {
+		  res
+		}
+	  }
+	}
+	
+	/**
+	 * Finding the user based on the ID.
+	 * 
+	 * @param pUserID The User ID.
+	 * @return the User model business object.
+	 */
+	def findTagByName(pTagName: String): OBTag = {
+	  DB.withConnection{ implicit c => 
+	    val list = SQL("SELECT * FROM TAGS WHERE upper(name) = upper({tagName})")
+	    	.on('tagName -> pTagName).as(dbTagListMapping *)
+	    if (list==null || list.size==0) {
+	      println("Tag "+pTagName+" cannot be found!")
+	      throw TagNotFoundException(pTagName)
+	    }
+	    list(0)
+	  }
+	}
+	
+  	/**
+  	 * Insert a new user.
+  	 * 
+  	 * @param pTitle The title.
+  	 * @param pAuthor The author.
+  	 * @param pPublishedYear The published year.
+  	 */
+	def createTag(pTagName: String) = {
+	  DB.withConnection { implicit c => 
+	    SQL("insert into TAGS (NAME) values ({name})")
+	        .on('name -> pTagName)
+	        .executeUpdate()
+	  }
+	}
+	
+	def updateTag(pID: Long, pName: String) = {
+	  DB.withConnection { implicit c => 
+	    SQL("update TAGS set name={name} where seqno={seqno}")
+	        .on('name -> pName,
+	            'seqno -> pID)
+	        .executeUpdate()
 	  }
 	}
 	

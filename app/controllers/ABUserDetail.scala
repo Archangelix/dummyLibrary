@@ -42,9 +42,7 @@ object ABUserDetail extends Controller with TSecured {
       "nationality" -> nonEmptyText
     )(FormUser.apply)(FormUser.unapply)verifying("Invalid date." ,{form =>
       	try {
-      	  println("Entering date validation")
       	  val date = sdf.parse(form.dob_date+"-"+form.dob_month+"-"+form.dob_year)
-      	  println("valid date!")
       	  true
       	} catch {
       	  case e:Exception => {println("invalid date!"); false}

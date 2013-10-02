@@ -21,12 +21,7 @@ function removeUser(pURL) {
 <body>
 	<div id="container">
 		@banner(true)
-		<div id="menubar">
-			<ul>
-			<li><a href="/useradmin">User</a></li>
-			<li><a href="/cataloglist">Catalog</a></li>
-			</ul>
-		</div>
+		@menubar_admin()
 		<div id="content">
 			<h1 class="pageTitle">LIST OF USERS</h1>
 			<form action="@routes.ABUserList.listUsers" method="POST">

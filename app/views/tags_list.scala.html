@@ -1,0 +1,80 @@
+@(myForm: Form[form.FormTag], list: List[OBTag])(implicit session: Session)
+<!-- usersList.scala.html -->
+
+@import helper._
+@import viewhelpers._
+
+<html>
+<head>
+	<title>Local Library</title>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<script>
+		function updateTag(rowIdx) {
+			console.log("rowIdx = "+rowIdx);
+		  var seqNo = $('#list'+rowIdx).val();
+			$('#selectedID').val(seqNo);
+			console.log("seqNo = "+seqNo);
+
+			var newTagName = $("#input"+rowIdx).val();
+			$('#updatedTagName').val(newTagName);
+			console.log("newTagName = "+newTagName);
+			
+			document.forms[0].action = "/tags/"+rowIdx+"/update";
+			document.forms[0].submit();
+		}
+		
+		function createTag() {
+			document.forms[0].submit();
+		}
+	
+	</script>
+</head>
+<body>
+	<div id="container">
+		@banner(true)
+		@menubar_admin()
+		<div id="content">
+			<h1 class="pageTitle">LIST OF TAGS</h1>
+				<form action="@routes.ABTagsList.saveCreate" method="POST">
+				<input type='hidden' id='selectedID' name='selectedID'/>
+				<input type='hidden' id='updatedTagName' name='updatedTagName'/>
+				<div align="center">
+				@if(list.isEmpty) {
+					No tags have been created yet!
+				} else {
+					<table class="list">
+						<tr>
+							<th width="5%">S/No</th>
+							<th width="25%">NAME</th>
+							<th width="5%">ACTION</th>
+						</tr>
+						@repeatWithIndex(myForm("list")) { (tag, idx) =>
+						<input type="hidden" id='list@idx' name='list[@idx].seqno' value='@tag("seqno").value.get'/>
+						<tr class="resultItem">
+							<td align="center">@(idx+1)</td>
+							<td>@helper.inputText(tag("name"), 
+								'placeholder ->"Tag name",
+								'id -> ("input"+idx)
+								)
+							</td>
+							<td align="center">
+								<a href='javascript:updateTag(@(idx))'>Save</a>
+							</td>
+						</tr>
+						}
+					</table>
+				}
+				<br/>
+					@helper.inputText(myForm("newTagName"), 
+									'placeholder ->"New tag name"
+									)
+					<input type="submit" value="Create New" onclick="javascript:createTag()"/>
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'/></script>
+</html>

@@ -42,18 +42,18 @@
 						</td>
 					</tr>
 				</table>
-							<input type="submit" name="btnSearchCatalog" id="btnSearchCatalog" value="Search"/>
+				<input type="submit" name="btnSearchCatalog" id="btnSearchCatalog" value="Search"/>
+				<h2>Results</h2>
 				@if(pCatalogs.isEmpty) {
-					The catalogs are empty!
+					<div>The catalogs are empty!</div>
 				} else {
-					<h2>Results</h2>
-						@pCatalogs.map { catalog =>
-							<div class="divCatResult">
-								<h3>@catalog.idx. @catalog.title</h3>
-								<em>by @catalog.author - published in @catalog.publishedYear</em>
-								No descriptions available.
-							</div>
-						}
+					@pCatalogs.map { catalog =>
+						<div class="divCatResult">
+							<h3>@catalog.idx. @catalog.title</h3>
+							<em>by @catalog.author - published in @catalog.publishedYear</em>
+							No descriptions available.
+						</div>
+					}
 				}
 			</form>
 		</div>
