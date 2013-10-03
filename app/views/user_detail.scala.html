@@ -40,7 +40,8 @@
 						<tr>
 							<td>User ID</td>
 							<td>@helper.inputText(myForm("userID"), 
-								'placeholder ->"User ID"
+								'placeholder -> "User ID",
+								'class -> "capitaliseinput"
 								)
 							</td>
 						</tr>
@@ -122,6 +123,17 @@
 								)
 							</td>
 						</tr>
+						@if(mode.equals(MODE_ADD)) { 
+						<tr>
+							<td>Password</td>
+							<td>@helper.inputPassword(myForm("password"),
+								'placeholder -> "Password"
+							)
+							</td>
+						</tr>
+						} else {
+							<input type="hidden" name="password"/>
+						}
 						<tr><td>&nbsp;</td></tr>
 						<tr>
 							<td colspan="2" align="center">

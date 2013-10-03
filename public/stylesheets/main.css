@@ -71,6 +71,9 @@ div.divCatResult em {
 	font-size: .9em;
 }
 
-#newTagName {
+.capitaliseinput {
+	text-transform: uppercase;
+}
+.initcapitaliseinput {
 	text-transform: capitalize;
 }

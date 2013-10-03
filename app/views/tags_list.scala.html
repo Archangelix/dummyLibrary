@@ -56,7 +56,8 @@
 							<td align="center">@(idx+1)</td>
 							<td>@helper.inputText(tag("name"), 
 								'placeholder ->"Tag name",
-								'id -> ("input"+idx)
+								'id -> ("input"+idx),
+								'class -> "initcapitaliseinput"
 								)
 							</td>
 							<td align="center">
@@ -68,7 +69,8 @@
 				}
 				<br/>
 					@helper.inputText(myForm("newTagName"), 
-									'placeholder ->"New tag name"
+									'placeholder -> "New tag name",
+									'class -> "initcapitaliseinput"
 									)
 					<input type="submit" value="Create New" onclick="javascript:createTag()"/>
 				</div>
@@ -77,4 +79,5 @@
 	</div>
 </body>
 <script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'/></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'/></script>
 </html>

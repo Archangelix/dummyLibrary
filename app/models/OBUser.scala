@@ -20,6 +20,7 @@ case class OBUser (
     dob: Date,
     role: OBUserRole,
     nationality: Long,
+    password: String,
     isDeleted: Boolean
 )
 
@@ -28,14 +29,14 @@ object OBUser {
     OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, 
         if (pUser.gender) Gender.MALE else Gender.FEMALE, 
         pUser.idNumber, pUser.address, 
-        pUser.dob, pUserRole, pUser.nationality, pUser.isDeleted)
+        pUser.dob, pUserRole, pUser.nationality, "", pUser.isDeleted)
   
   def apply(pUser: FormUser): OBUser = 
-    OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, 
+    OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID.toUpperCase, pUser.name, 
         Gender(pUser.gender), 
         pUser.idNumber, pUser.address, 
         sdf.parse(pUser.dob_date+"-"+pUser.dob_month+"-"+pUser.dob_year), 
-            OBUserRole(pUser.userRoleID.toInt), pUser.nationality.toInt, false)
+            OBUserRole(pUser.userRoleID.toInt), pUser.nationality.toInt, "", false)
   
   val sdf = new SimpleDateFormat("dd-MM-yy")
 }

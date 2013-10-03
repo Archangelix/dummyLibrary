@@ -18,6 +18,8 @@ import play.api.Play.current
 import play.api.db._
 import models.OBTag
 import models.exception.TagNotFoundException
+import java.security.SecureRandom
+import common.SecurityUtil
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -384,11 +386,12 @@ object DBService {
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
   	 */
-	def createUser(pUser: OBUser) = {
+	def createUser(pUser: OBUser, pPassword: String) = {
 	  DB.withConnection { implicit c => 
 	    SQL("insert into USERS (userid, name, gender, id_number, address, dob, user_role_id, nationality) values " +
 	    		"({userid}, {name}, {gender}, {idNumber}, {address}, {dob}, {userRoleID}, {nationality})")
-	        .on('userid -> pUser.userID, 'name -> pUser.name, 
+	        .on('userid -> pUser.userID.toUpperCase(), 
+	            'name -> pUser.name, 
 	            'gender -> Gender.MALE.equals(pUser.gender), 
 	            'idNumber -> pUser.idNumber, 'address -> pUser.address, 
 	            'dob -> pUser.dob, 
@@ -396,6 +399,8 @@ object DBService {
 	            'nationality -> pUser.nationality)
 	        .executeUpdate()
 	  }
+	  
+	  createPassword(pUser.userID, pPassword)
 	}
 	
   	/**
@@ -424,6 +429,28 @@ object DBService {
 	            'nationality -> pUser.nationality,
 	            'seqno ->pUser.seqNo)
 	    	.executeUpdate()
+	  }
+	}
+	
+	val generateRandomPassword = {
+	  val sr = new SecureRandom()
+	  var bytes = new Array[Byte](6)
+	  sr.nextBytes(bytes)
+	  bytes.toString
+	}
+	
+	def createPassword(pUserID: String, pPassword: String) = {
+	  val sr = new SecureRandom()
+	  var bytes = new Array[Byte](32)
+	  sr.nextBytes(bytes)
+	  val encryptedPwd = SecurityUtil.hex_digest(bytes.toString()+pPassword)
+	  val securedPassword = bytes.toString() + "|" + encryptedPwd
+	  DB.withConnection { implicit c =>
+	    SQL("insert into USER_SECURITY (userid, password) values " +
+	    		"({userid}, {password})")
+	        .on('userid -> pUserID,
+	            'password -> securedPassword)
+	        .executeUpdate()
 	  }
 	}
 	

@@ -14,12 +14,20 @@ import play.api.mvc.Security
 import play.api.mvc.WithHeaders
 import play.mvc.Http.Session
 import services.DBService
+import java.security.MessageDigest
+import common.SecurityUtil
 
 /**
  * Action to handle the logging section.
  */
 object ABLogin extends Controller {
 
+	def sha256(pKey: String) = {
+	  val digest = MessageDigest.getInstance("SHA-256")
+	  val hash = digest.digest(pKey.getBytes("UTF-8"))
+	  hash.toString
+	}
+	
   val loginForm = Form[FormUserPassword](
       mapping (
           "username" -> nonEmptyText,
@@ -27,8 +35,17 @@ object ABLogin extends Controller {
       )(FormUserPassword.apply)(FormUserPassword.unapply)
       verifying ("Invalid user / password", { user =>
         try {
-        	val dbPassword = DBService.getPassword(user.username)
-  			dbPassword.equals(user.password)
+           	val dbPassword = DBService.getPassword(user.username.toUpperCase())
+        	val words = dbPassword.split('|')
+        	println("DB Passwords = "+words)
+        	val salt = words(0)
+        	val saltedDBPassword = words(1)
+        	val encryptedUserPwd = SecurityUtil.hex_digest(salt+user.password)
+        	println("User salted password = "+encryptedUserPwd)
+  			saltedDBPassword.equals(encryptedUserPwd)
+           
+//        	val dbPassword = DBService.getPassword(user.username.toUpperCase())
+//  			dbPassword.equals(user.password)
         } catch {
         case e: UserNotFoundException => false
         }
