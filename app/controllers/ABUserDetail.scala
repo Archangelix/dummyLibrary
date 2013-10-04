@@ -40,7 +40,8 @@ object ABUserDetail extends Controller with TSecured {
       "userRoleID" ->nonEmptyText,
       "user_role_name" -> optional(text),
       "nationality" -> nonEmptyText,
-      "password" -> text
+      "password" -> text,
+      "password2" -> text
     )(FormUser.apply)(FormUser.unapply)verifying("Invalid date." ,{form =>
       	try {
       	  val date = sdf.parse(form.dob_date+"-"+form.dob_month+"-"+form.dob_year)
@@ -64,7 +65,8 @@ object ABUserDetail extends Controller with TSecured {
       "userRoleID" ->nonEmptyText,
       "user_role_name" -> optional(text),
       "nationality" -> nonEmptyText,
-      "password" -> text
+      "password" -> nonEmptyText,
+      "password2" -> nonEmptyText
     )(FormUser.apply)(FormUser.unapply)verifying("Invalid date." ,{form =>
       	try {
       	  val date = sdf.parse(form.dob_date+"-"+form.dob_month+"-"+form.dob_year)
@@ -127,11 +129,18 @@ object ABUserDetail extends Controller with TSecured {
             	println ("Ok, valid userid!")
             	val user = OBUser(successForm)
             	val password = successForm.password
-            	if (isBlank(password)) {
-	         	  val newErrors = Form(filledForm.mapping, filledForm.data, 
-	        	      Seq(new FormError("password", "Password is required.")), filledForm.value)
-	        	  println ("Password is required.")
-	        	  BadRequest(views.html.user_detail(mode, newErrors, seqCountries, seqUserRoles)(session))
+            	val errors:Seq[Option[FormError]] = Seq(
+            	  if (isBlank(password)) {
+           		    Some(new FormError("password", "Password is required."))
+            	  } else None, 
+            	  if (!isBlank(password) && !password.equals(successForm.password2)) {
+            		  Some(new FormError("password2", "Both passwords must be the same."))
+            	  } else None
+            	).filter(_!=None)
+            	if (errors.size>0) {
+	         	  val newErrorForm = Form(filledForm.mapping, filledForm.data, 
+	        	      errors.map(_.get), filledForm.value)
+            		BadRequest(views.html.user_detail(mode, newErrorForm, seqCountries, seqUserRoles)(session))
             	} else {
             		DBService.createUser(user, password)
             		Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")

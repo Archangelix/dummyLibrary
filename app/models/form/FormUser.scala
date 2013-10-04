@@ -26,7 +26,8 @@ case class FormUser(
     userRoleID: String,
     userRoleName: Option[String],
     nationality: String,
-    password: String
+    password: String,
+    password2: String
 )
 
 object FormUser {
@@ -34,7 +35,7 @@ object FormUser {
     FormUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, pUser.gender.toString(), 
         pUser.idNumber, pUser.address,
         sdf_date.format(pUser.dob), sdf_month.format(pUser.dob), sdf_year.format(pUser.dob),
-        pUser.role.id.toString, Some(pUser.role.name), pUser.nationality.toString, "")
+        pUser.role.id.toString, Some(pUser.role.name), pUser.nationality.toString, "", "")
   }
   
   val sdf_date = new SimpleDateFormat("d")
