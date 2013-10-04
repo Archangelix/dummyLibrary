@@ -20,6 +20,7 @@ import models.OBTag
 import models.exception.TagNotFoundException
 import java.security.SecureRandom
 import common.SecurityUtil
+import java.sql.Connection
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -387,7 +388,7 @@ object DBService {
   	 * @param pPublishedYear The published year.
   	 */
 	def createUser(pUser: OBUser, pPassword: String) = {
-	  DB.withConnection { implicit c => 
+	  DB.withTransaction { implicit c => 
 	    SQL("insert into USERS (userid, name, gender, id_number, address, dob, user_role_id, nationality) values " +
 	    		"({userid}, {name}, {gender}, {idNumber}, {address}, {dob}, {userRoleID}, {nationality})")
 	        .on('userid -> pUser.userID.toUpperCase(), 
@@ -398,9 +399,10 @@ object DBService {
 	            'userRoleID -> pUser.role.id,
 	            'nationality -> pUser.nationality)
 	        .executeUpdate()
+	        
+        createPassword(pUser.userID, pPassword)(c)
 	  }
 	  
-	  createPassword(pUser.userID, pPassword)
 	}
 	
   	/**
@@ -439,19 +441,17 @@ object DBService {
 	  bytes.toString
 	}
 	
-	def createPassword(pUserID: String, pPassword: String) = {
+	def createPassword(pUserID: String, pPassword: String)(implicit c: Connection) = {
 	  val sr = new SecureRandom()
 	  var bytes = new Array[Byte](32)
 	  sr.nextBytes(bytes)
 	  val encryptedPwd = SecurityUtil.hex_digest(bytes.toString()+pPassword)
 	  val securedPassword = bytes.toString() + "|" + encryptedPwd
-	  DB.withConnection { implicit c =>
-	    SQL("insert into USER_SECURITY (userid, password) values " +
-	    		"({userid}, {password})")
-	        .on('userid -> pUserID,
-	            'password -> securedPassword)
-	        .executeUpdate()
-	  }
+      SQL("insert into USER_SECURITY (userid, password) values " +
+    		"({userid}, {password})")
+        .on('userid -> pUserID,
+            'password -> securedPassword)
+        .executeUpdate()
 	}
 	
 	def updatePassword(pUserID: String, pPassword: String) = {

@@ -148,6 +148,7 @@ object ABUserDetail extends Controller with TSecured {
             val errors: Seq[Option[FormError]] = if (!isBlank(password)) {
               validatePassword(successForm.password, successForm.password2)
             } else Seq()
+            
             if (errors.size > 0) {
               val newErrorForm = Form(filledForm.mapping, filledForm.data,
                 errors.map(_.get), filledForm.value)
