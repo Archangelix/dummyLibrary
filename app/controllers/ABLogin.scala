@@ -16,6 +16,7 @@ import play.mvc.Http.Session
 import services.DBService
 import java.security.MessageDigest
 import common.SecurityUtil
+import play.api.data.FormError
 
 /**
  * Action to handle the logging section.
@@ -33,23 +34,6 @@ object ABLogin extends Controller {
           "username" -> nonEmptyText,
           "password" -> nonEmptyText
       )(FormUserPassword.apply)(FormUserPassword.unapply)
-      verifying ("Invalid user / password", { user =>
-        try {
-           	val dbPassword = DBService.getPassword(user.username.toUpperCase())
-        	val words = dbPassword.split('|')
-        	println("DB Passwords = "+words)
-        	val salt = words(0)
-        	val saltedDBPassword = words(1)
-        	val encryptedUserPwd = SecurityUtil.hex_digest(salt+user.password)
-        	println("User salted password = "+encryptedUserPwd)
-  			saltedDBPassword.equals(encryptedUserPwd)
-           
-//        	val dbPassword = DBService.getPassword(user.username.toUpperCase())
-//  			dbPassword.equals(user.password)
-        } catch {
-        case e: UserNotFoundException => false
-        }
-      })
   )
   
   /**
@@ -69,22 +53,41 @@ object ABLogin extends Controller {
         BadRequest(views.html.login(error))
       },
       data => {
-	    try {
-	      session.get("abc")
-	      val formUsername = data.username
-	      val dbUser = DBService.findByUserID(formUsername)
-	      val role = dbUser.role
-	      if (role.equals(OBUserRole.ADMIN)) {
-	    	Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
-	      } else {
-	    	Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
-	      }
-	    } catch {
-	      case e: Exception => {
-	        e.printStackTrace()
-	        BadRequest (views.html.login(tempForm))
-	      }
-	    }
+        val validLogin = try {
+           	val dbPassword = DBService.getPassword(data.username.toUpperCase())
+        	val words = dbPassword.split('|')
+        	println("DB Passwords = "+words)
+        	val salt = words(0)
+        	val saltedDBPassword = words(1)
+        	val encryptedUserPwd = SecurityUtil.hex_digest(salt+data.password)
+        	println("User salted password = "+encryptedUserPwd)
+  			saltedDBPassword.equals(encryptedUserPwd)
+        } catch {
+        	case e: UserNotFoundException => false
+        }
+        
+        if (validLogin) {
+        	try {
+        		val formUsername = data.username
+				val dbUser = DBService.findByUserID(formUsername)
+				val role = dbUser.role
+				if (role.equals(OBUserRole.ADMIN)) {
+					Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
+				} else {
+					Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
+				}
+        	} catch {
+        		case e: Exception => {
+        			e.printStackTrace()
+        			BadRequest (views.html.login(tempForm))
+        		}
+        	}
+        } else {
+          val errorForm = Form(tempForm.mapping, 
+              Map("username"->data.username, "password" -> ""), 
+              Seq(new FormError("", "Invalid user / password" )), tempForm.value)
+          BadRequest (views.html.login(errorForm))
+        }
       }
     )
   }
