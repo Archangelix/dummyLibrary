@@ -454,6 +454,20 @@ object DBService {
 	  }
 	}
 	
+	def updatePassword(pUserID: String, pPassword: String) = {
+	  val sr = new SecureRandom()
+	  var bytes = new Array[Byte](32)
+	  sr.nextBytes(bytes)
+	  val encryptedPwd = SecurityUtil.hex_digest(bytes.toString()+pPassword)
+	  val securedPassword = bytes.toString() + "|" + encryptedPwd
+	  DB.withConnection { implicit c =>
+	    SQL("update USER_SECURITY set password = {password} where userid={userid} ")
+	        .on('userid -> pUserID,
+	            'password -> securedPassword)
+	        .executeUpdate()
+	  }
+	}
+	
 	/**
 	 * Fetch a catalog based on the ID. No books detail will be fetched.
 	 * 

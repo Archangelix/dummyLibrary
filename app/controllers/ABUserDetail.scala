@@ -128,31 +128,50 @@ object ABUserDetail extends Controller with TSecured {
             case e: UserNotFoundException => {
             	println ("Ok, valid userid!")
             	val user = OBUser(successForm)
-            	val password = successForm.password
-            	val errors:Seq[Option[FormError]] = Seq(
-            	  if (isBlank(password)) {
-           		    Some(new FormError("password", "Password is required."))
-            	  } else None, 
-            	  if (!isBlank(password) && !password.equals(successForm.password2)) {
-            		  Some(new FormError("password2", "Both passwords must be the same."))
-            	  } else None
-            	).filter(_!=None)
+            	val errors:Seq[Option[FormError]] = validatePassword(successForm.password, successForm.password2)
             	if (errors.size>0) {
 	         	  val newErrorForm = Form(filledForm.mapping, filledForm.data, 
 	        	      errors.map(_.get), filledForm.value)
             		BadRequest(views.html.user_detail(mode, newErrorForm, seqCountries, seqUserRoles)(session))
             	} else {
+            		val password = successForm.password
             		DBService.createUser(user, password)
             		Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
             	}
             }
           }
         } else {
-          DBService.updateUser(OBUser(successForm))
-          Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
-        }
+            val user = OBUser(successForm)
+            DBService.updateUser(user)
+
+            val password = successForm.password
+            val errors: Seq[Option[FormError]] = if (!isBlank(password)) {
+              validatePassword(successForm.password, successForm.password2)
+            } else Seq()
+            if (errors.size > 0) {
+              val newErrorForm = Form(filledForm.mapping, filledForm.data,
+                errors.map(_.get), filledForm.value)
+              BadRequest(views.html.user_detail(mode, newErrorForm, seqCountries, seqUserRoles)(session))
+            } else {
+              DBService.updatePassword(user.userID, password)
+              Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
+            }
+          }
       }
     )
+  }
+  
+  def validatePassword(pPassword1: String, pPassword2: String):Seq[Option[FormError]] = {
+    Seq(
+      if (isBlank(pPassword1)) {
+        Some(new FormError("password", "Password is required."))
+      } else None,
+      if (!isBlank(pPassword1) && !pPassword1.equals(pPassword2)) {
+        Some(new FormError("password2", "Both passwords must be the same."))
+      } else {
+        None
+      }
+    ).filter(_ != None)
   }
   
   def isBlank(str: String) = str==null || str.trim().equals("")

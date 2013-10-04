@@ -123,7 +123,17 @@
 								)
 							</td>
 						</tr>
-						@if(mode.equals(MODE_ADD)) { 
+						<tr>
+							<td colspan="2">
+								<h3>
+								@if(mode.equals(MODE_ADD)) {
+									SET PASSWORD
+								} else {
+									RESET PASSWORD
+								}
+								</h3>
+							</td>
+						</tr>
 						<tr>
 							<td>Password</td>
 							<td>@helper.inputPassword(myForm("password"),
@@ -138,9 +148,6 @@
 							)
 							</td>
 						</tr>
-						} else {
-							<input type="hidden" name="password"/>
-						}
 						<tr><td>&nbsp;</td></tr>
 						<tr>
 							<td colspan="2" align="center">
