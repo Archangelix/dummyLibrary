@@ -62,24 +62,9 @@
 						</tr>
 						<tr>
 							<td>Date of Birth</td>
-							<td>@helper.select(
-								  myForm("dob_date"),
-								  for(i<-1 to 31) yield (i.toString, i.toString),
-								  '_label -> "",
-								  '_default -> "--"
-								)
-								@helper.select(
-								  myForm("dob_month"),
-								  for(i<-1 to 12) yield (i.toString, i.toString),
-								  '_label -> "",
-								  '_default -> "--"
-								)
-								@helper.select(
-								  myForm("dob_year"),
-								  for(i<-1900 to 2013) yield (i.toString, i.toString),
-								  '_label -> "",
-								  '_default -> "--"
-								)
+							<td>@helper.inputDate(myForm("dob"),
+								'placeholder -> "Date of birth"
+							)
 								<p class="error">
 								@myForm.errors.filter(_.key=="").map{ err =>
 									@err.message

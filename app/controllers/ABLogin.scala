@@ -23,12 +23,6 @@ import play.api.data.FormError
  */
 object ABLogin extends Controller {
 
-	def sha256(pKey: String) = {
-	  val digest = MessageDigest.getInstance("SHA-256")
-	  val hash = digest.digest(pKey.getBytes("UTF-8"))
-	  hash.toString
-	}
-	
   val loginForm = Form[FormUserPassword](
       mapping (
           "username" -> nonEmptyText,
@@ -53,6 +47,7 @@ object ABLogin extends Controller {
         BadRequest(views.html.login(error))
       },
       data => {
+        // Authenticate the user password.
         val validLogin = try {
            	val dbPassword = DBService.getPassword(data.username.toUpperCase())
         	val words = dbPassword.split('|')
@@ -67,22 +62,24 @@ object ABLogin extends Controller {
         }
         
         if (validLogin) {
-        	try {
-        		val formUsername = data.username
-				val dbUser = DBService.findByUserID(formUsername)
-				val role = dbUser.role
-				if (role.equals(OBUserRole.ADMIN)) {
-					Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
-				} else {
-					Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
-				}
-        	} catch {
-        		case e: Exception => {
-        			e.printStackTrace()
-        			BadRequest (views.html.login(tempForm))
-        		}
-        	}
+          // Correct password. Redirect the user to the respective home page according to the role.
+          try {
+            val formUsername = data.username
+            val dbUser = DBService.findByUserID(formUsername)
+            val role = dbUser.role
+            if (role.equals(OBUserRole.ADMIN)) {
+              Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
+            } else {
+              Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
+            }
+          } catch {
+            case e: Exception => {
+              e.printStackTrace()
+              BadRequest(views.html.login(tempForm))
+            }
+          }
         } else {
+          // Wrong password. Return to login page.
           val errorForm = Form(tempForm.mapping, 
               Map("username"->data.username, "password" -> ""), 
               Seq(new FormError("", "Invalid user / password" )), tempForm.value)
@@ -92,6 +89,9 @@ object ABLogin extends Controller {
     )
   }
   
+  /**
+   * Log out the user. Bring the user back to the login page.
+   */
   def logout = Action { implicit req =>
     Redirect(routes.ABLogin.loginPage).withNewSession.flashing("message" -> "Log out successful!")
   }

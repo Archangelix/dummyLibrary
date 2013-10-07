@@ -20,9 +20,7 @@ case class FormUser(
     gender: String, 
     idNumber: String, 
     address: String,
-    dob_date: String,
-    dob_month: String,
-    dob_year: String,
+    dob: Date,
     userRoleID: String,
     userRoleName: Option[String],
     nationality: String,
@@ -34,13 +32,14 @@ object FormUser {
   def apply(pUser: OBUser): FormUser = {
     FormUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, pUser.gender.toString(), 
         pUser.idNumber, pUser.address,
-        sdf_date.format(pUser.dob), sdf_month.format(pUser.dob), sdf_year.format(pUser.dob),
+        pUser.dob,
         pUser.role.id.toString, Some(pUser.role.name), pUser.nationality.toString, "", "")
   }
   
   val sdf_date = new SimpleDateFormat("d")
   val sdf_month = new SimpleDateFormat("M")
   val sdf_year = new SimpleDateFormat("yyyy")
+  val sdf = new SimpleDateFormat("d-M-yyyy")
   
 }
 

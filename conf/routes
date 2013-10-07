@@ -3,8 +3,9 @@
 # ~~~~
 
 # Home page
-GET		/										controllers.ABLogin.loginPage
-POST	/										controllers.ABLogin.login
+GET     /		               					controllers.Assets.at(path="/public", file="index.html")
+GET		/login									controllers.ABLogin.loginPage
+POST	/login									controllers.ABLogin.login
 GET		/logout									controllers.ABLogin.logout
 GET     /cataloglist                   			controllers.ABCatalogList.index
 GET     /first                      			controllers.ABCatalogList.navigateFirst

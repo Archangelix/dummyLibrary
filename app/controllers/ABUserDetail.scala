@@ -15,6 +15,11 @@ import play.api.mvc.Controller
 import services.DBService
 import play.api.data.FormError
 import play.api.data.FormError
+import play.api.data.validation.Constraint
+import java.util.Date
+import play.api.data.validation.Invalid
+import play.api.data.validation.Valid
+import play.api.data.validation.ValidationError
 /**
  * Action to handle the user section, including the add, update, delete, and view.
  */
@@ -26,6 +31,12 @@ object ABUserDetail extends Controller with TSecured {
   val seqCountries = DDCountry.all
   val seqUserRoles = DDUserRoles.all
   
+  def minYear(pMinYear: Int): Constraint[Date] = 
+    Constraint[Date]("constraint.minYear", pMinYear) { o => 
+      if (o.getYear >= pMinYear) Valid
+      else Invalid(ValidationError("error.minYear", pMinYear))
+  }
+  
   val formEditUserMapping = mapping(
       "rowIdx" -> optional(of[Long]),
       "seqNo" -> optional(of[Long]),
@@ -34,21 +45,21 @@ object ABUserDetail extends Controller with TSecured {
       "gender" -> nonEmptyText,
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
-      "dob_date" -> text,
-      "dob_month" -> text,
-      "dob_year" -> text,
+      "dob" -> date("dd/MM/yyyy").verifying(minYear(1900)),
       "userRoleID" ->nonEmptyText,
       "user_role_name" -> optional(text),
       "nationality" -> nonEmptyText,
       "password" -> text,
       "password2" -> text
     )(FormUser.apply)(FormUser.unapply)verifying("Invalid date." ,{form =>
-      	try {
+      	println("test user detail")
+      	/*try {
       	  val date = sdf.parse(form.dob_date+"-"+form.dob_month+"-"+form.dob_year)
       	  true
       	} catch {
       	  case e:Exception => {println("invalid date!"); false}
-      	}
+      	}*/
+      	true
   	  })
 
   val formNewUserMapping = mapping(
@@ -59,25 +70,21 @@ object ABUserDetail extends Controller with TSecured {
       "gender" -> nonEmptyText,
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
-      "dob_date" -> text,
-      "dob_month" -> text,
-      "dob_year" -> text,
+      "dob" -> date("dd/MM/yyyy").verifying(minYear(1900)),
       "userRoleID" ->nonEmptyText,
       "user_role_name" -> optional(text),
       "nationality" -> nonEmptyText,
       "password" -> nonEmptyText,
       "password2" -> nonEmptyText
     )(FormUser.apply)(FormUser.unapply)verifying("Invalid date." ,{form =>
-      	try {
+      	/*try {
       	  val date = sdf.parse(form.dob_date+"-"+form.dob_month+"-"+form.dob_year)
       	  true
       	} catch {
       	  case e:Exception => {println("invalid date!"); false}
-      	}
+      	}*/
+      true
   	  })
-
-  val editUserForm = Form[FormUser](formEditUserMapping)
-  val newUserForm = Form[FormUser](formNewUserMapping)
 
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
   
@@ -85,7 +92,8 @@ object ABUserDetail extends Controller with TSecured {
    * Displaying the catalog detail page with blank information.
    */
   def gotoNewUser() = withAuth {username => implicit req =>
-    Ok(views.html.user_detail(MODE_ADD, editUserForm, seqCountries, seqUserRoles)(session)).withSession(
+    Ok(views.html.user_detail(MODE_ADD, Form[FormUser](formNewUserMapping), 
+        seqCountries, seqUserRoles)(session)).withSession(
         session + ("mode" -> MODE_ADD))
   }
 
@@ -95,7 +103,7 @@ object ABUserDetail extends Controller with TSecured {
   def edit(pSeqNo: String) = withAuth {username => implicit req =>
     val user= DBService.findUserBySeqNo(pSeqNo.toLong)
     val formUser = FormUser(user)
-    val filledForm = editUserForm.fill(formUser)
+    val filledForm = Form[FormUser](formEditUserMapping).fill(formUser)
     
     println("filledForm with user userID = "+filledForm("userID").value)
     Ok(views.html.user_detail(MODE_EDIT, filledForm, seqCountries, seqUserRoles)(session)).withSession(
@@ -106,9 +114,9 @@ object ABUserDetail extends Controller with TSecured {
     val mode = session.get("mode").getOrElse("")
     val filledForm = 
       if (mode.equals(MODE_ADD)) 
-    	newUserForm.bindFromRequest() 
+    	Form[FormUser](formNewUserMapping).bindFromRequest() 
       else 
-        editUserForm.bindFromRequest()
+        Form[FormUser](formEditUserMapping).bindFromRequest()
     filledForm.fold(
       errorForm => {
         errorForm.errors.foreach{ err =>

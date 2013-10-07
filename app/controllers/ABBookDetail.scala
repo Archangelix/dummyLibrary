@@ -23,18 +23,17 @@ object ABBookDetail extends Controller with TSecured {
      * Dropdown items for the 'Origin' type.
      */
   val ddItemOriginList = List[(String, String)](
-		  ("new" -> "New"),
-		  ("old" -> "Old")
-      )
+    ("new" -> "New"),
+    ("old" -> "Old"))
     
   val formBookMapping = mapping(
-      "idx" -> optional(of[Long]),
-      "id" -> optional(of[Long]),
-      "catalogID" -> of[Long],
-      "originCode" -> nonEmptyText,
-      "originDesc" -> optional(text),
-      "remarks" -> nonEmptyText
-    )(FormBook.apply)(FormBook.unapply)
+    "idx" -> optional(of[Long]),
+    "id" -> optional(of[Long]),
+    "catalogID" -> of[Long],
+    "originCode" -> nonEmptyText,
+    "originDesc" -> optional(text),
+    "remarks" -> nonEmptyText
+  )(FormBook.apply)(FormBook.unapply)
 
   val bookForm = Form[FormBook] (formBookMapping)
 
@@ -58,7 +57,7 @@ object ABBookDetail extends Controller with TSecured {
       error => {
         println("validation failed.")
         val mode = session.get("bookMode").getOrElse(MODE_ADD)
-        error.errors.foreach(err => println(err.key + ": "+err.message))
+//        error.errors.foreach(err => println(err.key + ": "+err.message))
         BadRequest(views.html.book_detail(mode, error, pCatalogID, ddItemOriginList))
       },
       data => {

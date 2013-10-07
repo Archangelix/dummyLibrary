@@ -35,8 +35,8 @@ object OBUser {
     OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID.toUpperCase, pUser.name, 
         Gender(pUser.gender), 
         pUser.idNumber, pUser.address, 
-        sdf.parse(pUser.dob_date+"-"+pUser.dob_month+"-"+pUser.dob_year), 
+        pUser.dob, 
             OBUserRole(pUser.userRoleID.toInt), pUser.nationality.toInt, "", false)
   
-  val sdf = new SimpleDateFormat("dd-MM-yy")
+  val sdf = new SimpleDateFormat("dd-MM-yyyy")
 }
