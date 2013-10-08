@@ -17,6 +17,9 @@ import services.DBService
 import java.security.MessageDigest
 import common.SecurityUtil
 import play.api.data.FormError
+import controllers.ABUserDetail.MODE_ADD
+import controllers.ABUserDetail.MODE_EDIT
+import models.form.FormUser
 
 /**
  * Action to handle the logging section.
@@ -34,7 +37,7 @@ object ABLogin extends Controller {
    * Displaying the login page.
    */
   def loginPage = Action { implicit req =>
-    Ok(views.html.login(loginForm))
+    Ok(views.html.index(loginForm))
   }
   
   /**
@@ -44,7 +47,7 @@ object ABLogin extends Controller {
     val tempForm = loginForm.bindFromRequest
     tempForm.fold (
       error => {
-        BadRequest(views.html.login(error))
+        Redirect(routes.ABLoginSignup.loginPage).flashing("username" -> loginForm.data("username"))
       },
       data => {
         // Authenticate the user password.
@@ -75,7 +78,7 @@ object ABLogin extends Controller {
           } catch {
             case e: Exception => {
               e.printStackTrace()
-              BadRequest(views.html.login(tempForm))
+              Redirect(routes.ABLoginSignup.loginPage).flashing("username" -> data.username)
             }
           }
         } else {
@@ -83,7 +86,7 @@ object ABLogin extends Controller {
           val errorForm = Form(tempForm.mapping, 
               Map("username"->data.username, "password" -> ""), 
               Seq(new FormError("", "Invalid user / password" )), tempForm.value)
-          BadRequest (views.html.login(errorForm))
+          Redirect(routes.ABLoginSignup.loginPage).flashing("username" -> data.username)
         }
       }
     )

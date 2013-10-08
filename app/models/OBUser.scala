@@ -31,12 +31,23 @@ object OBUser {
         pUser.idNumber, pUser.address, 
         pUser.dob, pUserRole, pUser.nationality, "", pUser.isDeleted)
   
-  def apply(pUser: FormUser): OBUser = 
-    OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID.toUpperCase, pUser.name, 
-        Gender(pUser.gender), 
-        pUser.idNumber, pUser.address, 
-        pUser.dob, 
+  def apply(pUser: FormUser): OBUser = OBUser(pUser, false) 
+  
+  def apply(pUser: FormUser, pIsUserRegistration: Boolean): OBUser = {
+    if (pIsUserRegistration) {
+    	OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID.toUpperCase, pUser.name, 
+    			Gender(pUser.gender), 
+    			pUser.idNumber, pUser.address, 
+    			pUser.dob, 
+    			OBUserRole.BORROWER, pUser.nationality.toInt, "", false)
+    } else {
+    	OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID.toUpperCase, pUser.name, 
+	        Gender(pUser.gender), 
+	        pUser.idNumber, pUser.address, 
+	        pUser.dob, 
             OBUserRole(pUser.userRoleID.toInt), pUser.nationality.toInt, "", false)
+    }
+  }
   
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
 }

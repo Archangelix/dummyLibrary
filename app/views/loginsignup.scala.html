@@ -1,0 +1,180 @@
+@(loginForm: Form[form.FormUserPassword], signupForm: Form[form.FormUser])(implicit session: Session, flash: Flash)
+@import models.common.DDCountry
+
+<!doctype html>
+<html>
+	<head>
+		<title>Twitter Bootstrap 3</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
+		<script>
+			var successFn = function(data) {
+				console.log('Ajax successful!');
+				if (data == 'true') {
+					$('#alert-box').html('Username available!');
+					$('#alert-box').removeClass();
+					$('#alert-box').addClass('ajaxSuccessful');
+					console.log('Username available!');
+				} else {
+					$('#alert-box').html('Username not available!');
+					console.log('Username available!');
+					$('#alert-box').removeClass();
+					$('#alert-box').addClass('ajaxFailed');
+				}
+			}
+			
+			var errorFn = function(err) {
+				console.log('Ajax failed!');
+				console.debug(err);
+			}
+			
+			var ajax1 = {
+				success: successFn,
+				error: errorFn
+			}
+			
+			function checkUsernameAvailability() {
+				var username = $('#signUpUserID').val();
+				jsRoutes.controllers.ABLoginSignup.isUsernameAvailable(username).ajax(ajax1);
+			}
+		</script>
+	</head>
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="/">Dummy Library</a>
+		</div>
+	</div>
+	</div>
+	<div class="container">
+	<div id="divLoginErrorSignIn">
+		<form id="formLogin" action="@routes.ABLoginSignup.login" method="POST" class="navbar-form navbar-right">
+			<fieldset>
+				<legend>Login Information</legend>
+				<div class="form-group">
+					@helper.inputText(loginForm("username"),
+							'_label -> "User ID",
+							'placeholder -> "User ID",
+							'class -> "form-control capitaliseinput"
+							)
+				</div>
+				<div class="form-group">
+					@helper.inputText(loginForm("password"), 
+							'_label -> "Password",
+							'placeholder -> "Password",
+							'class -> "form-control",
+							'type -> "password"
+							)
+				</div>
+			</fieldset>
+			@defining(loginForm.errors.filter(_.key.equals(""))) { errors =>
+				@if(errors.size>0) {
+					<div align="left">
+						<ul class="error">
+						@errors.map { error =>
+							<li>@error.message</li>
+						}
+						</ul>
+					</div>
+				}
+			}
+			<div class="form-group">
+			<button type="submit" class="btn btn-success">Sign in</button>
+			<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/'" class="btn btn-danger"/>
+			</div>
+		</form>
+		<form id="formSignup" action="@routes.ABLoginSignup.signup" method="POST" class="navbar-form navbar-right">
+			<input type="hidden" name="userRoleID"/>
+			<fieldset>
+				<legend>Registration</legend>
+				<div class="form-group">
+					@helper.inputText(signupForm("username"),
+							'id -> "signUpUserID",
+							'_label -> "User ID",
+							'placeholder -> "User ID",
+							'class -> "form-control capitaliseinput",
+							'onblur -> "checkUsernameAvailability()"
+							)
+					<div id='alert-box'></div>
+				</div>
+				<div class="form-group">
+					@helper.inputText(signupForm("name"),
+							'_label -> "Full Name",
+							'placeholder -> "Full Name",
+							'class -> "form-control"
+							)
+				</div>
+				<div id="divGender" class="form-group">
+					@helper.inputRadioGroup(signupForm("gender"),
+						options = Seq("M" -> "Male", "F" -> "Female"),
+						'_label -> "Gender"
+					)
+				</div>
+				<div class="form-group">
+					@helper.inputDate(signupForm("dob"),
+						'placeholder -> "Date of birth",
+						'_label -> "Date of Birth"
+					)
+					<p class="error">
+					@signupForm.errors.filter(_.key=="").map{ err =>
+						@err.message
+					}
+					</p>
+				</div>
+				<div class="form-group">
+					@helper.inputText(signupForm("idNumber"),
+						'placeholder -> "ID Number",
+						'_label -> "ID Number"
+					)
+				</div>
+				<div class="form-group">
+					@helper.textarea(signupForm("address"),
+						'rows -> 3,
+						'cols -> 50,
+						'placeholder ->"Address",
+						'_label -> "Address"
+						)
+				</div>
+				<div class="form-group">
+					@helper.select(
+							signupForm("nationality"),
+							DDCountry.all,
+							'_label -> "Nationality",
+							'_default -> "Please select"
+						)
+				</div>
+				<div class="form-group">
+					@helper.inputText(signupForm("password"), 
+							'_label -> "Password",
+							'placeholder -> "Password",
+							'class -> "form-control",
+							'type -> "password",
+							'value -> ""
+							)
+				</div>
+				<div id="divPassword2" class="form-group">
+					@helper.inputText(signupForm("password2"), 
+							'_label -> "Verify Password",
+							'placeholder -> "Enter the password again",
+							'class -> "form-control",
+							'type -> "password",
+							'value -> ""
+							)
+				</div>
+				<div class="form-group">
+					<input type="submit" name="addNewUser" value='Register' class="btn btn-success"/>
+					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/'" class="btn btn-danger"/>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	</div>
+</body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+<script type="text/javascript" src="@routes.ABLoginSignup.javascriptRoutes"></script>
+</html>

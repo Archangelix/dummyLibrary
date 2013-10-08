@@ -3,10 +3,15 @@
 # ~~~~
 
 # Home page
-GET     /		               					controllers.Assets.at(path="/public", file="index.html")
-GET		/login									controllers.ABLogin.loginPage
+#GET    /		               					controllers.Assets.at(path="/public", file="index.html")
+GET		/										controllers.ABLogin.loginPage
 POST	/login									controllers.ABLogin.login
 GET		/logout									controllers.ABLogin.logout
+GET		/isUsernameAvailable/:username			controllers.ABLoginSignup.isUsernameAvailable(username)
+GET		/javascriptRoutes						controllers.ABLoginSignup.javascriptRoutes
+GET		/loginsignup							controllers.ABLoginSignup.loginPage
+POST	/userlogin								controllers.ABLoginSignup.login
+POST	/usersignup								controllers.ABLoginSignup.signup
 GET     /cataloglist                   			controllers.ABCatalogList.index
 GET     /first                      			controllers.ABCatalogList.navigateFirst
 GET     /prev                       			controllers.ABCatalogList.navigatePrev
@@ -35,6 +40,7 @@ POST	/searchbook								controllers.ABSearchCatalog.search
 GET		/tags									controllers.ABTagsList.listTags
 POST	/tags/:seqno/update						controllers.ABTagsList.saveUpdate(seqno)
 POST	/tags/create							controllers.ABTagsList.saveCreate
+GET     /assets/*file          					controllers.Assets.at(path="/public", file)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

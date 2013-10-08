@@ -1,25 +1,29 @@
 package controllers
 
 import java.text.SimpleDateFormat
+import java.util.Date
+
+import common.SecurityUtil.validatePassword
 import models.OBUser
 import models.common.DDCountry
 import models.common.DDUserRoles
 import models.exception.UserNotFoundException
 import models.form.FormUser
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.data.Forms
-import play.api.data.format.Formats._
-import play.api.mvc.Action
-import play.api.mvc.Controller
-import services.DBService
 import play.api.data.FormError
-import play.api.data.FormError
+import play.api.data.Forms.date
+import play.api.data.Forms.mapping
+import play.api.data.Forms.nonEmptyText
+import play.api.data.Forms.of
+import play.api.data.Forms.optional
+import play.api.data.Forms.text
+import play.api.data.format.Formats.longFormat
 import play.api.data.validation.Constraint
-import java.util.Date
 import play.api.data.validation.Invalid
 import play.api.data.validation.Valid
 import play.api.data.validation.ValidationError
+import play.api.mvc.Controller
+import services.DBService
 /**
  * Action to handle the user section, including the add, update, delete, and view.
  */
@@ -168,19 +172,6 @@ object ABUserDetail extends Controller with TSecured {
           }
       }
     )
-  }
-  
-  def validatePassword(pPassword1: String, pPassword2: String):Seq[Option[FormError]] = {
-    Seq(
-      if (isBlank(pPassword1)) {
-        Some(new FormError("password", "Password is required."))
-      } else None,
-      if (!isBlank(pPassword1) && !pPassword1.equals(pPassword2)) {
-        Some(new FormError("password2", "Both passwords must be the same."))
-      } else {
-        None
-      }
-    ).filter(_ != None)
   }
   
   def isBlank(str: String) = str==null || str.trim().equals("")
