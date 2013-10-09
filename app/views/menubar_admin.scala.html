@@ -1,7 +1,18 @@
-<div id="menubar">
-	<ul>
-		<li><a href="/useradmin">User</a></li>
-		<li><a href="/cataloglist">Catalog</a></li>
-		<li><a href="/tags">Tags</a></li>
-	</ul>
-</div>
+@()(implicit session: Session)
+	<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="/">Dummy Library</a>
+		</div>
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li id="liUsers" ><a href="/useradmin">Users</a></li>
+				<li id="liCatalogs" ><a href="/cataloglist">Catalogs</a></li>
+				<li id="liTags" ><a href="/tags">Tags</a></li>
+			</ul>
+		<div id="loginInfo" class="navbar-right">
+			Hi, @session.get(Security.username).getOrElse("")! (<a href="/logout">Sign out</a>)
+		</div>
+		</div>
+	</div>
+	</div>

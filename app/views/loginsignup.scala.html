@@ -1,46 +1,46 @@
-@(loginForm: Form[form.FormUserPassword], signupForm: Form[form.FormUser])(implicit session: Session, flash: Flash)
+@(loginForm: Form[form.FormUserPassword], signupForm: Form[form.FormUser])(implicit session: Session)
 @import models.common.DDCountry
-
+<!-- loginsignup.scala.html -->
 <!doctype html>
 <html>
-	<head>
-		<title>Twitter Bootstrap 3</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
-		<script>
-			var successFn = function(data) {
-				console.log('Ajax successful!');
-				if (data == 'true') {
-					$('#alert-box').html('Username available!');
-					$('#alert-box').removeClass();
-					$('#alert-box').addClass('ajaxSuccessful');
-					console.log('Username available!');
-				} else {
-					$('#alert-box').html('Username not available!');
-					console.log('Username available!');
-					$('#alert-box').removeClass();
-					$('#alert-box').addClass('ajaxFailed');
-				}
+<head>
+	<title>Dummy Library</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
+	<script>
+		var successFn = function(data) {
+			console.log('Ajax successful!');
+			if (data == 'true') {
+				$('#alert-box').html('Username available!');
+				$('#alert-box').removeClass();
+				$('#alert-box').addClass('ajaxSuccessful');
+				console.log('Username available!');
+			} else {
+				$('#alert-box').html('Username not available!');
+				console.log('Username available!');
+				$('#alert-box').removeClass();
+				$('#alert-box').addClass('ajaxFailed');
 			}
-			
-			var errorFn = function(err) {
-				console.log('Ajax failed!');
-				console.debug(err);
-			}
-			
-			var ajax1 = {
-				success: successFn,
-				error: errorFn
-			}
-			
-			function checkUsernameAvailability() {
-				var username = $('#signUpUserID').val();
-				jsRoutes.controllers.ABLoginSignup.isUsernameAvailable(username).ajax(ajax1);
-			}
-		</script>
+		}
+		
+		var errorFn = function(err) {
+			console.log('Ajax failed!');
+			console.debug(err);
+		}
+		
+		var ajax1 = {
+			success: successFn,
+			error: errorFn
+		}
+		
+		function checkUsernameAvailability() {
+			var username = $('#signUpUserID').val();
+			jsRoutes.controllers.ABLoginSignup.isUsernameAvailable(username).ajax(ajax1);
+		}
+	</script>
 	</head>
 <body>
 	<div class="navbar navbar-inverse navbar-fixed-top">
@@ -51,7 +51,7 @@
 	</div>
 	</div>
 	<div class="container">
-	<div id="divLoginErrorSignIn">
+	<div class="divMainContainer" id="divLoginErrorSignIn">
 		<form id="formLogin" action="@routes.ABLoginSignup.login" method="POST" class="navbar-form navbar-right">
 			<fieldset>
 				<legend>Login Information</legend>

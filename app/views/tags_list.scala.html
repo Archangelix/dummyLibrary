@@ -1,4 +1,5 @@
 @(myForm: Form[form.FormTag], list: List[OBTag])(implicit session: Session)
+<!doctype html>
 <!-- usersList.scala.html -->
 
 @import helper._
@@ -6,10 +7,12 @@
 
 <html>
 <head>
-	<title>Local Library</title>
+	<title>Dummy Library</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
 	<script>
 		function updateTag(rowIdx) {
 			console.log("rowIdx = "+rowIdx);
@@ -21,7 +24,7 @@
 			$('#updatedTagName').val(newTagName);
 			console.log("newTagName = "+newTagName);
 			
-			document.forms[0].action = "/tags/"+rowIdx+"/update";
+			document.forms[0].action = "/tags/"+seqNo+"/update";
 			document.forms[0].submit();
 		}
 		
@@ -32,11 +35,9 @@
 	</script>
 </head>
 <body>
-	<div id="container">
-		@banner(true)
-		@menubar_admin()
-		<div id="content">
-			<h1 class="pageTitle">LIST OF TAGS</h1>
+	@menubar_admin()
+	<div id="divCommonList" class="divMainContainer container">
+		<h1>List of Tags</h1>
 				<form action="@routes.ABTagsList.saveCreate" method="POST">
 				<input type='hidden' id='selectedID' name='selectedID'/>
 				<input type='hidden' id='updatedTagName' name='updatedTagName'/>
@@ -69,15 +70,17 @@
 				}
 				<br/>
 					@helper.inputText(myForm("newTagName"), 
-									'placeholder -> "New tag name",
-									'class -> "initcapitaliseinput"
-									)
+							'placeholder -> "New tag name",
+							'class -> "initcapitaliseinput"
+							)
 					<input type="submit" value="Create New" onclick="javascript:createTag()"/>
 				</div>
 			</form>
-		</div>
 	</div>
 </body>
 <script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'/></script>
 <script src='@routes.Assets.at("javascripts/bootstrap.js")'/></script>
+<script>
+	$('#liTags').addClass('active');
+</script>
 </html>

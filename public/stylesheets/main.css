@@ -7,6 +7,11 @@ html {
 	background-size: cover;
 }
 
+body {
+	padding-top: 50px;
+	bottom: 0;
+}
+
 #mainSearchCatalog {
 	position: absolute;
 	top: 40%;
@@ -43,16 +48,17 @@ html {
 	border: 0;
 }
 
+#loginInfo {
+	color: #777777;
+	padding: 15px 0;
+}
+
 #banner {
 	background-color: grey;
 }
 
 #companyTitle {
 	font-size: 4em;
-}
-
-#loginInfo {
-	float: right;
 }
 
 #banner, #menubar {
@@ -93,9 +99,17 @@ h1.pageTitle {
 	margin: 0;
 }
 
+fieldset {
+	margin-bottom: 2em;
+}
+
 fieldset label, fieldset input {
 	display: block;
 	width: 100%:
+}
+
+#divCommonList dt label {
+	display: none;
 }
 
 dd, dt, dl {
@@ -124,15 +138,21 @@ div.divCatResult em {
 	width: 38em;
 }
 
-#divLoginErrorSignIn {
+.divMainContainer {
 	background: rgba(255,255,255,.9);
 	position: absolute;
-	top: 5em;
+	top: 100px;
 	padding-bottom: 3em;
 	left: 0;
 	right: 0;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+#divCommonList {
+	width: 80em;
+	margin-top: auto;
+	margin-bottom: auto;
 }
 
 select, textarea, #alert-box,

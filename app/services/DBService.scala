@@ -574,12 +574,12 @@ object DBService {
   	  					"select row_number() over(order by USERS.SEQNO) as rowIdx, " +
   	  					"	USERS.*, USER_ROLE.ID, USER_ROLE.NAME USER_ROLE_NAME " +
   	  					"from USERS, USER_ROLE " +
-  	  					"where USERS.USER_ROLE_ID = USER_ROLE.id" +
+  	  					"where USERS.USER_ROLE_ID = USER_ROLE.id and USERS.is_deleted=false " +
   	  				") tempUser " +
   	  				"where rowIdx<={endIdx} and rowIdx>={startIdx} order by rowIdx")
   	  				.on ('startIdx -> startIdx, 'endIdx -> endIdx)
   	  				.as(dbUserListMapping *)
-  	  val firstRow = SQL("select COUNT(*) c from USERS").apply.head
+  	  val firstRow = SQL("select COUNT(*) c from USERS where is_deleted=false").apply.head
   	  val cnt = firstRow[Long]("c")
   	  
   	  (list.map(dbUser => OBUser(dbUser, 

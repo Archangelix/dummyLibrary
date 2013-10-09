@@ -1,7 +1,7 @@
 package models.common
 
 case class Gender(private val gender: String) {
-  override def toString() = this.gender
+  override def toString() = if ("M".equals(gender)) "Male" else "Female"
 }
 
 object Gender {

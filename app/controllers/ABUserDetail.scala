@@ -3,7 +3,8 @@ package controllers
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import common.SecurityUtil.validatePassword
+import common.SecurityUtil._
+import common.CommonUtil._
 import models.OBUser
 import models.common.DDCountry
 import models.common.DDUserRoles
@@ -32,9 +33,6 @@ object ABUserDetail extends Controller with TSecured {
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
   
-  val seqCountries = DDCountry.all
-  val seqUserRoles = DDUserRoles.all
-  
   def minYear(pMinYear: Int): Constraint[Date] = 
     Constraint[Date]("constraint.minYear", pMinYear) { o => 
       if (o.getYear >= pMinYear) Valid
@@ -44,51 +42,34 @@ object ABUserDetail extends Controller with TSecured {
   val formEditUserMapping = mapping(
       "rowIdx" -> optional(of[Long]),
       "seqNo" -> optional(of[Long]),
-      "userID" -> nonEmptyText,
+      "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
-      "dob" -> date("dd/MM/yyyy").verifying(minYear(1900)),
+      "dob" -> date("yyyy-MM-dd").verifying(validDOB),
       "userRoleID" ->nonEmptyText,
       "user_role_name" -> optional(text),
       "nationality" -> nonEmptyText,
       "password" -> text,
       "password2" -> text
-    )(FormUser.apply)(FormUser.unapply)verifying("Invalid date." ,{form =>
-      	println("test user detail")
-      	/*try {
-      	  val date = sdf.parse(form.dob_date+"-"+form.dob_month+"-"+form.dob_year)
-      	  true
-      	} catch {
-      	  case e:Exception => {println("invalid date!"); false}
-      	}*/
-      	true
-  	  })
+    )(FormUser.apply)(FormUser.unapply)
 
   val formNewUserMapping = mapping(
       "rowIdx" -> optional(of[Long]),
       "seqNo" -> optional(of[Long]),
-      "userID" -> nonEmptyText,
+      "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
-      "dob" -> date("dd/MM/yyyy").verifying(minYear(1900)),
+      "dob" -> date("yyyy-MM-dd").verifying(validDOB),
       "userRoleID" ->nonEmptyText,
       "user_role_name" -> optional(text),
       "nationality" -> nonEmptyText,
       "password" -> nonEmptyText,
       "password2" -> nonEmptyText
-    )(FormUser.apply)(FormUser.unapply)verifying("Invalid date." ,{form =>
-      	/*try {
-      	  val date = sdf.parse(form.dob_date+"-"+form.dob_month+"-"+form.dob_year)
-      	  true
-      	} catch {
-      	  case e:Exception => {println("invalid date!"); false}
-      	}*/
-      true
-  	  })
+    )(FormUser.apply)(FormUser.unapply)
 
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
   
@@ -96,8 +77,8 @@ object ABUserDetail extends Controller with TSecured {
    * Displaying the catalog detail page with blank information.
    */
   def gotoNewUser() = withAuth {username => implicit req =>
-    Ok(views.html.user_detail(MODE_ADD, Form[FormUser](formNewUserMapping), 
-        seqCountries, seqUserRoles)(session)).withSession(
+    Ok(views.html.user_detail(MODE_ADD, Form[FormUser](formNewUserMapping)
+        )(session)).withSession(
         session + ("mode" -> MODE_ADD))
   }
 
@@ -110,7 +91,7 @@ object ABUserDetail extends Controller with TSecured {
     val filledForm = Form[FormUser](formEditUserMapping).fill(formUser)
     
     println("filledForm with user userID = "+filledForm("userID").value)
-    Ok(views.html.user_detail(MODE_EDIT, filledForm, seqCountries, seqUserRoles)(session)).withSession(
+    Ok(views.html.user_detail(MODE_EDIT, filledForm)(session)).withSession(
         session + ("mode" -> MODE_EDIT))
   }
   
@@ -126,7 +107,7 @@ object ABUserDetail extends Controller with TSecured {
         errorForm.errors.foreach{ err =>
           println(err.key+": "+err.message)
         }
-        BadRequest(views.html.user_detail(mode, filledForm, seqCountries, seqUserRoles)(session))
+        BadRequest(views.html.user_detail(mode, filledForm)(session))
       },
       successForm => {
         if (mode.equals(MODE_ADD)) {
@@ -135,7 +116,7 @@ object ABUserDetail extends Controller with TSecured {
         	  val newErrors = Form(filledForm.mapping, filledForm.data, 
         	      Seq(new FormError("userID", "This User ID is not available.")), filledForm.value)
         	  println ("Duplicate userid has been found!")
-        	  BadRequest(views.html.user_detail(mode, newErrors, seqCountries, seqUserRoles)(session))
+        	  BadRequest(views.html.user_detail(mode, newErrors)(session))
           } catch {
             case e: UserNotFoundException => {
             	println ("Ok, valid userid!")
@@ -144,7 +125,7 @@ object ABUserDetail extends Controller with TSecured {
             	if (errors.size>0) {
 	         	  val newErrorForm = Form(filledForm.mapping, filledForm.data, 
 	        	      errors.map(_.get), filledForm.value)
-            		BadRequest(views.html.user_detail(mode, newErrorForm, seqCountries, seqUserRoles)(session))
+            		BadRequest(views.html.user_detail(mode, newErrorForm)(session))
             	} else {
             		val password = successForm.password
             		DBService.createUser(user, password)
@@ -164,7 +145,7 @@ object ABUserDetail extends Controller with TSecured {
             if (errors.size > 0) {
               val newErrorForm = Form(filledForm.mapping, filledForm.data,
                 errors.map(_.get), filledForm.value)
-              BadRequest(views.html.user_detail(mode, newErrorForm, seqCountries, seqUserRoles)(session))
+              BadRequest(views.html.user_detail(mode, newErrorForm)(session))
             } else {
               DBService.updatePassword(user.userID, password)
               Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")

@@ -1,152 +1,146 @@
-@(mode: String, myForm: Form[form.FormUser], 
-	pCountries: Seq[(String, String)], pUserRoles: Seq[(String, String)])(implicit session: Session)
-
+@(mode: String, signupForm: Form[form.FormUser])(implicit session: Session)
+@import models.common._
 @import controllers.ABUserDetail.MODE_ADD
 @import controllers.ABUserDetail.MODE_EDIT
 
+<!-- loginsignup.scala.html -->
+<!doctype html>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
-</head>
+	<title>Dummy Library</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
+	</head>
 <body>
-	<div id="container">
-		@banner(true)
-		@menubar_admin()
-		<div id="content">
-			<h1 class="pageTitle">
+	@menubar_admin()
+	<div class="container">
+	<div class="divMainContainer" id="divLoginErrorSignIn">
+		<form id="formSignup" action="@routes.ABUserDetail.save" method="POST" class="navbar-form navbar-right">
+			<input type='hidden' name='seqNo' value='@signupForm("seqNo").value'/>
+			<fieldset>
+				<legend>
 				@if(mode.equals(MODE_ADD)) { 
-					ADD A NEW USER
+					REGISTRATION
 				} else {
-					EDIT A USER
+					MODIFICATION
 				}
-				<form action="@routes.ABUserDetail.save" method="POST">
-					<div align="left">
-					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
-						@if(errs.size>0) {
-							<ul class="error">
-							@errs.map { err =>
-								<li>@err.message</li>
-							}
-							</ul>
-						}
+				</legend>
+				<div class="form-group">
+					@if(mode.equals(MODE_ADD)) { 
+						@helper.inputText(signupForm("username"),
+								'id -> "signUpUserID",
+								'_label -> "Username",
+								'placeholder -> "Username",
+								'class -> "form-control capitaliseinput",
+								'onblur -> "checkUsernameAvailability()"
+								)
+					} else {
+						<label>Username</label>
+						<p>@signupForm("username").value</p>
+						<input type='hidden' name='username' value='@signupForm("username").value'/>
 					}
-					<input type="hidden" value="@myForm("seqNo").value" name="seqNo"/>
-					<input type="hidden" value="@myForm("id").value" name="id"/>
-					<table class="outbordertable">
-						<col width="30%"/>
-						<col width="70%"/>
-						<tr>
-							<td>User ID</td>
-							<td>@helper.inputText(myForm("userID"), 
-								'placeholder -> "User ID",
-								'class -> "capitaliseinput"
-								)
-							</td>
-						</tr>
-						<tr>
-							<td>Name</td>
-							<td>@helper.inputText(myForm("name"), 
-								'placeholder ->"Name"
-								)
-							</td>
-						</tr>
-						<tr>
-							<td>Gender</td>
-							<td align="left">@helper.inputRadioGroup(myForm("gender"),
-								options = Seq("M" -> "Male", "F" -> "Female"),
-								'_label -> ""
+					<div id='alert-box'></div>
+				</div>
+				<div class="form-group">
+					@helper.inputText(signupForm("name"),
+							'_label -> "Full Name",
+							'placeholder -> "Full Name",
+							'class -> "form-control"
 							)
-							</td>
-						</tr>
-						<tr>
-							<td>Date of Birth</td>
-							<td>@helper.inputDate(myForm("dob"),
-								'placeholder -> "Date of birth"
-							)
-								<p class="error">
-								@myForm.errors.filter(_.key=="").map{ err =>
-									@err.message
-								}
-								</p>
-							</td>
-						</tr>
-						<tr>
-							<td>ID Number</td>
-							<td>@helper.inputText(myForm("idNumber"),
-								'placeholder -> "ID Number"
-							)
-							</td>
-						</tr>
-						<tr>
-							<td>Address</td>
-							<td>@helper.textarea(myForm("address"),
-								'rows -> 3,
-								'cols -> 50,
-								'placeholder ->"Address"
-								)
-							</td>
-						</tr>
-						<tr>
-							<td>Role</td>
-							<td>@helper.select(
-								  myForm("userRoleID"),
-								  pUserRoles,
-								  '_label -> "",
+				</div>
+				<div id="divGender" class="form-group">
+					@if(mode.equals(MODE_ADD)) { 
+						@helper.inputRadioGroup(signupForm("gender"),
+							options = Seq("M" -> "Male", "F" -> "Female"),
+							'_label -> "Gender"
+						)
+					} else {
+						<label>Gender</label>
+						<p>@Gender(signupForm("gender").value.getOrElse("")).toString()</p>
+						<input type='hidden' name='gender' value='@signupForm("gender").value'/>
+					}
+				</div>
+				<div class="form-group">
+					@helper.inputDate(signupForm("dob"),
+						'placeholder -> "Date of birth",
+						'_label -> "Date of Birth"
+					)
+					<p class="error">
+					@signupForm.errors.filter(_.key=="").map{ err =>
+						@err.message
+					}
+					</p>
+				</div>
+				<div class="form-group">
+					@helper.inputText(signupForm("idNumber"),
+						'placeholder -> "ID Number",
+						'_label -> "ID Number"
+					)
+				</div>
+				<div class="form-group">
+					@helper.textarea(signupForm("address"),
+						'rows -> 3,
+						'cols -> 50,
+						'placeholder ->"Address",
+						'_label -> "Address"
+						)
+				</div>
+				<div class="form-group">
+					@helper.select(
+								  signupForm("userRoleID"),
+								  DDUserRoles.all,
+								  '_label -> "User Role",
 								  '_default -> "Please select"
-								)
-							</td>
-						</tr>
-						<tr>
-							<td>Nationality</td>
-							<td>@helper.select(
-								  myForm("nationality"),
-								  pCountries,
-								  '_label -> "",
-								  '_default -> "Please select"
-								)
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2">
-								<h3>
-								@if(mode.equals(MODE_ADD)) {
-									SET PASSWORD
-								} else {
-									RESET PASSWORD
-								}
-								</h3>
-							</td>
-						</tr>
-						<tr>
-							<td>Password</td>
-							<td>@helper.inputPassword(myForm("password"),
-								'placeholder -> "Password"
+					)
+				</div>
+				<div class="form-group">
+					@helper.select(
+							signupForm("nationality"),
+							DDCountry.all,
+							'_label -> "Nationality",
+							'_default -> "Please select"
+						)
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>
+					@if(mode.equals(MODE_ADD)) {
+						SET PASSWORD
+					} else {
+						RESET PASSWORD
+					}
+				</legend>
+				<div class="form-group">
+					@helper.inputText(signupForm("password"), 
+							'_label -> "Password",
+							'placeholder -> "Password",
+							'class -> "form-control",
+							'type -> "password",
+							'value -> ""
 							)
-							</td>
-						</tr>
-						<tr>
-							<td>Enter the password again</td>
-							<td>@helper.inputPassword(myForm("password2"),
-								'placeholder -> "Enter the password again"
+				</div>
+				<div id="divPassword2" class="form-group">
+					@helper.inputText(signupForm("password2"), 
+							'_label -> "Verify Password",
+							'placeholder -> "Enter the password again",
+							'class -> "form-control",
+							'type -> "password",
+							'value -> ""
 							)
-							</td>
-						</tr>
-						<tr><td>&nbsp;</td></tr>
-						<tr>
-							<td colspan="2" align="center">
-								<input type="submit" name="addNewUser" value="Save"/>
-								<input type="button" name="btnCancel" value="Cancel" 
-									onclick="javascript:window.location='/useradmin'"/>
-							</td>
-						</tr>
-					</table>
-					<br/>
-					</div>
-				</form>
-			</h1>
-		</div>
+				</div>
+				<div class="form-group">
+					<input type="submit" name="addNewUser" value='Save' class="btn btn-success"/>
+					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/useradmin'" class="btn btn-danger"/>
+				</div>
+			</fieldset>
+		</form>
+	</div>
 	</div>
 </body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+<script type="text/javascript" src="@routes.ABLoginSignup.javascriptRoutes"></script>
 </html>

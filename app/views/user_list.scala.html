@@ -1,85 +1,89 @@
 @(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[form.FormUser])(implicit session: Session)
-<!-- usersList.scala.html -->
+<!doctype html>
+<!-- users_list.scala.html -->
 
 @import helper._
 
 <html>
 <head>
-<title>Local Library</title>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
-<script>
-function removeUser(pURL) {
-	if (confirm('Are you sure you want to delete this user?')) {
-		window.location = pURL;
+	<title>Dummy Library</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
+	<script>
+	function removeUser(pURL) {
+		if (confirm('Are you sure you want to delete this user?')) {
+			window.location = pURL;
+		}
 	}
-}
-</script>
-<script src="index.js"></script>
+	</script>
 </head>
 <body>
-	<div id="container">
-		@banner(true)
-		@menubar_admin()
-		<div id="content">
-			<h1 class="pageTitle">LIST OF USERS</h1>
-			<form action="@routes.ABUserList.listUsers" method="POST">
-				<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
-				<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
-				<br/>
-				<div align="center">
-				@if(pList.isEmpty) {
-					The users are empty!
-				} else {
-					<table class="list">
-						<tr>
-							<th width="5%">S/No</th>
-							<th width="25%">NAME</th>
-							<th width="35%">ADDRESS</th>
-							<th width="10%">DOB</th>
-							<th width="15%">ROLE</th>
-							<th width="10%">ACTION</th>
-						</tr>
-						@pList.map { user =>
-						<tr>
-							<td align="center">@user.rowIdx</td>
-							<td>@user.name</td>
-							<td>@user.address</td>
-							<td>@("%1$td-%1$tm-%1$tY".format(user.dob))</td>
-							<td>@user.userRoleName</td>
-							<td align="center">
-								<a href="@routes.ABUserDetail.edit(user.seqNo.get.toString)">Edit</a> /
-								<a href="javascript:removeUser(@routes.ABUserList.removeUser(user.seqNo.get.toString))">Remove</a>
-							</td>
-						</tr>
-						}
-					</table>
-				}
-				<br/>
-				<div align="center">
-					Page: @pCurrentPageIdx / @pMaxPageIdx
-					<table>
-						<tr>
-							<td align="center">
-								<a href="@routes.ABUserList.navigateFirst">First</a> |
-								<a href="@routes.ABUserList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a> |
-								<a href="@routes.ABUserList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a> |
-								<a href="@routes.ABUserList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a>
-							</td>
-						</tr>
-						<tr>
-							<td colspan=4>
-								
-							</td>
-						</tr>
-					</table>
-				</div>
-				<br/>
-				<a href="/newuser">Add a new user</a>
-				</div>
-			</form>
-		</div>
+	@menubar_admin()
+	<div id="divCommonList" class="divMainContainer container">
+		<h1>List of Users</h1>
+		<form action="@routes.ABUserList.listUsers" method="POST">
+			<input type="hidden" name="currentPageIdx" value="@pCurrentPageIdx"/>
+			<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
+			<br/>
+			<div align="center">
+			@if(pList.isEmpty) {
+				The users are empty!
+			} else {
+				<table class="list">
+					<tr>
+						<th width="5%">S/No</th>
+						<th width="25%">NAME</th>
+						<th width="35%">ADDRESS</th>
+						<th width="10%">DOB</th>
+						<th width="15%">ROLE</th>
+						<th width="10%">ACTION</th>
+					</tr>
+					@pList.map { user =>
+					<tr>
+						<td align="center">@user.rowIdx</td>
+						<td>@user.name</td>
+						<td>@user.address</td>
+						<td>@("%1$td-%1$tm-%1$tY".format(user.dob))</td>
+						<td>@user.userRoleName</td>
+						<td align="center">
+							<a href="@routes.ABUserDetail.edit(user.seqNo.get.toString)">Edit</a> /
+							<a href="javascript:removeUser('@routes.ABUserList.removeUser(user.seqNo.get.toString)')">Remove</a>
+						</td>
+					</tr>
+					}
+				</table>
+			}
+			<br/>
+			<div align="center">
+				Page: @pCurrentPageIdx / @pMaxPageIdx
+				<table>
+					<tr>
+						<td align="center">
+							<a href="@routes.ABUserList.navigateFirst">First</a> |
+							<a href="@routes.ABUserList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a> |
+							<a href="@routes.ABUserList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a> |
+							<a href="@routes.ABUserList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=4>
+							
+						</td>
+					</tr>
+				</table>
+			</div>
+			<br/>
+			<a href="/newuser">Add a new user</a>
+			</div>
+		</form>
 	</div>
 </body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+<script>
+	$('#liUsers').addClass('active');
+</script>
 </html>

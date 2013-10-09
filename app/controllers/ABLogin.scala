@@ -71,7 +71,7 @@ object ABLogin extends Controller {
             val dbUser = DBService.findByUserID(formUsername)
             val role = dbUser.role
             if (role.equals(OBUserRole.ADMIN)) {
-              Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
+              Redirect(routes.ABUserList.listUsers).withSession(Security.username -> formUsername)
             } else {
               Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
             }

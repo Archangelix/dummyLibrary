@@ -42,19 +42,6 @@ object ABLoginSignup extends Controller with TSecured {
       
   val loginForm = Form[FormUserPassword](formUserLoginMapping)
   
-  def validDate(): Constraint[Date] = 
-    Constraint[Date]("constraint.validDate") {o =>
-      println("date constraint!")
-      val currentTime = DateTime.now
-      val inputTime = new DateTime(o)
-      val threshold = inputTime.plus(Period.years(6))
-      if (currentTime.compareTo(threshold)<0 ) {
-        Invalid(ValidationError("Minimum age is 6 years old.", 6))
-      } else {
-        Valid
-      }
-  }
-    
   val formNewUserMapping = mapping(
       "rowIdx" -> optional(of[Long]),
       "seqNo" -> optional(of[Long]),
@@ -63,7 +50,7 @@ object ABLoginSignup extends Controller with TSecured {
       "gender" -> nonEmptyText,
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
-      "dob" -> date("yyyy-MM-dd").verifying(validDate),
+      "dob" -> date("yyyy-MM-dd").verifying(validDOB),
       "userRoleID" ->text,
       "user_role_name" -> optional(text),
       "nationality" -> nonEmptyText,
@@ -118,7 +105,7 @@ object ABLoginSignup extends Controller with TSecured {
             val dbUser = DBService.findByUserID(formUsername)
             val role = dbUser.role
             if (role.equals(OBUserRole.ADMIN)) {
-              Redirect(routes.ABCatalogList.index).withSession(Security.username -> formUsername)
+              Redirect(routes.ABUserList.listUsers).withSession(Security.username -> formUsername)
             } else {
               Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
             }
