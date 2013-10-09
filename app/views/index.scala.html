@@ -10,6 +10,17 @@
 		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
 		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
 		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/index.css")' media='screen'/>
+		<script>
+			function checkSignInEnable() {
+				var username = $('#username').val();
+				var password = $('#password').val();
+				if (username == '' || password == '') {
+					$('#btnSignIn').attr('disabled', 'disabled');
+				} else {
+					$('#btnSignIn').removeAttr('disabled');
+				}
+			}
+		</script>
 	</head>
 <body>
 	<div class="navbar navbar-inverse navbar-fixed-top">
@@ -27,18 +38,20 @@
 				<div class="form-group">
 					@helper.inputText(myForm("username"), 
 							'placeholder -> "User ID",
-							'class -> "form-control"
+							'class -> "form-control",
+							'onkeyup -> "checkSignInEnable()"
 							)
 				</div>
 				<div class="form-group">
 					@helper.inputText(myForm("password"), 
 							'placeholder -> "Password",
 							'class -> "form-control",
-							'type -> "password"
+							'type -> "password",
+							'onkeyup -> "checkSignInEnable()"
 							)
 				</div>
-				<input type="submit" value="Sign in" class="btn btn-success"/>
-				<input type="button" value="Register" onclick='javascript:window.location="/loginsignup"' class="btn btn-danger"/>
+				<input type="submit" id="btnSignIn" value="Sign in" class="btn btn-success"/>
+				<input type="button" id="btnRegister" value="Register" onclick='javascript:window.location="/loginsignup"' class="btn btn-danger"/>
 			</form>
 		</div><!--/.nav-collapse -->
 	</div>
@@ -49,4 +62,7 @@
 </body>
 		<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
 		<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+		<script>
+			checkSignInEnable();
+		</script>
 </html>
