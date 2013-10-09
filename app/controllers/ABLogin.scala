@@ -37,7 +37,7 @@ object ABLogin extends Controller {
    * Displaying the login page.
    */
   def loginPage = Action { implicit req =>
-    Ok(views.html.index(loginForm))
+    Ok(views.html.index(loginForm)(session))
   }
   
   /**
@@ -73,7 +73,7 @@ object ABLogin extends Controller {
             if (role.equals(OBUserRole.ADMIN)) {
               Redirect(routes.ABUserList.listUsers).withSession(Security.username -> formUsername)
             } else {
-              Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
+              Redirect(routes.ABLogin.loginPage).withSession(Security.username -> formUsername)
             }
           } catch {
             case e: Exception => {

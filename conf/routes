@@ -12,7 +12,6 @@ GET		/javascriptRoutes						controllers.ABLoginSignup.javascriptRoutes
 GET		/loginsignup							controllers.ABLoginSignup.loginPage
 POST	/userlogin								controllers.ABLoginSignup.login
 POST	/usersignup								controllers.ABLoginSignup.signup
-GET		/adminhome								controllers.ABAdminHome.adminHomepage
 GET     /cataloglist                   			controllers.ABCatalogList.index
 GET     /first                      			controllers.ABCatalogList.navigateFirst
 GET     /prev                       			controllers.ABCatalogList.navigatePrev

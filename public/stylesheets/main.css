@@ -99,10 +99,6 @@ h1.pageTitle {
 	margin: 0;
 }
 
-fieldset {
-	margin-bottom: 2em;
-}
-
 fieldset label, fieldset input {
 	display: block;
 	width: 100%:
@@ -134,7 +130,7 @@ div.divCatResult em {
 	text-transform: capitalize;
 }
 
-#divLoginErrorSignIn, dd.error, ul.error {
+#divLoginErrorSignIn {
 	width: 38em;
 }
 

@@ -1,4 +1,5 @@
-@(myForm: Form[form.FormUserPassword])(implicit session: Session, flash: Flash)
+@(myForm: Form[form.FormUserPassword])(implicit session: Session)
+@import views.html.helper._
 <!-- index.scala.html-->
 <!doctype html>
 <html>
@@ -23,36 +24,13 @@
 		</script>
 	</head>
 <body>
-	<div class="navbar navbar-inverse navbar-fixed-top">
-	<div class="container">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="#">Dummy Library</a>
-		</div>
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li class="active"><a href="/">Home</a></li>
-				<li><a href="#about">About</a></li>
-				<li><a href="#contact">Contact</a></li>
-			</ul>
-			<form action="@routes.ABLogin.login" method="POST" class="navbar-form navbar-right">
-				<div class="form-group">
-					@helper.inputText(myForm("username"), 
-							'placeholder -> "User ID",
-							'class -> "form-control",
-							'onkeyup -> "checkSignInEnable()"
-							)
-				</div>
-				<div class="form-group">
-					@helper.inputText(myForm("password"), 
-							'placeholder -> "Password",
-							'class -> "form-control",
-							'type -> "password",
-							'onkeyup -> "checkSignInEnable()"
-							)
-				</div>
-				<input type="submit" id="btnSignIn" value="Sign in" class="btn btn-success"/>
-				<input type="button" id="btnRegister" value="Register" onclick='javascript:window.location="/loginsignup"' class="btn btn-danger"/>
-			</form>
+			@defining(session.get(Security.username).getOrElse("")) { username => 
+				@if(username!=null && !username.trim().equals("")) {
+					@menubar_borrower()
+				} else {
+					@menubar_public(myForm)
+				}
+			}
 		</div><!--/.nav-collapse -->
 	</div>
 	</div>

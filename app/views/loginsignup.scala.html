@@ -69,23 +69,23 @@
 							'class -> "form-control",
 							'type -> "password"
 							)
+					@defining(loginForm.errors.filter(_.key.equals(""))) { errors =>
+						@if(errors.size>0) {
+							<div align="left">
+								<ul class="error">
+								@errors.map { error =>
+									<li>@error.message</li>
+								}
+								</ul>
+							</div>
+						}
+					}
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-success">Sign in</button>
+					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/'" class="btn btn-danger"/>
 				</div>
 			</fieldset>
-			@defining(loginForm.errors.filter(_.key.equals(""))) { errors =>
-				@if(errors.size>0) {
-					<div align="left">
-						<ul class="error">
-						@errors.map { error =>
-							<li>@error.message</li>
-						}
-						</ul>
-					</div>
-				}
-			}
-			<div class="form-group">
-			<button type="submit" class="btn btn-success">Sign in</button>
-			<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/'" class="btn btn-danger"/>
-			</div>
 		</form>
 		<form id="formSignup" action="@routes.ABLoginSignup.signup" method="POST" class="navbar-form navbar-right">
 			<input type="hidden" name="userRoleID"/>
