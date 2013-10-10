@@ -26,22 +26,20 @@ object ABSearchCatalog extends Controller with TSecured {
   /**
    * Displaying the login page.
    */
-  def index = withAuth {username => implicit req =>
+  def index = Action { implicit req =>
     val filledForm = searchCatalogForm.fill(FormSearchCatalog("", "", ""))
     Ok(views.html.borrower.searchBook(filledForm, List()))
   }
   
-  def search = withAuth {username => implicit req =>
+  def search(pStr: String) = Action { implicit req =>
     val cat = searchCatalogForm.bindFromRequest
     cat.fold(
       error => {
-        println("Error form")
         BadRequest(views.html.borrower.searchBook(error, List()))
       },
       success => {
         val casesensitive = "Y".equals(success.caseSensitive)
    		//println("Case sensitive = "+success.caseSensitive)
-        println("Case sensitive = "+casesensitive)
     	val catalogList = DBService.findCatalogs(success, casesensitive);
         Ok(views.html.borrower.searchBook(cat, catalogList.map(FormCatalog(_))))
       }

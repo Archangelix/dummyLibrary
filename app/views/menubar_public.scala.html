@@ -1,34 +1,31 @@
-@(myForm: Form[form.FormUserPassword])(implicit session: Session)
+@(myForm: Form[form.FormUserPassword], displayLoginForm: Boolean)(implicit session: Session)
 	<div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">
 		<div class="navbar-header">
 			<a class="navbar-brand" href="/">Dummy Library</a>
 		</div>
+		@if(displayLoginForm) {
 		<div class="navbar-collapse collapse">
-			<ul class="nav navbar-nav">
-				<li id="liUsers" ><a href="/useradmin">Users</a></li>
-				<li id="liCatalogs" ><a href="/cataloglist">Catalogs</a></li>
-				<li id="liTags" ><a href="/tags">Tags</a></li>
-			</ul>
-				<form action="@routes.ABLogin.login" method="POST" class="navbar-form navbar-right">
-					<div class="form-group">
-						@helper.inputText(myForm("username"), 
-								'placeholder -> "User ID",
-								'class -> "form-control",
-								'onkeyup -> "checkSignInEnable()"
-								)
-					</div>
-					<div class="form-group">
-						@helper.inputText(myForm("password"), 
-								'placeholder -> "Password",
-								'class -> "form-control",
-								'type -> "password",
-								'onkeyup -> "checkSignInEnable()"
-								)
-					</div>
-					<input type="submit" id="btnSignIn" value="Sign in" class="btn btn-success"/>
-					<input type="button" id="btnRegister" value="Register" onclick='javascript:window.location="/loginsignup"' class="btn btn-danger"/>
-				</form>
+			<form action="@routes.ABLogin.login" method="POST" class="navbar-form navbar-right">
+				<div class="form-group">
+					@helper.inputText(myForm("username"), 
+							'placeholder -> "User ID",
+							'class -> "form-control",
+							'onkeyup -> "checkSignInEnable()"
+							)
+				</div>
+				<div class="form-group">
+					@helper.inputText(myForm("password"), 
+							'placeholder -> "Password",
+							'class -> "form-control",
+							'type -> "password",
+							'onkeyup -> "checkSignInEnable()"
+							)
+				</div>
+				<input type="submit" id="btnSignIn" value="Sign in" class="btn btn-success"/>
+				<input type="button" id="btnRegister" value="Register" onclick='javascript:window.location="/loginsignup"' class="btn btn-danger"/>
+			</form>
 		</div>
+		}
 	</div>
 	</div>

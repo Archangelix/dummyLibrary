@@ -104,11 +104,15 @@ object ABLoginSignup extends Controller with TSecured {
             val formUsername = data.username
             val dbUser = DBService.findByUserID(formUsername)
             val role = dbUser.role
-            if (role.equals(OBUserRole.ADMIN)) {
-              Redirect(routes.ABUserList.listUsers).withSession(Security.username -> formUsername)
-            } else {
-              Redirect(routes.ABSearchCatalog.index).withSession(Security.username -> formUsername)
-            }
+            val call = 
+	            if (role.equals(OBUserRole.ADMIN)) {
+	              routes.ABUserList.listUsers
+	            } else {
+	              routes.ABLogin.loginPage
+	            }
+
+            Redirect(call).withSession(Security.username -> formUsername,
+            		"menuType" -> role.toString)
           } catch {
             case e: Exception => {
               e.printStackTrace()
@@ -157,7 +161,7 @@ object ABLoginSignup extends Controller with TSecured {
 	        	} else {
 	        		val password = successForm.password
 	        		DBService.createUser(user, password)
-	        		Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
+	        		Redirect(routes.ABLogin.loginPage()).withSession(session - "mode")
 	        	}
 	        }
 	      }

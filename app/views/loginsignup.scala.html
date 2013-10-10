@@ -43,13 +43,7 @@
 	</script>
 	</head>
 <body>
-	<div class="navbar navbar-inverse navbar-fixed-top">
-	<div class="container">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="/">Dummy Library</a>
-		</div>
-	</div>
-	</div>
+	@menubar_public(loginForm, false)
 	<div class="container">
 	<div class="divMainContainer" id="divLoginErrorSignIn">
 		<form id="formLogin" action="@routes.ABLoginSignup.login" method="POST" class="navbar-form navbar-right">

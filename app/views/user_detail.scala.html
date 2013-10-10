@@ -13,19 +13,19 @@
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
-	</head>
+</head>
 <body>
 	@menubar_admin()
 	<div class="container">
-	<div class="divMainContainer" id="divLoginErrorSignIn">
+	<div class="divMainContainer" id="divAdminUser">
 		<form id="formSignup" action="@routes.ABUserDetail.save" method="POST" class="navbar-form navbar-right">
 			<input type='hidden' name='seqNo' value='@signupForm("seqNo").value'/>
 			<fieldset>
 				<legend>
 				@if(mode.equals(MODE_ADD)) { 
-					REGISTRATION
+					USER REGISTRATION
 				} else {
-					MODIFICATION
+					USER MODIFICATION
 				}
 				</legend>
 				<div class="form-group">
@@ -104,15 +104,6 @@
 							'_default -> "Please select"
 						)
 				</div>
-			</fieldset>
-			<fieldset>
-				<legend>
-					@if(mode.equals(MODE_ADD)) {
-						SET PASSWORD
-					} else {
-						RESET PASSWORD
-					}
-				</legend>
 				<div class="form-group">
 					@helper.inputText(signupForm("password"), 
 							'_label -> "Password",

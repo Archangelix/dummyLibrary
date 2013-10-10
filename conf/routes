@@ -36,7 +36,7 @@ POST	/newuser								controllers.ABUserDetail.save
 GET		/user/:id/edit							controllers.ABUserDetail.edit(id)
 GET		/user/:id/delete						controllers.ABUserList.removeUser(id)
 GET		/searchbook								controllers.ABSearchCatalog.index
-POST	/searchbook								controllers.ABSearchCatalog.search
+GET		/searchbook/:str						controllers.ABSearchCatalog.search(str)
 GET		/tags									controllers.ABTagsList.listTags
 POST	/tags/:seqno/update						controllers.ABTagsList.saveUpdate(seqno)
 POST	/tags/create							controllers.ABTagsList.saveCreate

@@ -1,61 +1,58 @@
 @(mode: String, myForm: Form[form.FormBook], pCatalogID: String, pOrigins: List[(String, String)])(implicit session: Session)
-
 @import views.html.helper._
 
+<!doctype html>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<title>Dummy Library</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
 </head>
 <body>
-	<div id="container">
-		@banner(true)
-		@menubar_admin()
-		<div id="content">
-			<h1 class="pageTitle">
-				BOOK DETAIL
-			</h1>
-				<form action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST">
-					<div align="left">
-					@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
-						@if(errs.size>0) {
-							<ul class="error">
-							@errs.map { err =>
-								<li>@err.message</li>
-							}
-							</ul>
-						}
-					}
-					<input type="hidden" value="@myForm("id").value" name="@myForm("id").name"/>
-					<input type="hidden" value="@pCatalogID" name="@myForm("catalogID").name"/>
-					<table border="1">
-						<tr>
-							<td>Origin</td>
-							<td>@select(
-								  myForm("originCode"),
+	@menubar_admin()
+	<div class="container">
+	<div id="divBookDetail" class="divMainContainer">
+		<form id="formCatalogDetail" action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST" class="navbar-form navbar-right">
+			<input type="hidden" value='@myForm("id").value' name='@myForm("id").name'/>
+			<input type="hidden" value="@pCatalogID" name='@myForm("catalogID").name'/>
+			<fieldset>
+				<legend>BOOK DETAIL</legend>
+				<div class="form-group">
+					@select(myForm("originCode"),
 								  pOrigins.map{ t =>
 								    t._1 -> t._2
 								  },
-								  '_label -> "",
-								  '_default -> "Please select"
+								  '_label -> "Origin",
+								  '_default -> "Please select",
+									'class -> "form-control"
 								)
-							</td>
-						</tr>
-						<tr>
-							<td>Remarks</td>
-							<td>@helper.inputText(myForm("remarks"), 
-								'placeholder -> "Remarks"
+				</div>
+				<div class="form-group">
+					@helper.inputText(myForm("remarks"), 
+								'placeholder -> "Remarks",
+								'_label -> "Remarks",
+								'class -> "form-control"
 								)
-							</td>
-						</tr>
-					</table>
-					<br/>
-					<input type="submit" name="addNewBook" value="Save"/>
-					<input type="button" name="btnCancel" value="Cancel" onclick="javascript:window.location='/cataloglist'"/>
-					</div>
-				</form>
-		</div>
+				</div>
+				@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
+					@if(errs.size>0) {
+						<ul class="error">
+						@errs.map { err =>
+							<li>@err.message</li>
+						}
+						</ul>
+					}
+				}
+				<div class="form-group">
+					<input type="submit" name="addNewBook" value='Save' class="btn btn-success"/>
+					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/cataloglist'" class="btn btn-danger"/>
+				</div>
+			</fieldset>
+		</form>
+	</div>
 	</div>
 </body>
 </html>

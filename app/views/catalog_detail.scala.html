@@ -1,28 +1,55 @@
 @(mode: String, myForm: Form[form.FormCatalog], books: List[form.FormBook])(implicit session: Session)
-
 @import controllers.ABCatalogDetail.MODE_ADD
 @import controllers.ABCatalogDetail.MODE_EDIT
 
+<!doctype html>
+
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")'/>
-<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<title>Dummy Library</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
 </head>
 <body>
-	<div id="container">
-		@banner(true)
-		@menubar_admin()
-		<div id="content">
-			<h1 class="pageTitle">
-			@if(mode.equals(MODE_ADD)) {
-				ADD A NEW CATALOG 
-			} else {
-				EDIT A CATALOG
-			}
-			</h1>
-			<form action="@routes.ABCatalogDetail.save" method="POST">
-				<div align="left">
+	@menubar_admin()
+	<div class="container">
+	<div id="divCatalogDetail" class="divMainContainer">
+		<form id="formCatalogDetail" action="@routes.ABCatalogDetail.save" method="POST" class="navbar-form navbar-right">
+			<input type='hidden' name='seqNo' value='@myForm("seqNo").value'/>
+			<input type="hidden" value="@myForm("id").value" name="id"/>
+			<fieldset>
+				<legend>
+				@if(mode.equals(MODE_ADD)) {
+					CATALOG REGISTRATION
+				} else {
+					CATALOG MODIFICATION
+				}
+				</legend>
+				<div class="form-group">
+					@helper.inputText(myForm("title"),
+							'id -> "signUpUserID",
+							'_label -> "Title",
+							'placeholder -> "Title",
+							'class -> "form-control"
+							)
+				</div>
+				<div class="form-group">
+					@helper.inputText(myForm("author"),
+							'_label -> "Author",
+							'placeholder -> "Author",
+							'class -> "form-control"
+							)
+				</div>
+				<div class="form-group">
+					@helper.inputText(myForm("publishedYear"), 
+							'_label -> "Published in",
+							'placeholder -> "Published year",
+							'class -> "form-control"
+							)
+				</div>
 				@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
 					@if(errs.size>0) {
 						<ul class="error">
@@ -32,77 +59,40 @@
 						</ul>
 					}
 				}
-				<input type="hidden" value="@myForm("id").value" name="id"/>
-				<table class="outbordertable">
-					<col width="30%"/>
-					<col width="70%"/>
-					<tr>
-						<td>Title</td>
-						<td>@helper.inputText(myForm("title"), 
-							'placeholder ->"Catalog title"
-							)
-						</td>
-					</tr>
-					<tr>
-						<td>Author</td>
-						<td>@helper.inputText(myForm("author"), 
-							'placeholder -> "Catalog author"
-							)
-						</td>
-					</tr>
-					<tr>
-						<td>Published in</td>
-						<td>@helper.inputText(myForm("publishedYear"),
-							'placeholder -> "Published year"
-						)
-						</td>
-					</tr>
-					<tr><td>&nbsp;</td></tr>
-					<tr>
-						<td colspan="2" align="center">
-							<input type="submit" name="addNewCatalog" value="Save"/>
-							<input type="button" name="btnCancel" value="Cancel" 
-								onclick="javascript:window.location='/cataloglist'"/>
-						</td>
-					</tr>
-				</table>
-				<br/>
+				<div class="form-group">
+					<input type="submit" name="addNewCatalog" value='Save' class="btn btn-success"/>
+					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/cataloglist'" class="btn btn-danger"/>
 				</div>
-				<br/>
-				<div align="left">
-				@if(books.size==0) {
-					No registered books yet.
-					@if(mode.equals(MODE_EDIT)) { 
-						<a href="/bookdetail/@myForm("id").value/new">Do you want to add one?</a>
-					} else {
-						Create the catalog first.
-					}
-				} else {
-					<table>
-						<tr>
-							<td align="right"><a href="/bookdetail/@myForm("id").value/new">Add a new book</a></td>
-						</tr>
-					</table>
-					<table class="singlebordertable">
-						<col width="5%"/>
-						<col width="95%"/>
-						<tr>
-							<th>S/No</th>
-							<th>Remarks</th>
-							<th>Origin</th>
-						</tr>
-						@books.zipWithIndex.map { item => 
-							<tr>
-								<td align="center">@(item._2+1)</td>
-								<td>@item._1.remarks</td>
-								<td>@item._1.originDesc</td>
-							</tr>
-						}
-					</table>
+			</fieldset>
+	</form>
+	<div id="divCatalogBooks">
+		<legend>CATALOG BOOKS</legend>
+		@if(books.size==0) {
+			No registered books yet.
+			@if(mode.equals(MODE_EDIT)) { 
+				<a href="/bookdetail/@myForm("id").value/new">Do you want to add one?</a>
+			} else {
+				Create the catalog first.
+			}
+		} else {
+			<table class="list">
+				<tr>
+					<th>S/No</th>
+					<th>Remarks</th>
+					<th>Origin</th>
+				</tr>
+				@books.zipWithIndex.map { item => 
+					<tr>
+						<td align="center">@(item._2+1)</td>
+						<td>@item._1.remarks</td>
+						<td>@item._1.originDesc</td>
+					</tr>
 				}
-				</div>
-			</form>
-		</div>
+			</table>
+			<a href="/bookdetail/@myForm("id").value/new">Add a new book</a>
+		}
+	</div>
+	</div>
 	</div>
 </body>
 </html>

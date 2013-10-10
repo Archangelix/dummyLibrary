@@ -71,9 +71,13 @@ object ABLogin extends Controller {
             val dbUser = DBService.findByUserID(formUsername)
             val role = dbUser.role
             if (role.equals(OBUserRole.ADMIN)) {
-              Redirect(routes.ABUserList.listUsers).withSession(Security.username -> formUsername)
+              Redirect(routes.ABUserList.listUsers).withSession(
+                  Security.username -> formUsername,
+                  "menuType" -> role.toString)
             } else {
-              Redirect(routes.ABLogin.loginPage).withSession(Security.username -> formUsername)
+              Redirect(routes.ABLogin.loginPage).withSession(
+                  Security.username -> formUsername,
+                  "menuType" -> role.toString)
             }
           } catch {
             case e: Exception => {

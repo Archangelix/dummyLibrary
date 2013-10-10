@@ -5,14 +5,9 @@
 			<a class="navbar-brand" href="/">Dummy Library</a>
 		</div>
 		<div class="navbar-collapse collapse">
-			<ul class="nav navbar-nav">
-				<li id="liUsers" ><a href="/useradmin">Users</a></li>
-				<li id="liCatalogs" ><a href="/cataloglist">Catalogs</a></li>
-				<li id="liTags" ><a href="/tags">Tags</a></li>
-			</ul>
-		<div id="loginInfo" class="navbar-right">
-			Hi, <strong>@session.get(Security.username).getOrElse("")</strong>! (<a href="/logout">Sign out</a>)
-		</div>
+			<div id="loginInfo" class="navbar-right">
+				Hi, <strong>@session.get(Security.username).getOrElse("")</strong>! (<a href="/logout">Sign out</a>)
+			</div>
 		</div>
 	</div>
 	</div>

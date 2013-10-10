@@ -21,22 +21,28 @@
 					$('#btnSignIn').removeAttr('disabled');
 				}
 			}
+			
+			function search() {
+				var url = '/searchbook/'+$('#txtSearch').val();
+				window.location=url;
+			}
+			
 		</script>
 	</head>
 <body>
-			@defining(session.get(Security.username).getOrElse("")) { username => 
-				@if(username!=null && !username.trim().equals("")) {
-					@menubar_borrower()
-				} else {
-					@menubar_public(myForm)
-				}
-			}
-		</div><!--/.nav-collapse -->
-	</div>
-	</div>
+	@{defining(session.get("menuType").getOrElse("")) { menuType =>
+		menuType match {
+			case "ADMIN" => menubar_admin()
+			case "BORROWER" => menubar_borrower()
+			case _ => menubar_public(myForm, true)
+		}
+	}}
+	<form action='@routes.ABLogin.loginPage' method='GET'>
 	<div id="mainSearchCatalog">
-		<input type="text" placeholder="Enter keywords here"><button type="submit" class="btn btn-warning">Search</button>
+		<input id='txtSearch' type="text" placeholder="Enter keywords here">
+		<a href="javascript:search()" class="btn btn-warning">Search</a>
 	</div>
+	</form>
 </body>
 		<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
 		<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
