@@ -614,24 +614,14 @@ object DBService {
 	  res
 	}
 
-	def findCatalogs(pCat: FormSearchCatalog, pIsCaseSensitive: Boolean) = {
-	  val author = pCat.author
-	  val title = pCat.title
-	  val paramAuthor = if (isBlank(author)) "%%" else 
-	    if (pIsCaseSensitive) "%"+author+"%"
-	    else "%"+author.toUpperCase()+"%"
-	  val paramTitle = if (isBlank(title)) "%%" else 
-	    if (pIsCaseSensitive) "%"+title+"%"
-	    else "%"+title.toUpperCase()+"%"
-
+	def findCatalogs(pStr: String) = {
+	  val key = "%"+pStr.toUpperCase()+"%"
 	  DB.withConnection { implicit c => 
-    	val authorField = if (pIsCaseSensitive) "AUTHOR" else "UPPER(AUTHOR)"
-    	val titleField = if (pIsCaseSensitive) "TITLE" else "UPPER(TITLE)"
 		val res = SQL (
-		    "select row_number() over (order by id) idx, * " +
-		    "from CATALOG where "+authorField+" LIKE {author} AND "+titleField+" LIKE {title} ")
-		    .on('title -> paramTitle, 
-			   'author -> paramAuthor)
+		    "select row_number() over (order by id) idx, * from " +
+		    "(SELECT DISTINCT * FROM CATALOG " +
+		    "where upper(AUTHOR) LIKE {str} OR upper(TITLE) LIKE {str}) TMP ")
+		    .on('str -> key)
 		    .as(dbCatalogListMapping *)
 		    
 		if (res==null || res.size==0) {
@@ -641,7 +631,7 @@ object DBService {
 		}
 	  }
 	}
-
+//select row_number() over (order by id) idx, * from  (SELECT DISTINCT * FROM CATALOG where upper(AUTHOR) LIKE '%TWO%' OR upper(TITLE) LIKE '%TWO%') TMP 
 	def listAllTags() = { 
 	  DB.withConnection { implicit c => 
 		val res = SQL ("select * from TAGS order by seqno")

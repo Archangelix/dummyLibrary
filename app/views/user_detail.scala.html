@@ -17,8 +17,8 @@
 <body>
 	@menubar_admin()
 	<div class="container">
-	<div class="divMainContainer" id="divAdminUser">
-		<form id="formSignup" action="@routes.ABUserDetail.save" method="POST" class="navbar-form navbar-right">
+	<div id="divAdminUser" class="divMainContainer">
+		<form id="formSignup" action="@routes.ABUserDetail.save" method="POST" class="navbar-form">
 			<input type='hidden' name='seqNo' value='@signupForm("seqNo").value'/>
 			<fieldset>
 				<legend>

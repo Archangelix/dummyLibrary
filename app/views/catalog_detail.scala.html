@@ -17,7 +17,7 @@
 	@menubar_admin()
 	<div class="container">
 	<div id="divCatalogDetail" class="divMainContainer">
-		<form id="formCatalogDetail" action="@routes.ABCatalogDetail.save" method="POST" class="navbar-form navbar-right">
+		<form id="formCatalogDetail" action="@routes.ABCatalogDetail.save" method="POST" class="navbar-form">
 			<input type='hidden' name='seqNo' value='@myForm("seqNo").value'/>
 			<input type="hidden" value="@myForm("id").value" name="id"/>
 			<fieldset>

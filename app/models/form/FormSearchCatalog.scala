@@ -10,10 +10,11 @@ import models.OBCatalog
  * a deleted book comes from / to the View layer. 
  * In this layer by default <code>isDeleted</code> attribute is always <code>false</code>.
  */
-case class FormSearchCatalog(author: String, title: String, caseSensitive: String)
+case class FormSearchCatalog(searchKeyword: String, 
+    author: String, title: String, caseSensitive: String)
 
 object FormSearchCatalog {
   def apply(pCatalog: OBCatalog, pCaseSensitive: Boolean): FormSearchCatalog = {
-    FormSearchCatalog(pCatalog.author, pCatalog.title, if (pCaseSensitive) "Y" else "N")
+    FormSearchCatalog("", pCatalog.author, pCatalog.title, if (pCaseSensitive) "Y" else "N")
   }
 }

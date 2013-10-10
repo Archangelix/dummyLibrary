@@ -37,10 +37,10 @@
 			case _ => menubar_public(myForm, true)
 		}
 	}}
-	<form action='@routes.ABLogin.loginPage' method='GET'>
-	<div id="mainSearchCatalog">
-		<input id='txtSearch' type="text" placeholder="Enter keywords here">
-		<a href="javascript:search()" class="btn btn-warning">Search</a>
+	<form action='@routes.ABSearchCatalog.index' method='GET'>
+	<div id="mainSearchCatalog" class="searchBox">
+		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here">
+		<a href="javascript:search()" class="btn">Search</a>
 	</div>
 	</form>
 </body>

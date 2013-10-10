@@ -1,0 +1,70 @@
+@(pStr: String, pCatalogs: List[form.FormCatalog])(implicit session: Session)
+@import views.html.helper._
+<!-- search_catalog.scala.html-->
+<!doctype html>
+<html>
+<head>
+	<title>Dummy Library</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/index.css")' media='screen'/>
+	<script>
+		function checkSignInEnable() {
+			var username = $('#username').val();
+			var password = $('#password').val();
+			if (username == '' || password == '') {
+				$('#btnSignIn').attr('disabled', 'disabled');
+			} else {
+				$('#btnSignIn').removeAttr('disabled');
+			}
+		}
+		
+		function search() {
+			var url = '/searchbook/'+$('#txtSearch').val();
+			window.location=url;
+		}
+		
+	</script>
+</head>
+<body>
+	@{defining(session.get("menuType").getOrElse("")) { menuType =>
+		menuType match {
+			case "ADMIN" => menubar_admin()
+			case "BORROWER" => menubar_borrower()
+			case _ => menubar_public(null, false)
+		}
+	}}
+	<form action='@routes.ABSearchCatalog.index' method='GET'>
+	<div id="divSearchInput" class="searchBox">
+		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here" value="@pStr">
+		<a href="javascript:search()" class="btn">Search</a>
+	</div>
+	</form>
+	<div class="container">
+	<div id="divSearchResult" class="divMainContainer">
+		<div class="navbar-form">
+			<legend>Results</legend>
+			@if(pCatalogs.isEmpty) {
+				<div>The catalogs are empty!</div>
+			} else {
+				@pCatalogs.map { catalog =>
+					<div class="divCatResult">
+						<h3>@catalog.idx. @catalog.title</h3>
+						<em>by @catalog.author - published in @catalog.publishedYear</em>
+						No descriptions available.
+					</div>
+				}
+			}
+		</div>
+	</div>
+	</div>
+</body>
+	<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+	<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+	<script>
+		checkSignInEnable();
+	</script>
+</html>

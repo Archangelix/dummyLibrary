@@ -12,21 +12,39 @@ body {
 	bottom: 0;
 }
 
-#mainSearchCatalog {
-	position: absolute;
-	top: 40%;
+.searchBox {
 	width: 46em;
 	min-width: 20em;
 	height: 39px;
 	background-color: steelblue;
 	padding: 0;
+}
+
+#mainSearchCatalog {
+	position: absolute;
+	top: 40%;
 	left: 0;
 	right: 0;
 	margin-left: auto;
 	margin-right: auto;
 }
 
-#mainSearchCatalog input {
+#divSearchInput {
+	position: absolute;
+	top: 60px;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#divSearchResult {
+	width: 46em;
+	bottom: 10px;
+	overflow: scroll;
+}
+
+.searchBox input {
 	position: relative;
 	top: 2px;
 	left: 2px;
@@ -35,17 +53,18 @@ body {
 	min-width: 20em;
 }
 
-#mainSearchCatalog button, #mainSearchCatalog a {
+.searchBox button, .searchBox a {
 	position: relative;
 	margin: 0 .1em;
 	font-size: 1.5em;
 	padding: 0 5px;
-	top: 3px;
-	height: 35px;
+	top: 1px;
+	height: 33px;
 	width: 10%;
 	min-width: 3.8em;
 	background-color: steelblue;
 	border: 0;
+	color: black;
 }
 
 #loginInfo {
@@ -110,7 +129,7 @@ div.divCatResult em {
 .divMainContainer {
 	background: rgba(255,255,255,.9);
 	position: absolute;
-	top: 100px;
+	top: 110px;
 	padding-bottom: 3em;
 	left: 0;
 	right: 0;

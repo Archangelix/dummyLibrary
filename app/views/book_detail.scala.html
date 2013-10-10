@@ -15,7 +15,7 @@
 	@menubar_admin()
 	<div class="container">
 	<div id="divBookDetail" class="divMainContainer">
-		<form id="formCatalogDetail" action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST" class="navbar-form navbar-right">
+		<form id="formCatalogDetail" action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST" class="navbar-form">
 			<input type="hidden" value='@myForm("id").value' name='@myForm("id").name'/>
 			<input type="hidden" value="@pCatalogID" name='@myForm("catalogID").name'/>
 			<fieldset>
