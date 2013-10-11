@@ -41,7 +41,8 @@ body {
 #divSearchResult {
 	width: 46em;
 	bottom: 10px;
-	overflow: scroll;
+	min-height: 100px;
+	overflow-y: auto;
 }
 
 .searchBox input {

@@ -631,7 +631,7 @@ object DBService {
 		}
 	  }
 	}
-//select row_number() over (order by id) idx, * from  (SELECT DISTINCT * FROM CATALOG where upper(AUTHOR) LIKE '%TWO%' OR upper(TITLE) LIKE '%TWO%') TMP 
+ 
 	def listAllTags() = { 
 	  DB.withConnection { implicit c => 
 		val res = SQL ("select * from TAGS order by seqno")

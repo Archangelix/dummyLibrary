@@ -27,6 +27,26 @@
 			window.location=url;
 		}
 		
+		function replaceKeyWord(sentence, keyword) {
+			while (sentence.indexOf(keyword)>=0) {
+				sentence = sentence.replace(keyword, "&*(");
+			}
+
+			while (sentence.indexOf("&*(")>=0) {
+				sentence = sentence.replace("&*(", "<strong>"+keyword+"</strong>");
+			}
+			
+			return sentence;
+		}
+		
+		function highlightKeywords(str) {
+			$('h4').each(function(idx) {
+				var oldText = $(this).text();
+				var newText = replaceKeyWord(oldText, str);
+				$(this).html(newText);
+			})
+		}
+		
 	</script>
 </head>
 <body>
@@ -52,7 +72,7 @@
 			} else {
 				@pCatalogs.map { catalog =>
 					<div class="divCatResult">
-						<h3>@catalog.idx. @catalog.title</h3>
+						<h4>@catalog.idx. @catalog.title</h4>
 						<em>by @catalog.author - published in @catalog.publishedYear</em>
 						No descriptions available.
 					</div>
@@ -66,5 +86,6 @@
 	<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
 	<script>
 		checkSignInEnable();
+		highlightKeywords('@pStr.toUpperCase()');
 	</script>
 </html>
