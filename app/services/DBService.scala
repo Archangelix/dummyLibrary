@@ -16,8 +16,8 @@ import models.exception.UserNotFoundException
 import models.form.FormSearchCatalog
 import play.api.Play.current
 import play.api.db._
-import models.OBTag
-import models.exception.TagNotFoundException
+import models.OBCategory
+import models.exception.CategoryNotFoundException
 import java.security.SecureRandom
 import common.SecurityUtil
 import java.sql.Connection
@@ -130,10 +130,10 @@ object DBService {
 	  }
 	}
 	
-  val dbTagListMapping = {
+  val dbCategoryListMapping = {
     get[Long]("seqno") ~
     get[String]("name") map {
-      case seqno~name => OBTag(Some(seqno), name)
+      case seqno~name => OBCategory(Some(seqno), name)
     }
   }
 
@@ -632,10 +632,10 @@ object DBService {
 	  }
 	}
  
-	def listAllTags() = { 
+	def listAllCategories() = { 
 	  DB.withConnection { implicit c => 
-		val res = SQL ("select * from TAGS order by seqno")
-		    .as(dbTagListMapping *)
+		val res = SQL ("select * from CATEGORIES order by seqno")
+		    .as(dbCategoryListMapping *)
 		    
 		if (res==null || res.size==0) {
 		  List() 
@@ -651,13 +651,13 @@ object DBService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findTagByName(pTagName: String): OBTag = {
+	def findCategoryByName(pCategoryName: String): OBCategory = {
 	  DB.withConnection{ implicit c => 
-	    val list = SQL("SELECT * FROM TAGS WHERE upper(name) = upper({tagName})")
-	    	.on('tagName -> pTagName).as(dbTagListMapping *)
+	    val list = SQL("SELECT * FROM CATEGORIES WHERE upper(name) = upper({categoryName})")
+	    	.on('categoryName -> pCategoryName).as(dbCategoryListMapping *)
 	    if (list==null || list.size==0) {
-	      println("Tag "+pTagName+" cannot be found!")
-	      throw TagNotFoundException(pTagName)
+	      println("Category "+pCategoryName+" cannot be found!")
+	      throw CategoryNotFoundException(pCategoryName)
 	    }
 	    list(0)
 	  }
@@ -670,17 +670,17 @@ object DBService {
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
   	 */
-	def createTag(pTagName: String) = {
+	def createCategory(pCategoryName: String) = {
 	  DB.withConnection { implicit c => 
-	    SQL("insert into TAGS (NAME) values ({name})")
-	        .on('name -> pTagName)
+	    SQL("insert into CATEGORIES (NAME) values ({name})")
+	        .on('name -> pCategoryName)
 	        .executeUpdate()
 	  }
 	}
 	
-	def updateTag(pID: Long, pName: String) = {
+	def updateCategory(pID: Long, pName: String) = {
 	  DB.withConnection { implicit c => 
-	    SQL("update TAGS set name={name} where seqno={seqno}")
+	    SQL("update CATEGORIES set name={name} where seqno={seqno}")
 	        .on('name -> pName,
 	            'seqno -> pID)
 	        .executeUpdate()

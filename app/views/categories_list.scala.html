@@ -1,4 +1,4 @@
-@(myForm: Form[form.FormTag], list: List[OBTag])(implicit session: Session)
+@(myForm: Form[form.FormCategory], list: List[OBCategory])(implicit session: Session)
 @import helper._
 @import viewhelpers._
 
@@ -14,21 +14,21 @@
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
 	<script>
-		function updateTag(rowIdx) {
+		function updateCategory(rowIdx) {
 			console.log("rowIdx = "+rowIdx);
 		  var seqNo = $('#list'+rowIdx).val();
 			$('#selectedID').val(seqNo);
 			console.log("seqNo = "+seqNo);
 
-			var newTagName = $("#input"+rowIdx).val();
-			$('#updatedTagName').val(newTagName);
-			console.log("newTagName = "+newTagName);
+			var newCategoryName = $("#input"+rowIdx).val();
+			$('#updatedCategoryName').val(newCategoryName);
+			console.log("newCategoryName = "+newCategoryName);
 			
-			document.forms[0].action = "/tags/"+seqNo+"/update";
+			document.forms[0].action = "/categories/"+seqNo+"/update";
 			document.forms[0].submit();
 		}
 		
-		function createTag() {
+		function createCategory() {
 			document.forms[0].submit();
 		}
 	
@@ -37,13 +37,13 @@
 <body>
 	@menubar_admin()
 	<div id="divCommonList" class="divMainContainer container">
-		<h1>List of Tags</h1>
-		<form action="@routes.ABTagsList.saveCreate" method="POST">
+		<h1>List of Categories</h1>
+		<form action="@routes.ABCategory.saveCreate" method="POST">
 			<input type='hidden' id='selectedID' name='selectedID'/>
-			<input type='hidden' id='updatedTagName' name='updatedTagName'/>
+			<input type='hidden' id='updatedCategoryName' name='updatedCategoryName'/>
 			<div align="center">
 			@if(list.isEmpty) {
-				No tags have been created yet!
+				No categories have been created yet!
 			} else {
 				<table class="list">
 					<tr>
@@ -51,29 +51,29 @@
 						<th width="25%">NAME</th>
 						<th width="5%">ACTION</th>
 					</tr>
-					@repeatWithIndex(myForm("list")) { (tag, idx) =>
-					<input type="hidden" id='list@idx' name='list[@idx].seqno' value='@tag("seqno").value.get'/>
+					@repeatWithIndex(myForm("list")) { (cat, idx) =>
+					<input type="hidden" id='list@idx' name='list[@idx].seqno' value='@cat("seqno").value.get'/>
 					<tr class="resultItem">
 						<td align="center">@(idx+1)</td>
-						<td>@helper.inputText(tag("name"), 
-							'placeholder ->"Tag name",
+						<td>@helper.inputText(cat("name"), 
+							'placeholder ->"Category name",
 							'id -> ("input"+idx),
 							'class -> "initcapitaliseinput"
 							)
 						</td>
 						<td align="center">
-							<a href='javascript:updateTag(@(idx))'>Save</a>
+							<a href='javascript:updateCategory(@(idx))'>Save</a>
 						</td>
 					</tr>
 					}
 				</table>
 			}
 			<br/>
-				@helper.inputText(myForm("newTagName"), 
-						'placeholder -> "New tag name",
+				@helper.inputText(myForm("newCategoryName"), 
+						'placeholder -> "New category name",
 						'class -> "initcapitaliseinput"
 						)
-				<input type="submit" value="Create New" onclick="javascript:createTag()"/>
+				<input type="submit" value="Create New" onclick="javascript:createCategory()"/>
 			</div>
 		</form>
 	</div>
@@ -81,6 +81,6 @@
 <script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'/></script>
 <script src='@routes.Assets.at("javascripts/bootstrap.js")'/></script>
 <script>
-	$('#liTags').addClass('active');
+	$('#liCategory').addClass('active');
 </script>
 </html>

@@ -37,9 +37,9 @@ GET		/user/:id/edit							controllers.ABUserDetail.edit(id)
 GET		/user/:id/delete						controllers.ABUserList.removeUser(id)
 GET		/searchbook								controllers.ABSearchCatalog.index
 GET		/searchbook/:str						controllers.ABSearchCatalog.search(str)
-GET		/tags									controllers.ABTagsList.listTags
-POST	/tags/:seqno/update						controllers.ABTagsList.saveUpdate(seqno)
-POST	/tags/create							controllers.ABTagsList.saveCreate
+GET		/categories								controllers.ABCategory.listCategories
+POST	/categories/:seqno/update				controllers.ABCategory.saveUpdate(seqno)
+POST	/categories/create						controllers.ABCategory.saveCreate
 GET     /assets/*file          					controllers.Assets.at(path="/public", file)
 
 # Map static resources from the /public folder to the /assets URL path
