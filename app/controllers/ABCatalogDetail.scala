@@ -13,7 +13,7 @@ import services.DBService
 import play.api.data.Forms
 import models.form.FormBook
 import models.form.FormCatalog
-import controllers.util.MySession
+import play.api.data.Field
 
 /**
  * Action to handle the catalog section, including the add, update, delete, and view.
@@ -23,6 +23,16 @@ object ABCatalogDetail extends Controller with TSecured {
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
   
+  val formBookMapping = mapping(
+    "idx" -> optional(of[Long]),
+    "id" -> optional(of[Long]),
+    "catalogID" -> of[Long],
+    "originCode" -> nonEmptyText,
+    "originDesc" -> optional(text),
+    "remarks" -> nonEmptyText
+  )(FormBook.apply)(FormBook.unapply)
+
+    
   val formCatalogMapping = mapping(
       "idx" -> optional(of[Long]),
       "id" -> optional(of[Long]),
@@ -33,7 +43,9 @@ object ABCatalogDetail extends Controller with TSecured {
         val yearFormat = new SimpleDateFormat("yyyy")
         val currentYear = yearFormat.format(currentTime).toInt
         number(min = 0, max = currentYear)
-      }
+      },
+      "category" -> number,
+      "books" -> optional(list(formBookMapping))
     )(FormCatalog.apply)(FormCatalog.unapply)
 
   val catalogForm = Form[FormCatalog](
@@ -50,7 +62,7 @@ object ABCatalogDetail extends Controller with TSecured {
    * Displaying the catalog detail page with blank information.
    */
   def gotoNewCatalog() = withAuth {username => implicit req =>
-    Ok(views.html.catalog_detail(MODE_ADD, catalogForm, List())(session)).withSession(
+    Ok(views.html.catalog_detail(MODE_ADD, catalogForm)(session)).withSession(
         session + ("mode" -> MODE_ADD))
   }
 
@@ -61,13 +73,9 @@ object ABCatalogDetail extends Controller with TSecured {
     val catalog = DBService.findCatalogByID(pIDStr.toInt, true)
     val formCatalog = FormCatalog(catalog)
     val filledForm = catalogForm.fill(formCatalog)
-    val formBooks = catalog.books.getOrElse(List()).map {
-      book => FormBook(book)
-    }
     
     val username = session.get("username").getOrElse("")
-    MySession.put(username, "formBooks", formBooks)
-    Ok(views.html.catalog_detail(MODE_EDIT, filledForm, formBooks)(session)).withSession(
+    Ok(views.html.catalog_detail(MODE_EDIT, filledForm)(session)).withSession(
         session + ("mode" -> MODE_EDIT))
   }
   
@@ -75,24 +83,24 @@ object ABCatalogDetail extends Controller with TSecured {
    * Saving the catalog details.
    */
   def save = withAuth {username => implicit req =>
+    println("save!!!")
     val tempForm = catalogForm.bindFromRequest()
     val mode = session.get("mode").getOrElse(MODE_ADD)
     val username = session.get("username").getOrElse("")
-    val flashBooks = MySession.get(username, "formBooks")
 
     tempForm.fold(
       errors => {
         tempForm.errors.map {err => 
           println(err.message)
         }
-        val formBooks = flashBooks.asInstanceOf[List[FormBook]]
-        BadRequest(views.html.catalog_detail(mode, tempForm, formBooks)(session))
+        BadRequest(views.html.catalog_detail(mode, tempForm)(session))
       },
       data => {
         if (mode.equals(MODE_ADD)) {
-          DBService.createCatalog(data.title, data.author, data.publishedYear)
+          DBService.createCatalog(data.title, data.author, data.publishedYear, data.category)
         } else {
-          DBService.updateCatalog(data.id.get, data.title, data.author, data.publishedYear)
+          DBService.updateCatalog(
+              data.id.get, data.title, data.author, data.publishedYear, data.category)
         }
         Redirect(routes.ABCatalogList.index()).withSession(session - "mode")
       })

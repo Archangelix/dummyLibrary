@@ -27,6 +27,14 @@
 				window.location=url;
 			}
 			
+			function checkSearchTextbox() {
+				var searchText = $('#txtSearch').val();
+				if (searchText == "") {
+					$('#btnSearch').attr("disabled", "disabled");
+				} else {
+					$('#btnSearch').removeAttr("disabled");
+				}
+			}
 		</script>
 	</head>
 <body>
@@ -39,8 +47,8 @@
 	}}
 	<form action='@routes.ABSearchCatalog.index' method='GET'>
 	<div id="mainSearchCatalog" class="searchBox">
-		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here">
-		<a href="javascript:search()" class="btn">Search</a>
+		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here" onkeyup="checkSearchTextbox()">
+		<a id="btnSearch" href="javascript:search()" class="btn" disabled>Search</a>
 	</div>
 	</form>
 </body>

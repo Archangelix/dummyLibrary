@@ -15,12 +15,15 @@ case class FormCatalog(
   val id: Option[Long],
   val title: String,
   val author: String, 
-  val publishedYear: Int
+  val publishedYear: Int,
+  val category: Int,
+  val books: Option[List[FormBook]]
 )
 
 object FormCatalog {
   def apply(pCatalog: OBCatalog): FormCatalog = {
     FormCatalog(pCatalog.idx, pCatalog.id, pCatalog.title, pCatalog.author, 
-        pCatalog.publishedYear)
+        pCatalog.publishedYear, pCatalog.category.code, 
+        Some(pCatalog.books.get.map(a => FormBook(a))))
   }
 }

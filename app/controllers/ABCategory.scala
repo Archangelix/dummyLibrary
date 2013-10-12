@@ -4,11 +4,7 @@ import models.OBCategory
 import models.exception.CategoryNotFoundException
 import models.form.FormCategory
 import play.api.data.Form
-import play.api.data.Forms.list
-import play.api.data.Forms.mapping
-import play.api.data.Forms.of
-import play.api.data.Forms.optional
-import play.api.data.Forms.text
+import play.api.data.Forms._
 import play.api.data.format.Formats.longFormat
 import play.api.mvc.Controller
 import services.DBService
@@ -17,12 +13,12 @@ import play.api.data.FormError
 object ABCategory extends Controller with TSecured {
 
   val categoryMapping = mapping(
-      "selectedID" -> optional(of[Long]),
+      "selectedID" -> optional(number),
       "updatedCategoryName" -> text,
       "newCategoryName" -> text,
       "list" -> optional(list(
 		  mapping(
-			  "seqno" -> optional(of[Long]),
+			  "seqno" -> number,
 			  "name" -> text
 	      )(OBCategory.apply)(OBCategory.unapply)
       ))
@@ -69,7 +65,6 @@ object ABCategory extends Controller with TSecured {
   }
   
   def saveUpdate(pRowIdx: String) = withAuth {username => implicit req => 
-    println("saveUpdate Entered!")
     val filledForm = categoryForm.bindFromRequest
     filledForm.fold(
         error => {
@@ -87,8 +82,8 @@ object ABCategory extends Controller with TSecured {
 		  } else {
 			  val isEligibleForUpdate = {
 				  try {
-					val OBCategory = DBService.findCategoryByName(categoryName)
-					OBCategory.seqno==selectedSeqNo
+					val category = DBService.findCategoryByName(categoryName)
+					category.code==selectedSeqNo
 				  } catch {
 					case e: CategoryNotFoundException => {
 					  true

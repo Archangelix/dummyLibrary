@@ -14,6 +14,7 @@ class OBCatalog(
   val title: String,
   val author: String, 
   val publishedYear: Int, 
+  val category: OBCategory,
   val isDeleted: Boolean,
   val books: Option[List[OBBook]]
 )
@@ -21,24 +22,27 @@ class OBCatalog(
 object OBCatalog {
   def apply(pCatalog: DBCatalog, pBooks: List[DBBook]): OBCatalog = 
 		 new OBCatalog(pCatalog.idx, pCatalog.id, pCatalog.title, pCatalog.author, 
-		     pCatalog.publishedYear, pCatalog.isDeleted, 
+		     pCatalog.publishedYear, OBCategory(pCatalog.category), pCatalog.isDeleted, 
 		     Some(pBooks.map(dbBook => OBBook(dbBook))))
 		    
   def apply(pIdx: Option[Long], pID: Option[Long], pTitle: String, pAuthor: String, 
-      pPublishedYear: Int, pIsDeleted: Boolean): OBCatalog = 
-		 new OBCatalog(pIdx, pID, pTitle, pAuthor, pPublishedYear, pIsDeleted, None)
+      pPublishedYear: Int, pCategory: Int, pIsDeleted: Boolean): OBCatalog = 
+		 new OBCatalog(pIdx, pID, pTitle, pAuthor, 
+		     pPublishedYear, OBCategory(pCategory), pIsDeleted, None)
 
   def apply(pIdx: Option[Long], pID: Option[Long], pTitle: String, pAuthor: String, 
-      pPublishedYear: Int, pIsDeleted: Boolean, books: List[OBBook]): OBCatalog = 
-		 new OBCatalog(pIdx, pID, pTitle, pAuthor, pPublishedYear, pIsDeleted, Some(books))
+      pPublishedYear: Int, pCategory: Int,  
+      pIsDeleted: Boolean, books: List[OBBook]): OBCatalog = 
+		 new OBCatalog(pIdx, pID, pTitle, pAuthor, 
+		     pPublishedYear, OBCategory(pCategory), pIsDeleted, Some(books))
 
   def apply(pCatalog: FormCatalog, pBooks: List[FormBook]): OBCatalog = 
 		 new OBCatalog(pCatalog.idx, pCatalog.id, pCatalog.title, pCatalog.author, 
-		     pCatalog.publishedYear, false,  
+		     pCatalog.publishedYear, OBCategory(pCatalog.category), false,  
 		     Some(pBooks.map(formBook => OBBook(formBook))))
 		    
   def unapply (pCatalog: OBCatalog) =
     if (pCatalog==null) None
     else Some((pCatalog.idx, pCatalog.id, pCatalog.title, pCatalog.author, 
-        pCatalog.publishedYear, pCatalog.isDeleted))
+        pCatalog.publishedYear, pCatalog.category, pCatalog.isDeleted))
 }

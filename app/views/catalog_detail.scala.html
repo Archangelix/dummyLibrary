@@ -1,6 +1,8 @@
-@(mode: String, myForm: Form[form.FormCatalog], books: List[form.FormBook])(implicit session: Session)
+@(mode: String, myForm: Form[form.FormCatalog])(implicit session: Session)
+@import viewhelpers._
 @import controllers.ABCatalogDetail.MODE_ADD
 @import controllers.ABCatalogDetail.MODE_EDIT
+@import models.common._
 
 <!doctype html>
 
@@ -50,6 +52,14 @@
 							'class -> "form-control"
 							)
 				</div>
+				<div class="form-group">
+					@helper.select(
+								  myForm("category"),
+								  DDCategories.all,
+								  '_label -> "Category",
+								  '_default -> "Please select"
+					)
+				</div>
 				@defining(myForm.errors.filter(_.key.equals(""))) { errs =>
 					@if(errs.size>0) {
 						<ul class="error">
@@ -67,30 +77,21 @@
 	</form>
 	<div id="divCatalogBooks">
 		<legend>CATALOG BOOKS</legend>
-		@if(books.size==0) {
-			No registered books yet.
-			@if(mode.equals(MODE_EDIT)) { 
-				<a href="/bookdetail/@myForm("id").value/new">Do you want to add one?</a>
-			} else {
-				Create the catalog first.
-			}
-		} else {
 			<table class="list">
 				<tr>
 					<th>S/No</th>
 					<th>Remarks</th>
 					<th>Origin</th>
 				</tr>
-				@books.zipWithIndex.map { item => 
+					@repeatWithIndex(myForm("books")) { (book, idx) =>
 					<tr>
-						<td align="center">@(item._2+1)</td>
-						<td>@item._1.remarks</td>
-						<td>@item._1.originDesc</td>
+						<td align="center">@(idx+1)</td>
+						<td>@book("remarks").value</td>
+						<td>@book("originDesc").value</td>
 					</tr>
 				}
 			</table>
 			<a href="/bookdetail/@myForm("id").value/new">Add a new book</a>
-		}
 	</div>
 	</div>
 	</div>

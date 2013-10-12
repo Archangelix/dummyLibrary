@@ -52,12 +52,14 @@ object DBService {
 
   val dbCatalogListMapping = {
     get[Long]("idx") ~
-    get[Long]("id") ~
+    get[Int]("id") ~
     get[String]("title") ~
     get[String]("author") ~
     get[Int]("publishedYear") ~
+    get[Int]("category_seqno") ~
     get[Boolean]("is_deleted") map {
-      case idx~id~title~author~publishedYear~isDeleted => DBCatalog (Some(idx), Some(id), title, author, publishedYear, isDeleted)
+      case idx~id~title~author~publishedYear~category~isDeleted => 
+        DBCatalog (Some(idx), Some(id), title, author, publishedYear, category, isDeleted)
     }
   }
 
@@ -66,8 +68,10 @@ object DBService {
     get[String]("title") ~
     get[String]("author") ~
     get[Int]("publishedYear") ~
+    get[Int]("category_seqno") ~
     get[Boolean]("is_deleted") map {
-      case id~title~author~publishedYear~isDeleted => DBCatalog (None, Some(id), title, author, publishedYear, isDeleted)
+      case id~title~author~publishedYear~category~isDeleted => 
+        DBCatalog (None, Some(id), title, author, publishedYear, category, isDeleted)
     }
   }
 
@@ -131,9 +135,9 @@ object DBService {
 	}
 	
   val dbCategoryListMapping = {
-    get[Long]("seqno") ~
+    get[Int]("seqno") ~
     get[String]("name") map {
-      case seqno~name => OBCategory(Some(seqno), name)
+      case seqno~name => OBCategory(seqno, name)
     }
   }
 
@@ -353,12 +357,14 @@ object DBService {
   	 * @param pTitle The title.
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
+  	 * @param pCategory The catalog category.
   	 */
-	def createCatalog(pTitle: String, pAuthor: String, pPublishedYear: Int) = {
+	def createCatalog(pTitle: String, pAuthor: String, pPublishedYear: Int, pCategory: Int) = {
 	  DB.withConnection { implicit c => 
-	    SQL("insert into CATALOG (title, author, publishedYear) values " +
-	    		"({title}, {author}, {publishedYear})"
-	        ).on('title -> pTitle, 'author -> pAuthor, 'publishedYear -> pPublishedYear
+	    SQL("insert into CATALOG (title, author, publishedYear, category) values " +
+	    		"({title}, {author}, {publishedYear}, {category})"
+	        ).on('title -> pTitle, 'author -> pAuthor, 'publishedYear -> pPublishedYear,
+	            'category -> pCategory
 	    ).executeUpdate()
 	  }
 	}
@@ -370,13 +376,15 @@ object DBService {
   	 * @param pTitle The title.
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
+  	 * @param pCategory The catalog category.
   	 */
-	def updateCatalog(pID: Long, pTitle: String, pAuthor: String, pPublishedYear: Int) = {
+	def updateCatalog(pID: Long, pTitle: String, pAuthor: String, pPublishedYear: Int, pCategory: Int) = {
 	  DB.withConnection { implicit c => 
 	    SQL("update CATALOG set title={title}, author={author}, publishedYear={publishedYear} " +
 	    		"where ID={id}")
-	    	.on('title -> pTitle, 'author -> pAuthor, 'publishedYear -> pPublishedYear, 'id -> pID)
-	    	.executeUpdate()
+	    	.on('title -> pTitle, 'author -> pAuthor, 'publishedYear -> pPublishedYear, 'id -> pID,
+	            'category -> pCategory
+	    ).executeUpdate()
 	  }
 	}
 	
@@ -611,6 +619,15 @@ object DBService {
 	  	
 	  // Convert from List to Map.
 	  val res = Map((list map {s => (s.code, s.desc)}) : _*)
+	  res
+	}
+
+	def getCategoriesMap: Map[String, String] = DB.withConnection { implicit c => 
+	  val list = SQL("SELECT * FROM CATEGORIES")
+	  	.as(dbCategoryListMapping *)
+	  	
+	  // Convert from List to Map.
+	  val res = Map((list map {s => (s.code.toString, s.name)}) : _*)
 	  res
 	}
 
