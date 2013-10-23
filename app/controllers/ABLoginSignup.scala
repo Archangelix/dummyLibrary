@@ -17,12 +17,12 @@ import services.DBService
 import java.security.MessageDigest
 import common.SecurityUtil._
 import common.CommonUtil._
-import play.api.data.FormError
 import controllers.ABUserDetail.MODE_ADD
 import controllers.ABUserDetail.MODE_EDIT
-import play.api.data.validation.Constraint
 import models.form.FormUser
 import java.util.Date
+import play.api.data.FormError
+import play.api.data.validation.Constraint
 import play.api.data.validation.Invalid
 import play.api.data.validation.Valid
 import play.api.data.validation.ValidationError
@@ -33,21 +33,15 @@ import play.api.Routes
 /**
  * Action to handle the logging section.
  */
-object ABLoginSignup extends Controller with TSecured {
+object ABLoginSignup extends Controller with TSecured with TLogin {
 
-  val formUserLoginMapping = mapping (
-          "username" -> nonEmptyText,
-          "password" -> nonEmptyText
-      )(FormUserPassword.apply)(FormUserPassword.unapply)
-      
-  val loginForm = Form[FormUserPassword](formUserLoginMapping)
-  
   val formNewUserMapping = mapping(
       "rowIdx" -> optional(of[Long]),
       "seqNo" -> optional(of[Long]),
       "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
+      "race" -> text.verifying(mustBeEmpty), // Prevent robots from submitting the signup form.
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
       "dob" -> date("yyyy-MM-dd").verifying(validDOB),
@@ -61,7 +55,7 @@ object ABLoginSignup extends Controller with TSecured {
   /**
    * Displaying the login page.
    */
-  def loginPage = Action { implicit req =>
+  override def loginPage = Action { implicit req =>
     println("ABLoginSignup")
     val username = flash.get("username")
     if (username == None) {
@@ -77,7 +71,7 @@ object ABLoginSignup extends Controller with TSecured {
   /**
    * Login authentication.
    */
-  def login = Action { implicit req =>
+  override def login = Action { implicit req =>
     val tempForm = loginForm.bindFromRequest
     tempForm.fold (
       error => {
@@ -184,13 +178,6 @@ object ABLoginSignup extends Controller with TSecured {
         Ok("true")
       }
     }
-  }
-  
-  /**
-   * Log out the user. Bring the user back to the login page.
-   */
-  def logout = Action { implicit req =>
-    Redirect(routes.ABLogin.loginPage).withNewSession.flashing("message" -> "Log out successful!")
   }
   
 }

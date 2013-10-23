@@ -2,7 +2,7 @@
 	<div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="/">Dummy Library</a>
+			<a class="navbar-brand" href="/">Dummy Librarypublic</a>
 		</div>
 		@if(displayLoginForm) {
 		<div class="navbar-collapse collapse">
@@ -29,3 +29,15 @@
 		}
 	</div>
 	</div>
+	<script>
+		function checkSignInEnable() {
+			var username = $('#username').val();
+			var password = $('#password').val();
+			if (username == '' || password == '') {
+				$('#btnSignIn').attr('disabled', 'disabled');
+			} else {
+				$('#btnSignIn').removeAttr('disabled');
+			}
+		}
+	</script>
+

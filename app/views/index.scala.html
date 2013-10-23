@@ -4,24 +4,9 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Dummy Library</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
-		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
+		@inc.common_head()
 		<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/index.css")' media='screen'/>
 		<script>
-			function checkSignInEnable() {
-				var username = $('#username').val();
-				var password = $('#password').val();
-				if (username == '' || password == '') {
-					$('#btnSignIn').attr('disabled', 'disabled');
-				} else {
-					$('#btnSignIn').removeAttr('disabled');
-				}
-			}
-			
 			function search() {
 				var url = '/searchbook/'+$('#txtSearch').val();
 				window.location=url;

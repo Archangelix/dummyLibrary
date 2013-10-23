@@ -45,6 +45,7 @@ object ABUserDetail extends Controller with TSecured {
       "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
+      "race" -> text.verifying(mustBeEmpty), // Prevent robots from submitting the signup form.
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
       "dob" -> date("yyyy-MM-dd").verifying(validDOB),
@@ -61,6 +62,7 @@ object ABUserDetail extends Controller with TSecured {
       "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
+      "race" -> text.verifying(mustBeEmpty), // Prevent robots from submitting the signup form.
       "idNumber" -> nonEmptyText,
       "address" -> nonEmptyText,
       "dob" -> date("yyyy-MM-dd").verifying(validDOB),

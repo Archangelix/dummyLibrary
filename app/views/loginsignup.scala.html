@@ -4,12 +4,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>Dummy Library</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/normalize.css")'/>
-	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/grid.css")'/>
-	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/bootstrap.css")' media='screen'/>
-	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/main.css")' media='screen'/>
+	@inc.common_head()
 	<script>
 		var successFn = function(data) {
 			console.log('Ajax successful!');
@@ -118,6 +113,12 @@
 						@err.message
 					}
 					</p>
+				</div>
+				<div class="form-group" style="display: none">
+					@helper.inputText(signupForm("race"),
+						'placeholder -> "race",
+						'_label -> "Race"
+					)
 				</div>
 				<div class="form-group">
 					@helper.inputText(signupForm("idNumber"),

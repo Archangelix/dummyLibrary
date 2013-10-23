@@ -13,7 +13,7 @@ import play.mvc.Http.Session
 import services.DBService
 import models.form.FormCatalog
 
-object ABSearchCatalog extends Controller with TSecured {
+object ABSearchCatalog extends Controller with TSecured with TLogin {
   
   val formSearchCatalogMapping = mapping(
       "searchKeyword" -> text,
@@ -28,26 +28,12 @@ object ABSearchCatalog extends Controller with TSecured {
    * Displaying the login page.
    */
   def index = Action { implicit req =>
-    val filledForm = searchCatalogForm.fill(FormSearchCatalog("abc", "", "", ""))
-    Ok(views.html.search_catalog("", List()))
+    val filledForm = searchCatalogForm.fill(FormSearchCatalog("", "", "", ""))
+    Ok(views.html.search_catalog(loginForm, "", List()))
   }
   
   def search(pStr: String) = Action { implicit req =>
-    	val catalogList = DBService.findCatalogs(pStr);
-        Ok(views.html.search_catalog(pStr, catalogList.map(FormCatalog(_))))
-    /*val cat = searchCatalogForm.bindFromRequest
-    cat.fold(
-      error => {
-        println("errors")
-        BadRequest(views.html.search_catalog(pStr, error, List()))
-      },
-      success => {
-        println("success")
-        val casesensitive = "Y".equals(success.caseSensitive)
-   		//println("Case sensitive = "+success.caseSensitive)
-    	val catalogList = DBService.findCatalogs(success, casesensitive);
-        Ok(views.html.search_catalog(pStr, cat, catalogList.map(FormCatalog(_))))
-      }
-    )*/
+	val catalogList = DBService.findCatalogs(pStr);
+    Ok(views.html.search_catalog(loginForm, pStr, catalogList.map(FormCatalog(_))))
   }
 }

@@ -21,4 +21,5 @@ conf/application*.conf
 *.dump
 *~
 hs_err*
+*.swp
 /.worksheet

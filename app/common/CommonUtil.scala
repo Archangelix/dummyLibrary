@@ -10,16 +10,25 @@ import play.api.data.validation.ValidationError
 
 object CommonUtil {
     def validDOB(): Constraint[Date] = 
-    Constraint[Date]("constraint.validDate") { o =>
-      val currentTime = DateTime.now
-      val inputTime = new DateTime(o)
-      val threshold = inputTime.plus(Period.years(6))
-      if (currentTime.compareTo(threshold)<0 ) {
-        Invalid(ValidationError("Minimum age is 6 years old.", 6))
-      } else {
-        Valid
+	    Constraint[Date]("constraint.validDate") { o =>
+	      val currentTime = DateTime.now
+	      val inputTime = new DateTime(o)
+	      val threshold = inputTime.plus(Period.years(6))
+	      if (currentTime.compareTo(threshold)<0 ) {
+	        Invalid(ValidationError("Minimum age is 6 years old.", 6))
+	      } else {
+	        Valid
+	      }
+	}
+    
+    def mustBeEmpty(): Constraint[String] = 
+      Constraint[String]("constraint.invalidInput") { o =>
+        if (!isBlank(o)) {
+          Invalid(ValidationError("Invalid form input."))
+        } else {
+          Valid
+        }
       }
-  }
 
 	def isBlank(str: String) = str==null || str.trim().isEmpty()
 }

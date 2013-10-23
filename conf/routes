@@ -27,6 +27,8 @@ GET		/bookdetail/:catalogid/:bookid			controllers.ABBookDetail.view(catalogid, b
 GET		/bookdetail/:catalogid/:bookid/edit		controllers.ABBookDetail.edit(catalogid, bookid)
 POST	/bookdetail/:catalogid/:bookid/save		controllers.ABBookDetail.saveUpdate(catalogid, bookid)
 GET     /useradmin                   			controllers.ABUserList.listUsers
+#GET     /contactus								controllers.ABContactUs.contactUsPage
+#POST	/contactus								controllers.ABContactUs.send
 GET     /firstUser                     			controllers.ABUserList.navigateFirst
 GET     /prevUser                      			controllers.ABUserList.navigatePrev
 GET     /nextUser                      			controllers.ABUserList.navigateNext

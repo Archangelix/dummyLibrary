@@ -17,7 +17,8 @@ case class FormUser(
     seqNo: Option[Long], 
     userID: String, 
     name: String, 
-    gender: String, 
+    gender: String,
+    race: String,
     idNumber: String, 
     address: String,
     dob: Date,
@@ -30,7 +31,7 @@ case class FormUser(
 
 object FormUser {
   def apply(pUser: OBUser): FormUser = {
-    FormUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, pUser.gender.toString(), 
+    FormUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, pUser.gender.toString(), "",
         pUser.idNumber, pUser.address,
         pUser.dob,
         pUser.role.id.toString, Some(pUser.role.name), pUser.nationality.toString, "", "")
