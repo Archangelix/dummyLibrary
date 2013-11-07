@@ -30,13 +30,23 @@
 			case _ => menubar_public(myForm, true)
 		}
 	}}
-	<form action='@routes.ABSearchCatalog.index' method='GET'>
+	<form action='@routes.ABSearchCatalog.index' method='GET'> 
 	<div id="mainSearchCatalog" class="searchBox">
 		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here" onkeyup="checkSearchTextbox()">
 		<a id="btnSearch" href="javascript:search()" class="btn" disabled>Search</a>
 	</div>
 	</form>
 </body>
-		<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
-		<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+	<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+	<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+	<script>
+		$(document).ready(function() {
+		  $("#txtSearch").keydown(function(event){
+		    if( (event.keyCode == 13) && ($('#btnSearch').attr("disabled") === "disabled") ) {
+		      event.preventDefault();
+		      return false;
+		    }
+		  });
+		});			
+	</script>
 </html>
