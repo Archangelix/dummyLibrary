@@ -28,7 +28,7 @@ case class DBUser (
 
 object DBUser {
   def apply(pUser: OBUser): DBUser = {
-    DBUser(pUser.seqNo.get, pUser.userID, pUser.name, pUser.address, pUser.dob, 
+    DBUser(pUser.seqNo.getOrElse(0), pUser.userID, pUser.name, pUser.address, pUser.dob, 
         pUser.gender==Gender.MALE, pUser.idNumber, pUser.nationality, 
         pUser.role.seqNo, pUser.isDeleted, 
         pUser.createUsercode, pUser.createTimestamp, 

@@ -226,8 +226,9 @@ object DBService {
 	 * @return the User model business object.
 	 */
 	def findByUserID(pUserID: String)(implicit pIncludeDeleted: Boolean = false): DBUser = {
+	  println("findByUserID")
 	  DB.withConnection{ implicit c => 
-	    val list = SQL("SELECT * FROM USERS WHERE userid={userID}")
+	    val list = SQL("SELECT * FROM USERS WHERE upper(userid)=upper({userID})")
 	    	.on('userID -> pUserID.toUpperCase()).as(dbUserMapping *)
 	    if (list==null || list.size==0) {
 	      println("User "+pUserID+" cannot be found!")
