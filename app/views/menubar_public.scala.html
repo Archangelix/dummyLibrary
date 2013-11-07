@@ -29,6 +29,7 @@
 		}
 	</div>
 	</div>
+	<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
 	<script>
 		function checkSignInEnable() {
 			var username = $('#username').val();
@@ -39,5 +40,7 @@
 				$('#btnSignIn').removeAttr('disabled');
 			}
 		}
+
+		checkSignInEnable();
 	</script>
 

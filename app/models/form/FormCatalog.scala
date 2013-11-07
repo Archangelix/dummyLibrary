@@ -1,6 +1,8 @@
 package models.form
 
 import models.OBCatalog
+import models.db.DBCatalog
+import models.db.DBBook
 
 /**
  * Catalog form object. A business object has to be mapped to / from this form object 
@@ -11,19 +13,18 @@ import models.OBCatalog
  * In this layer by default <code>isDeleted</code> attribute is always <code>false</code>.
  */
 case class FormCatalog(
-  val idx: Option[Long],
-  val id: Option[Long],
+  val seqNo: Option[Int],
   val title: String,
-  val author: String, 
-  val publishedYear: Int,
-  val category: Int,
+  val author: String,
+  val publishedYear: String,
+  val category: String,
   val books: Option[List[FormBook]]
 )
 
 object FormCatalog {
   def apply(pCatalog: OBCatalog): FormCatalog = {
-    FormCatalog(pCatalog.idx, pCatalog.id, pCatalog.title, pCatalog.author, 
-        pCatalog.publishedYear, pCatalog.category.code, 
-        Some(pCatalog.books.get.map(a => FormBook(a))))
+    FormCatalog(pCatalog.seqNo,pCatalog.title, pCatalog.author, 
+        pCatalog.publishedYear.toString, pCatalog.category.code.toString, 
+        Some(pCatalog.books.map(FormBook(_))))
   }
 }

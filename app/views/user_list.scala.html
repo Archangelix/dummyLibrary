@@ -1,4 +1,4 @@
-@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[form.FormUser])(implicit session: Session)
+@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[controllers.ABUserList.FormUserListItem])(implicit session: Session)
 @import helper._
 <!-- users_list.scala.html -->
 <!doctype html>
@@ -40,11 +40,11 @@
 						<td align="center">@user.rowIdx</td>
 						<td>@user.name</td>
 						<td>@user.address</td>
-						<td>@("%1$td-%1$tm-%1$tY".format(user.dob))</td>
+						<td>@user.dob</td>
 						<td>@user.userRoleName</td>
 						<td align="center">
-							<a href="@routes.ABUserDetail.edit(user.seqNo.get.toString)">Edit</a> /
-							<a href="javascript:removeUser('@routes.ABUserList.removeUser(user.seqNo.get.toString)')">Remove</a>
+							<a href="@routes.ABUserDetail.edit(user.seqNo)">Edit</a> /
+							<a href="javascript:removeUser('@routes.ABUserList.removeUser(user.seqNo)')">Remove</a>
 						</td>
 					</tr>
 					}

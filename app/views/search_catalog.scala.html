@@ -1,4 +1,4 @@
-@(myForm: Form[form.FormUserPassword], pStr: String, pCatalogs: List[form.FormCatalog])(implicit session: Session)
+@(myForm: Form[form.FormUserPassword], pStr: String, pCatalogs: List[controllers.ABSearchCatalog.FormCatalogListItem])(implicit session: Session)
 @import views.html.helper._
 <!-- search_catalog.scala.html-->
 <!doctype html>
@@ -7,21 +7,20 @@
 	@inc.common_head()
 	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/index.css")' media='screen'/>
 	<script>
-		function checkSignInEnable() {
-			var username = $('#username').val();
-			var password = $('#password').val();
-			if (username == '' || password == '') {
-				$('#btnSignIn').attr('disabled', 'disabled');
-			} else {
-				$('#btnSignIn').removeAttr('disabled');
-			}
-		}
-		
 		function search() {
 			var url = '/searchbook/'+$('#txtSearch').val();
 			window.location=url;
 		}
 		
+		function checkSearchTextbox() {
+			var searchText = $('#txtSearch').val();
+			if (searchText == "") {
+				$('#btnSearch').attr("disabled", "disabled");
+			} else {
+				$('#btnSearch').removeAttr("disabled");
+			}
+		}
+
 		function replaceKeyWord(sentence, keyword) {
 			while (sentence.indexOf(keyword)>=0) {
 				sentence = sentence.replace(keyword, "&*(");
@@ -54,8 +53,8 @@
 	}}
 	<form action='@routes.ABSearchCatalog.index' method='GET'>
 	<div id="divSearchInput" class="searchBox">
-		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here" value="@pStr">
-		<a href="javascript:search()" class="btn">Search</a>
+		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here" value="@pStr" onkeyup="checkSearchTextbox()">
+		<a id="btnSearch" href="javascript:search()" class="btn" disabled>Search</a>
 	</div>
 	</form>
 	<div class="container">
@@ -80,7 +79,7 @@
 	<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
 	<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
 	<script>
-		checkSignInEnable();
 		highlightKeywords('@pStr.toUpperCase()');
+		checkSearchTextbox();
 	</script>
 </html>

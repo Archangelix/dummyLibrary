@@ -1,29 +1,29 @@
-@(myForm: Form[form.FormCategory], list: List[OBCategory])(implicit session: Session)
+@(myForm: Form[form.FormCategory], list: List[common.Category])(implicit session: Session)
 @import helper._
 @import viewhelpers._
 
 <!doctype html>
-<!-- usersList.scala.html -->
+<!-- categories_list.scala.html -->
 
 <html>
 <head>
 	@inc.common_head()
 	<script>
-		function updateCategory(rowIdx) {
-			console.log("rowIdx = "+rowIdx);
-		  var seqNo = $('#list'+rowIdx).val();
-			$('#selectedID').val(seqNo);
-			console.log("seqNo = "+seqNo);
+		function updatecategory(rowidx) {
+			console.log("rowidx = "+rowidx);
+		  var seqno = $('#list'+rowidx).val();
+			$('#selectedid').val(seqno);
+			console.log("seqno = "+seqno);
 
-			var newCategoryName = $("#input"+rowIdx).val();
-			$('#updatedCategoryName').val(newCategoryName);
-			console.log("newCategoryName = "+newCategoryName);
+			var newcategoryname = $("#input"+rowidx).val();
+			$('#updatedcategoryname').val(newcategoryname);
+			console.log("newcategoryname = "+newcategoryname);
 			
-			document.forms[0].action = "/categories/"+seqNo+"/update";
+			document.forms[0].action = "/categories/"+seqno+"/update";
 			document.forms[0].submit();
 		}
 		
-		function createCategory() {
+		function createcategory() {
 			document.forms[0].submit();
 		}
 	
@@ -42,7 +42,7 @@
 			} else {
 				<table class="list">
 					<tr>
-						<th width="5%">S/No</th>
+						<th width="2%" align="center">S/No</th>
 						<th width="25%">NAME</th>
 						<th width="5%">ACTION</th>
 					</tr>
@@ -64,11 +64,17 @@
 				</table>
 			}
 			<br/>
-				@helper.inputText(myForm("newCategoryName"), 
-						'placeholder -> "New category name",
-						'class -> "initcapitaliseinput"
-						)
-				<input type="submit" value="Create New" onclick="javascript:createCategory()"/>
+			@helper.inputText(myForm("newCategoryName"), 
+					'placeholder -> "New category name",
+					'class -> "initcapitaliseinput"
+					)
+			<input type="submit" value="Create New" onclick="javascript:createCategory()"/>
+			@helper.inputText(myForm("newCategoryName2"), 
+					'id -> "newCategoryName2",
+					'placeholder -> "New category name",
+					'class -> "initcapitaliseinput",
+					'style -> "display: None"
+					)
 			</div>
 		</form>
 	</div>

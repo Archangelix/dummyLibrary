@@ -2,9 +2,8 @@ package controllers
 
 import java.text.SimpleDateFormat
 import java.util.Date
-
-import common.SecurityUtil._
-import common.CommonUtil._
+import util.SecurityUtil._
+import util.CommonUtil._
 import models.OBUser
 import models.common.DDCountry
 import models.common.DDUserRoles
@@ -12,19 +11,14 @@ import models.exception.UserNotFoundException
 import models.form.FormUser
 import play.api.data.Form
 import play.api.data.FormError
-import play.api.data.Forms.date
-import play.api.data.Forms.mapping
-import play.api.data.Forms.nonEmptyText
-import play.api.data.Forms.of
-import play.api.data.Forms.optional
-import play.api.data.Forms.text
+import play.api.data.Forms._
 import play.api.data.format.Formats.longFormat
 import play.api.data.validation.Constraint
 import play.api.data.validation.Invalid
 import play.api.data.validation.Valid
 import play.api.data.validation.ValidationError
 import play.api.mvc.Controller
-import services.DBService
+import services.CommonService
 /**
  * Action to handle the user section, including the add, update, delete, and view.
  */
@@ -40,8 +34,7 @@ object ABUserDetail extends Controller with TSecured {
   }
   
   val formEditUserMapping = mapping(
-      "rowIdx" -> optional(of[Long]),
-      "seqNo" -> optional(of[Long]),
+      "seqNo" -> optional(number),
       "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
@@ -57,8 +50,7 @@ object ABUserDetail extends Controller with TSecured {
     )(FormUser.apply)(FormUser.unapply)
 
   val formNewUserMapping = mapping(
-      "rowIdx" -> optional(of[Long]),
-      "seqNo" -> optional(of[Long]),
+      "seqNo" -> optional(number),
       "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
@@ -78,17 +70,19 @@ object ABUserDetail extends Controller with TSecured {
   /**
    * Displaying the catalog detail page with blank information.
    */
-  def gotoNewUser() = withAuth {username => implicit req =>
-    Ok(views.html.user_detail(MODE_ADD, Form[FormUser](formNewUserMapping)
-        )(session)).withSession(
+  def gotoNewUser() = withAuth { implicit officerUserID => implicit req =>
+    val newForm = Form(formNewUserMapping, 
+        Map("idNumber" -> req.getQueryString("id").getOrElse("")),
+        Seq(), None)
+    Ok(views.html.user_detail(MODE_ADD, newForm)(session)).withSession(
         session + ("mode" -> MODE_ADD))
   }
 
   /**
    * Displaying the book detail page with pre-populated user information.
    */
-  def edit(pSeqNo: String) = withAuth {username => implicit req =>
-    val user= DBService.findUserBySeqNo(pSeqNo.toLong)
+  def edit(pSeqNo: String) = withAuth { implicit officerUserID => implicit req =>
+    val user= OBUser.find(pSeqNo.toInt)
     val formUser = FormUser(user)
     val filledForm = Form[FormUser](formEditUserMapping).fill(formUser)
     
@@ -97,8 +91,9 @@ object ABUserDetail extends Controller with TSecured {
         session + ("mode" -> MODE_EDIT))
   }
   
-  def save() = withAuth {username => implicit req =>
+  def save() = withAuth { implicit officerUserID => implicit req =>
     val mode = session.get("mode").getOrElse("")
+    println("mode = "+mode)
     val filledForm = 
       if (mode.equals(MODE_ADD)) 
     	Form[FormUser](formNewUserMapping).bindFromRequest() 
@@ -114,7 +109,7 @@ object ABUserDetail extends Controller with TSecured {
       successForm => {
         if (mode.equals(MODE_ADD)) {
           try {
-        	  val dbUser = DBService.findByUserID(successForm.userID.toUpperCase())
+        	  val dbUser = OBUser.findByUserID(successForm.userID.toUpperCase())
         	  val newErrors = Form(filledForm.mapping, filledForm.data, 
         	      Seq(new FormError("userID", "This User ID is not available.")), filledForm.value)
         	  println ("Duplicate userid has been found!")
@@ -130,14 +125,14 @@ object ABUserDetail extends Controller with TSecured {
             		BadRequest(views.html.user_detail(mode, newErrorForm)(session))
             	} else {
             		val password = successForm.password
-            		DBService.createUser(user, password)
+            		CommonService.createUserAndPassword(user, password)
             		Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
             	}
             }
           }
         } else {
             val user = OBUser(successForm)
-            DBService.updateUser(user)
+            CommonService.updateUser(user)
 
             val password = successForm.password
             val errors: Seq[Option[FormError]] = if (!isBlank(password)) {
@@ -149,7 +144,7 @@ object ABUserDetail extends Controller with TSecured {
                 errors.map(_.get), filledForm.value)
               BadRequest(views.html.user_detail(mode, newErrorForm)(session))
             } else {
-              DBService.updatePassword(user.userID, password)
+              CommonService.updatePassword(user.userID, password)
               Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
             }
           }

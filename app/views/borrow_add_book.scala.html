@@ -1,0 +1,138 @@
+@(myForm: Form[ABBorrowBook.FormBorrow])(implicit session: Session)
+@import viewhelpers._
+<!-- borrow_add_book.scala.html -->
+<!doctype html>
+<html>
+<head>
+	@inc.common_head()
+	<script>
+		var successFn = function(data) {
+			console.log('Ajax successful!');
+			if (data == 'true') {
+				$('#alert-box').html('Username available!');
+				$('#alert-box').removeClass();
+				$('#alert-box').addClass('ajaxSuccessful');
+				console.log('Username available!');
+			} else {
+				$('#alert-box').html('Username not available!');
+				console.log('Username not available!');
+				$('#alert-box').removeClass();
+				$('#alert-box').addClass('ajaxFailed');
+			}
+		}
+		
+		var errorFn = function(err) {
+			console.log('Ajax failed!');
+			console.debug(err);
+		}
+		
+		var ajax1 = {
+			success: successFn,
+			error: errorFn
+		}
+		
+		function fetchBorrowerInfo() {
+			var username = $('#borrowerID').val();
+			jsRoutes.controllers.ABSearchBorrower.fetchUserInfo(username).ajax(ajax1);
+		}
+
+		function addNewBook() {
+			var booksInput = $("#borrowedBooks input");
+			var newIndex = booksInput.length;
+			if (newIndex==0) {
+				$('#noBookNotice').hide();
+				$('#addNewBookLInk').hide();
+				$('#borrowedBooks').append('<ol></ol>');
+			}
+			$('#borrowedBooks ol').append(
+					'<li><input type="text" id="books['+newIndex+']" name="books['+newIndex+']" ></li>'
+			)
+		<li><input type="text" id="books[0]" name="books[0]" 
+		></li>
+		}
+
+	</script>
+</head>
+<body>
+	@menubar_admin()
+	<div class="container">
+	<div class="divMainContainer" id="divBorrowAddBook">
+		<form id="formBorrowBookList" action="@routes.ABBorrowBook.addBook" method="POST" class="navbar-form">
+			<input type="hidden" name="adminUsername" value='@myForm("adminUsername").value'>
+			<input type="hidden" name="borrowerName" value='@myForm("borrowerName").value'>
+			<input type="hidden" name="borrowerAddress" value='@myForm("borrowerAddress").value'>
+			<input type="hidden" name="borrowDate" value='@myForm("borrowDate").value'>
+			<input type="hidden" name="returnDate" value='@myForm("returnDate").value'>
+			<fieldset>
+				<legend>BORROWER INFORMATION</legend>
+				<input type="hidden" name="borrowerID" value='@myForm("borrowerID").value'>
+				<div class="row">
+					<div class="form-group col-xs-6">
+						<label>Name</label>
+						<p>@myForm("borrowerName").value</p>
+					</div>
+					<div class="form-group col-xs-6">
+						<label>ID Number</label>
+						<p>@myForm("borrowerID").value</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-xs-12">
+						<label>Addres</label>
+						<p>@myForm("borrowerAddress").value</p>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset id="fsBorrowedBooksList">
+				<legend>BOOKS</legend>
+				@helper.inputText(myForm("newBookID"),
+							'id -> "newBookID",
+							'_label -> "Book ID",
+							'placeholder -> "Book ID"
+							)
+				<input type="submit" name="btnAdd" value='Add' class="btn btn-success"/>
+				@helper.inputText(myForm("addError"),
+						'id -> "addError",
+						'_label -> "",
+						'placeholder -> "Book ID",
+						'style -> "display: None"
+						)
+				@if(myForm("books").indexes.size>0) {
+					<table class="list">
+						<tr>
+							<th>S/No</th>
+							<th>Book ID</th>
+							<th>Title</th>
+							<th>Author</th>
+							<th>Published Year</th>
+							<th>Category</th>
+							<th>Remarks</th>
+						</tr>
+						@repeatWithIndex(myForm("books")) { (book, idx) =>
+						<tr>
+							<td align="center">@(idx+1)</td>
+							<td>@book("bookID").value</td>
+							<td>@book("title").value</td>
+							<td>@book("author").value</td>
+							<td>@book("publishedYear").value</td>
+							<td>@book("category").value</td>
+							<td>@book("remarks").value</td>
+						</tr>
+						}
+					</table>
+				} else {
+					<div id='borrowedBooks'>
+						<p id="noBookNotice">There are no books to be displayed.</p>
+					</div>
+				}
+			</fieldset>
+			<a href="/borrow/end" class="btn btn-success">End Transaction</a>
+		</form>
+	</div>
+	</div>
+</body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+<script type="text/javascript" src="@routes.ABBorrowBook.javascriptRoutes"></script>
+</html>
+

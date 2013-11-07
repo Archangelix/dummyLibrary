@@ -1,5 +1,8 @@
-@(mode: String, myForm: Form[form.FormBook], pCatalogID: String, pOrigins: List[(String, String)])(implicit session: Session)
+@(mode: String, myForm: Form[controllers.ABBookDetail.FormBook])(implicit session: Session)
 @import views.html.helper._
+@import controllers.ABCatalogDetail.MODE_ADD
+@import controllers.ABCatalogDetail.MODE_EDIT
+@import models.common.DDBookOrigin
 
 <!doctype html>
 <html>
@@ -10,22 +13,30 @@
 	@menubar_admin()
 	<div class="container">
 	<div id="divBookDetail" class="divMainContainer">
-		<form id="formCatalogDetail" action="@routes.ABBookDetail.saveNew(pCatalogID)" method="POST" class="navbar-form">
-			<input type="hidden" value='@myForm("id").value' name='@myForm("id").name'/>
-			<input type="hidden" value="@pCatalogID" name='@myForm("catalogID").name'/>
+		@if(mode.equals(MODE_ADD)) {
+			<form id="formCatalogDetail" action='@routes.ABBookDetail.saveNew(myForm("catalogSeqNo").value.get)' method="POST" class="navbar-form">
+		} else {
+			<form id="formCatalogDetail" action='@routes.ABBookDetail.saveUpdate(myForm("catalogSeqNo").value.get, myForm("seqNo").value.get)' method="POST" class="navbar-form">
+		}
+			<input type="hidden" value='@myForm("seqNo").value' name='@myForm("seqNo").name'/>
+			<input type="hidden" value='@myForm("catalogSeqNo").value' name='@myForm("catalogSeqNo").name'/>
 			<fieldset>
-				<legend>BOOK DETAIL</legend>
+				<legend>
+					@if(mode.equals(MODE_ADD)) {
+						BOOK REGISTRATION
+					} else {
+						BOOK MODIFICATION
+					}
+				</legend>
 				<div class="form-group">
 					@select(myForm("originCode"),
-								  pOrigins.map{ t =>
-								    t._1 -> t._2
-								  },
+								  DDBookOrigin.all,
 								  '_label -> "Origin",
 								  '_default -> "Please select",
 									'class -> "form-control"
 								)
 				</div>
-				<div class="form-group">
+			<div class="form-group">
 					@helper.inputText(myForm("remarks"), 
 								'placeholder -> "Remarks",
 								'_label -> "Remarks",
@@ -37,13 +48,13 @@
 						<ul class="error">
 						@errs.map { err =>
 							<li>@err.message</li>
-						}
+						}/
 						</ul>
 					}
 				}
 				<div class="form-group">
 					<input type="submit" name="addNewBook" value='Save' class="btn btn-success"/>
-					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/cataloglist'" class="btn btn-danger"/>
+					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/catalog/@myForm("catalogSeqNo").value/edit'" class="btn btn-danger"/>
 				</div>
 			</fieldset>
 		</form>

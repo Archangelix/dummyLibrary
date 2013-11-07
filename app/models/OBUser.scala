@@ -5,48 +5,72 @@ import common.Gender
 import db.DBUser
 import models.form.FormUser
 import java.text.SimpleDateFormat
+import models.common.UserRole
+import services.CommonService
 
 /**
  * User model business object. This is the object used for all business processes.
  */
 case class OBUser (
-    rowIdx: Option[Long],
-    seqNo: Option[Long], 
+    seqNo: Option[Int], 
     userID: String, 
     name: String, 
     gender: Gender, 
     idNumber: String, 
     address: String, 
     dob: Date,
-    role: OBUserRole,
-    nationality: Long,
-    password: String,
-    isDeleted: Boolean
+    role: UserRole,
+    nationality: Int,
+    isDeleted: Boolean,
+    createUsercode: String, 
+    createTimestamp: Date, 
+    auditUsercode: String, 
+    auditTimestamp: Date, 
+    auditReason: Option[String]
 )
 
 object OBUser {
-  def apply(pUser: DBUser, pUserRole: OBUserRole): OBUser = 
-    OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, 
+  def apply(pUser: DBUser): OBUser = 
+    OBUser(Some(pUser.seqNo), pUser.userID, pUser.name, 
         if (pUser.gender) Gender.MALE else Gender.FEMALE, 
         pUser.idNumber, pUser.address, 
-        pUser.dob, pUserRole, pUser.nationality, "", pUser.isDeleted)
+        pUser.dob, UserRole(pUser.userRoleSeqNo), pUser.nationality, pUser.isDeleted,
+        pUser.createUsercode, pUser.createTimestamp, 
+        pUser.auditUsercode, pUser.auditTimestamp, pUser.auditReason
+        )
   
   def apply(pUser: FormUser): OBUser = OBUser(pUser, false) 
   
   def apply(pUser: FormUser, pIsUserRegistration: Boolean): OBUser = {
     if (pIsUserRegistration) {
-    	OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID.toUpperCase, pUser.name, 
+    	OBUser(pUser.seqNo, pUser.userID, pUser.name, 
     			Gender(pUser.gender), 
     			pUser.idNumber, pUser.address, 
     			pUser.dob, 
-    			OBUserRole.BORROWER, pUser.nationality.toInt, "", false)
+    			UserRole.BORROWER, pUser.nationality.toInt, false,
+    			"", null, "", null, None
+    			)
     } else {
-    	OBUser(pUser.rowIdx, pUser.seqNo, pUser.userID.toUpperCase, pUser.name, 
+    	OBUser(pUser.seqNo, pUser.userID, pUser.name, 
 	        Gender(pUser.gender), 
 	        pUser.idNumber, pUser.address, 
 	        pUser.dob, 
-            OBUserRole(pUser.userRoleID.toInt), pUser.nationality.toInt, "", false)
+            UserRole(pUser.userRoleID.toInt), pUser.nationality.toInt, false,
+            "", null, "", null, None
+    		)
     }
+  }
+ 
+  def find(pSeqNo: Int): OBUser = {
+   CommonService.findUserBySeqNo(pSeqNo) 
+  }
+  
+  def findByUserID(pUserID: String): OBUser = {
+	  CommonService.findByUserID(pUserID: String)
+  }
+  
+  def findByIDNumber(pIDNumber: String): OBUser = {
+   CommonService.findUserByIDNumber(pIDNumber)
   }
   
   val sdf = new SimpleDateFormat("dd-MM-yyyy")

@@ -15,9 +15,9 @@
 				console.log('Username available!');
 			} else {
 				$('#alert-box').html('Username not available!');
-				console.log('Username available!');
 				$('#alert-box').removeClass();
 				$('#alert-box').addClass('ajaxFailed');
+				console.log('Username not available!');
 			}
 		}
 		
@@ -33,7 +33,46 @@
 		
 		function checkUsernameAvailability() {
 			var username = $('#signUpUserID').val();
-			jsRoutes.controllers.ABLoginSignup.isUsernameAvailable(username).ajax(ajax1);
+			if (username === '') {
+				$('#alert-box').html('');
+				$('#alert-box').removeClass();
+			} else {
+				jsRoutesUserID.controllers.ABLoginSignup.isUsernameAvailable(username).ajax(ajax1);
+			}
+		}
+
+		var fnIDNumbersuccess = function(data) {
+			console.log('Ajax successful!');
+			if (data == 'true') {
+				$('#alert-box-idNumber').html('');
+				$('#alert-box-idNumber').removeClass();
+				console.log('ID Number available!');
+			} else {
+				$('#alert-box-idNumber').html('Username not available!');
+				$('#alert-box-idNumber').removeClass();
+				$('#alert-box-idNumber').addClass('ajaxFailed');
+				console.log('ID Number not available!');
+			}
+		}
+		
+		var fnIDNumbererror = function(err) {
+			console.log('Ajax failed!');
+			console.debug(err);
+		}
+		
+		var ajaxIDNumber = {
+			success: fnIDNumbersuccess,
+			error: fnIDNumbererror
+		}
+		
+		function checkIDNumberAvailability() {
+			var idNumber = $('#signupIDNumber').val();
+			if (idNumber === '') {
+				$('#alert-box').html('');
+				$('#alert-box').removeClass();
+			} else {
+				jsRoutesIDNumber.controllers.ABLoginSignup.isIDNumberAvailable(idNumber).ajax(ajaxIDNumber);
+			}
 		}
 	</script>
 	</head>
@@ -48,7 +87,7 @@
 					@helper.inputText(loginForm("username"),
 							'_label -> "User ID",
 							'placeholder -> "User ID",
-							'class -> "form-control capitaliseinput"
+							'class -> "form-control"
 							)
 				</div>
 				<div class="form-group">
@@ -85,7 +124,7 @@
 							'id -> "signUpUserID",
 							'_label -> "User ID",
 							'placeholder -> "User ID",
-							'class -> "form-control capitaliseinput",
+							'class -> "form-control",
 							'onblur -> "checkUsernameAvailability()"
 							)
 					<div id='alert-box'></div>
@@ -108,11 +147,16 @@
 						'placeholder -> "Date of birth",
 						'_label -> "Date of Birth"
 					)
-					<p class="error">
-					@signupForm.errors.filter(_.key=="").map{ err =>
-						@err.message
+					
+					@defining(signupForm.errors.filter(_.key.equals(""))) { errs =>
+						@if(errs.size>0) {
+							<p class="error">
+								@errs.map{ err =>
+									@err.message
+								}
+							</p>
+						}
 					}
-					</p>
 				</div>
 				<div class="form-group" style="display: none">
 					@helper.inputText(signupForm("race"),
@@ -122,10 +166,13 @@
 				</div>
 				<div class="form-group">
 					@helper.inputText(signupForm("idNumber"),
+						'id -> "signupIDNumber",
 						'placeholder -> "ID Number",
-						'_label -> "ID Number"
+						'_label -> "ID Number",
+						'onblur -> "checkIDNumberAvailability()"
 					)
 				</div>
+				<div id='alert-box-idNumber'></div>
 				<div class="form-group">
 					@helper.textarea(signupForm("address"),
 						'rows -> 3,
@@ -171,5 +218,6 @@
 </body>
 <script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
 <script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
-<script type="text/javascript" src="@routes.ABLoginSignup.javascriptRoutes"></script>
+<script type="text/javascript" src="@routes.ABLoginSignup.jsRoutesUserID"></script>
+<script type="text/javascript" src="@routes.ABLoginSignup.jsRoutesIDNumber"></script>
 </html>

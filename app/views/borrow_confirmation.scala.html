@@ -1,0 +1,73 @@
+@(myForm: Form[ABBorrowBook.FormBorrow])(implicit session: Session)
+@import viewhelpers._
+<!-- borrow_confirmation.scala.html -->
+<!doctype html>
+<html>
+<head>
+	@inc.common_head()
+</head>
+<body>
+	@menubar_admin()
+	<div class="container">
+	<div class="divMainContainer" id="divBorrowAddBook">
+		<form id="formBorrowBookList" action="@routes.ABBorrowBook.confirm" method="POST" class="navbar-form">
+			<input type="hidden" name="adminUsername" value='@myForm("adminUsername").value'>
+			<input type="hidden" name="borrowerName" value='@myForm("borrowerName").value'>
+			<input type="hidden" name="borrowerAddress" value='@myForm("borrowerAddress").value'>
+			<input type="hidden" name="borrowDate" value='@myForm("borrowDate").value'>
+			<input type="hidden" name="returnDate" value='@myForm("returnDate").value'>
+			<fieldset>
+				<legend>BORROWER INFORMATION</legend>
+				<input type="hidden" name="borrowerID" value='@myForm("borrowerID").value'>
+				<div class="row">
+					<div class="form-group col-xs-6">
+						<label>Name</label>
+						<p>@myForm("borrowerName").value</p>
+					</div>
+					<div class="form-group col-xs-6">
+						<label>ID Number</label>
+						<p>@myForm("borrowerID").value</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-xs-12">
+						<label>Addres</label>
+						<p>@myForm("borrowerAddress").value</p>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset id="fsBorrowedBooksList">
+				<legend>BOOKS</legend>
+				<table class="list">
+					<tr>
+						<th>S/No</th>
+						<th>Book ID</th>
+						<th>Title</th>
+						<th>Author</th>
+						<th>Published Year</th>
+						<th>Category</th>
+						<th>Remarks</th>
+					</tr>
+					@repeatWithIndex(myForm("books")) { (book, idx) =>
+					<tr>
+						<td align="center">@(idx+1)</td>
+						<td>@book("bookID").value</td>
+						<td>@book("title").value</td>
+						<td>@book("author").value</td>
+						<td>@book("publishedYear").value</td>
+						<td>@book("category").value</td>
+						<td>@book("remarks").value</td>
+					</tr>
+					}
+				</table>
+			</fieldset>
+			<input type="submit" name="btnConfirm" value='Confirm' class="btn btn-success"/>
+		</form>
+	</div>
+	</div>
+</body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+<script type="text/javascript" src="@routes.ABBorrowBook.javascriptRoutes"></script>
+</html>
+

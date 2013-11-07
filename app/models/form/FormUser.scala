@@ -13,8 +13,7 @@ import java.text.SimpleDateFormat
  * In this layer by default <code>isDeleted</code> attribute is always <code>false</code>.
  */
 case class FormUser(
-    rowIdx: Option[Long],
-    seqNo: Option[Long], 
+    seqNo: Option[Int], 
     userID: String, 
     name: String, 
     gender: String,
@@ -31,10 +30,10 @@ case class FormUser(
 
 object FormUser {
   def apply(pUser: OBUser): FormUser = {
-    FormUser(pUser.rowIdx, pUser.seqNo, pUser.userID, pUser.name, pUser.gender.toString(), "",
+    FormUser(pUser.seqNo, pUser.userID, pUser.name, pUser.gender.toString(), "",
         pUser.idNumber, pUser.address,
         pUser.dob,
-        pUser.role.id.toString, Some(pUser.role.name), pUser.nationality.toString, "", "")
+        pUser.role.seqNo.toString, Some(pUser.role.name), pUser.nationality.toString, "", "")
   }
   
   val sdf_date = new SimpleDateFormat("d")

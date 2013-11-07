@@ -1,7 +1,7 @@
 package controllers
 
 import models.OBUser
-import models.OBUserRole
+import models.common.UserRole
 import models.exception.UserNotFoundException
 import models.form.FormUserPassword
 import play.api.data.Form
@@ -13,10 +13,9 @@ import play.api.mvc.Flash
 import play.api.mvc.Security
 import play.api.mvc.WithHeaders
 import play.mvc.Http.Session
-import services.DBService
 import java.security.MessageDigest
-import common.SecurityUtil._
-import common.CommonUtil._
+import util.SecurityUtil._
+import util.CommonUtil._
 import controllers.ABUserDetail.MODE_ADD
 import controllers.ABUserDetail.MODE_EDIT
 import models.form.FormUser
@@ -29,15 +28,16 @@ import play.api.data.validation.ValidationError
 import org.joda.time.DateTime
 import org.joda.time.Period
 import play.api.Routes
+import services.CommonService
 
 /**
  * Action to handle the logging section.
  */
 object ABLoginSignup extends Controller with TSecured with TLogin {
 
+  
   val formNewUserMapping = mapping(
-      "rowIdx" -> optional(of[Long]),
-      "seqNo" -> optional(of[Long]),
+      "seqNo" -> optional(of[Int]),
       "username" -> nonEmptyText,
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
@@ -80,7 +80,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
       data => {
         // Authenticate the user password.
         val validLogin = try {
-           	val dbPassword = DBService.getPassword(data.username.toUpperCase())
+           	val dbPassword = CommonService.getPassword(data.username)
         	val words = dbPassword.split('|')
         	println("DB Passwords = "+words)
         	val salt = words(0)
@@ -96,14 +96,12 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
           // Correct password. Redirect the user to the respective home page according to the role.
           try {
             val formUsername = data.username
-            val dbUser = DBService.findByUserID(formUsername)
-            val role = dbUser.role
-            val call = 
-	            if (role.equals(OBUserRole.ADMIN)) {
-	              routes.ABUserList.listUsers
-	            } else {
-	              routes.ABLogin.loginPage
-	            }
+            val user = OBUser.findByUserID(formUsername)
+            val role = user.role
+            val call = role match {
+              case UserRole.ADMIN => routes.ABUserList.listUsers
+              case _ => routes.ABLogin.loginPage
+            }
 
             Redirect(call).withSession(Security.username -> formUsername,
             		"menuType" -> role.toString)
@@ -137,7 +135,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
       },
       successForm => {
 	      try {
-	    	  val dbUser = DBService.findByUserID(successForm.userID.toUpperCase())
+	    	  val dbUser = OBUser.findByUserID(successForm.userID.toUpperCase())
 	    	  val newErrorForm = Form(filledForm.mapping, 
 	    	      filledForm.data -- (List("password", "password2")), 
 	    	      Seq(new FormError("username", "This User ID is not available.")), filledForm.value)
@@ -154,7 +152,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
 	        		BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm))
 	        	} else {
 	        		val password = successForm.password
-	        		DBService.createUser(user, password)
+	        		CommonService.createUserAndPassword(user, password)
 	        		Redirect(routes.ABLogin.loginPage()).withSession(session - "mode")
 	        	}
 	        }
@@ -163,15 +161,32 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
     )
   }
   
-  def javascriptRoutes = Action { implicit req =>
+  def jsRoutesUserID = Action { implicit req =>
     import routes.javascript._
-    Ok(Routes.javascriptRouter("jsRoutes")
+    Ok(Routes.javascriptRouter("jsRoutesUserID")
         (routes.javascript.ABLoginSignup.isUsernameAvailable)).as("text/javascript")
   }
   
   def isUsernameAvailable(pUsername: String) = Action { req =>
     try {
-      val dbUser = DBService.findByUserID(pUsername.toUpperCase())
+      val dbUser = OBUser.findByUserID(pUsername.toUpperCase())
+      Ok("false")
+    } catch {
+      case e: UserNotFoundException => {
+        Ok("true")
+      }
+    }
+  }
+  
+  def jsRoutesIDNumber = Action { implicit req =>
+    import routes.javascript._
+    Ok(Routes.javascriptRouter("jsRoutesIDNumber")
+        (routes.javascript.ABLoginSignup.isIDNumberAvailable)).as("text/javascript")
+  }
+  
+  def isIDNumberAvailable(idNumber: String) = Action { req =>
+    try {
+      val dbUser = OBUser.findByIDNumber(idNumber.toUpperCase())
       Ok("false")
     } catch {
       case e: UserNotFoundException => {

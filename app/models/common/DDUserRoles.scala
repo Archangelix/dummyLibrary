@@ -1,14 +1,13 @@
 package models.common
 
 import services.DBService
-import models.OBUserRole
 
 case class DDUserRoles(code: String, desc: String)
 
 object DDUserRoles {
   def apply(pCode: String): DDUserRoles = {
-    DDUserRoles(pCode, OBUserRole.all(pCode))
+    DDUserRoles(pCode, UserRole(pCode).toString)
   }
   
-  def all = OBUserRole.all.toList.sortBy(_._2)
+  def all: List[(String, String)] = UserRole.all.toList.map(a => (a._1, a._2.toString))
 }

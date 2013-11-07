@@ -10,11 +10,19 @@ import models.OBBook
  * a deleted book comes from / to the View layer. 
  * In this layer by default <code>isDeleted</code> attribute is always <code>false</code>.
  */
-case class FormBook(idx: Option[Long], id: Option[Long], catalogID: Long, 
-    originCode: String, originDesc: Option[String], remarks: String)
+case class FormBook(
+    idx: Option[Int], 
+    seqNo: Option[Int], 
+    catalogSeqNo: Option[Int], 
+    originCode: Option[String], 
+    originDesc: Option[String], 
+    remarks: Option[String]
+)
 
 object FormBook {
   def apply(pBook: OBBook): FormBook = {
-    FormBook(None, pBook.id, pBook.catalogID, pBook.originType.code, Some(pBook.originType.desc), pBook.remarks)
+    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
+        Some(pBook.origin.desc), Some(pBook.remarks)
+        )
   }
 }

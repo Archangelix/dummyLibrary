@@ -1,6 +1,9 @@
 package models.form
 
-import models.OBCategory
+import models.common.Category
 
-case class FormCategory(selectedID: Option[Int], updatedCategoryName: String, 
-    newCategoryName: String, list: Option[List[OBCategory]])
+case class FormCategory(
+    selectedID: Option[Int], 
+    updatedCategoryName: Option[String], 
+    newCategoryName: Option[String], 
+    list: Option[List[Category]])

@@ -1,20 +1,31 @@
-@(mode: String, myForm: Form[form.FormCatalog])(implicit session: Session)
+@(mode: String, myForm: Form[controllers.ABCatalogDetail.FormCatalog])(implicit session: Session)
 @import viewhelpers._
 @import controllers.ABCatalogDetail.MODE_ADD
 @import controllers.ABCatalogDetail.MODE_EDIT
 @import models.common._
 
 <!doctype html>
-
+<!-- catalog_detail.scala.html -->
 <html>
 <head>
 	@inc.common_head()
+	<script>
+	function removeBook(pURL) {
+		if (confirm('Are you sure you want to delete this book?')) {
+			window.location = pURL;
+		}
+	}
+	</script>
 </head>
 <body>
 	@menubar_admin()
 	<div class="container">
 	<div id="divCatalogDetail" class="divMainContainer">
-		<form id="formCatalogDetail" action="@routes.ABCatalogDetail.save" method="POST" class="navbar-form">
+		@if(mode.equals(MODE_ADD)) {
+			<form id="formCatalogDetail" action="@routes.ABCatalogDetail.saveNew" method="POST" class="navbar-form">
+		} else {
+			<form id="formCatalogDetail" action="@routes.ABCatalogDetail.saveUpdate" method="POST" class="navbar-form">
+		}
 			<input type='hidden' name='seqNo' value='@myForm("seqNo").value'/>
 			<input type="hidden" value="@myForm("id").value" name="id"/>
 			<fieldset>
@@ -72,23 +83,40 @@
 	</form>
 	<div id="divCatalogBooks">
 		<legend>CATALOG BOOKS</legend>
+			@if(myForm("books").indexes.size>0) {
 			<table class="list">
 				<tr>
 					<th>S/No</th>
-					<th>Remarks</th>
 					<th>Origin</th>
+					<th>Remarks</th>
+					<th align="center">Action</th>
 				</tr>
 					@repeatWithIndex(myForm("books")) { (book, idx) =>
 					<tr>
 						<td align="center">@(idx+1)</td>
-						<td>@book("remarks").value</td>
 						<td>@book("originDesc").value</td>
+						<td>@book("remarks").value</td>
+						<td align="center">
+							<a href='@routes.ABBookDetail.edit(book("catalogSeqNo").value.get, book("seqNo").value.get)'>Edit</a> /
+							<a href='javascript:removeBook("@routes.ABBookDetail.remove(book("catalogSeqNo").value.get,  book("seqNo").value.get)")'>Remove</a>
+						</td>
 					</tr>
 				}
 			</table>
-			<a href="/bookdetail/@myForm("id").value/new">Add a new book</a>
+			} else {
+				<div id='borrowedBooks'>
+					<p id="noBookNotice">There are no registered books.</p>
+				</div>
+			}
+			@if((myForm("id").value==None) || (myForm("id").value.get.trim().equals(""))) {
+				<p>Create and save the catalog first in order to register the book.</p>
+			} else {
+				<a href='/bookdetail/@myForm("id").value/new'>Add a new book</a>
+			}
 	</div>
 	</div>
 	</div>
 </body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'/></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'/></script>
 </html>

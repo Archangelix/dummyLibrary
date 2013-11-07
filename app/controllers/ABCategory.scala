@@ -1,39 +1,41 @@
 package controllers
 
-import models.OBCategory
 import models.exception.CategoryNotFoundException
 import models.form.FormCategory
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formats.longFormat
 import play.api.mvc.Controller
-import services.DBService
 import play.api.data.FormError
+import util.CommonUtil._
+import services.CommonService
+import models.common.Category
 
 object ABCategory extends Controller with TSecured {
 
   val categoryMapping = mapping(
       "selectedID" -> optional(number),
-      "updatedCategoryName" -> text,
-      "newCategoryName" -> text,
+      "updatedCategoryName" -> optional(text),
+      "newCategoryName" -> optional(text),
       "list" -> optional(list(
 		  mapping(
 			  "seqno" -> number,
 			  "name" -> text
-	      )(OBCategory.apply)(OBCategory.unapply)
+	      )(Category.apply)(Category.unapply)
       ))
      )(FormCategory.apply)(FormCategory.unapply)
+     
   val categoryForm = Form[FormCategory](categoryMapping)
   /**
    * Displaying the list of users for a corresponding page index.
    */
-  def listCategories = withAuth {username => implicit req => 
-    val list1 = DBService.listAllCategories()
-    val filledForm = categoryForm.fill(FormCategory(None, "", "", Some(list1)))
+  def listCategories = withAuth { implicit officerUserID => implicit req => 
+    val list1 = Category.alls
+    val filledForm = categoryForm.fill(FormCategory(None, None, None, Some(list1)))
     Ok(views.html.categories_list(filledForm, list1)(session))
   }
   
-  def saveCreate = withAuth {username => implicit req => 
+  def saveCreate = withAuth { implicit officerUserID => implicit req => 
     println("save Entered!")
     val filledForm = categoryForm.bindFromRequest
     filledForm.fold(
@@ -45,17 +47,17 @@ object ABCategory extends Controller with TSecured {
    		    val categoryName = success.newCategoryName
    		    if (isBlank(categoryName)) {
         	  val newErrors = Form(filledForm.mapping, filledForm.data, 
-        	      Seq(new FormError("newCategoryName", "This is required.")), filledForm.value)
+        	      Seq(new FormError("newCategoryName2", "This is required.")), filledForm.value)
 		      BadRequest(views.html.categories_list(newErrors, success.list.get)(session))
    		    } else {
 			    try {
-			      val OBCategory = DBService.findCategoryByName(categoryName)
+			      val category = Category.findByName(categoryName.get)
 	        	  val newErrors = Form(filledForm.mapping, filledForm.data, 
-	        	      Seq(new FormError("newCategoryName", "Duplicate category name exists.")), filledForm.value)
+	        	      Seq(new FormError("newCategoryName2", "Duplicate category name exists.")), filledForm.value)
 			      BadRequest(views.html.categories_list(newErrors, success.list.get)(session))
 			    } catch {
 			      case e: CategoryNotFoundException => {
-			    	  DBService.createCategory(categoryName)
+			    	  CommonService.createNewCategory(categoryName.get)
 			    	  Redirect(routes.ABCategory.listCategories())
 			      }
 			    }
@@ -64,7 +66,7 @@ object ABCategory extends Controller with TSecured {
     )
   }
   
-  def saveUpdate(pRowIdx: String) = withAuth {username => implicit req => 
+  def saveUpdate(pRowIdx: String) = withAuth { implicit officerUserID => implicit req => 
     val filledForm = categoryForm.bindFromRequest
     filledForm.fold(
         error => {
@@ -72,17 +74,17 @@ object ABCategory extends Controller with TSecured {
           BadRequest(views.html.categories_list(error, filledForm.get.list.get)(session))
         }, success => {
           println("success!")
-		  val rowidx = pRowIdx.toLong
-		  val selectedSeqNo = success.selectedID
-		  val categoryName = success.updatedCategoryName
+		  val rowidx = pRowIdx.toInt
+		  val categoryName = success.updatedCategoryName.get
 		  if (isBlank(categoryName)) {
 		    val newErrors = Form(filledForm.mapping, filledForm.data, 
 	        	      Seq(new FormError("list["+rowidx+"].name", "This is required.")), filledForm.value)
 		    BadRequest(views.html.categories_list(newErrors, success.list.get)(session))
 		  } else {
+			  val selectedSeqNo = success.selectedID.get
 			  val isEligibleForUpdate = {
 				  try {
-					val category = DBService.findCategoryByName(categoryName)
+					val category = Category.findByName(categoryName)
 					category.code==selectedSeqNo
 				  } catch {
 					case e: CategoryNotFoundException => {
@@ -91,7 +93,7 @@ object ABCategory extends Controller with TSecured {
 				  }
 	          }
 			  if (isEligibleForUpdate) {
-				DBService.updateCategory(rowidx, categoryName)
+				CommonService.updateCategory(selectedSeqNo, categoryName)
 				Redirect(routes.ABCategory.listCategories())
 			  } else {
 	        	val newErrors = Form(filledForm.mapping, filledForm.data, 
@@ -103,5 +105,4 @@ object ABCategory extends Controller with TSecured {
     )
   }
 
-  def isBlank(str: String) = str==null || str.trim().equals("")
 }

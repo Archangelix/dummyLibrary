@@ -8,7 +8,9 @@ GET		/										controllers.ABLogin.loginPage
 POST	/login									controllers.ABLogin.login
 GET		/logout									controllers.ABLogin.logout
 GET		/isUsernameAvailable/:username			controllers.ABLoginSignup.isUsernameAvailable(username)
-GET		/javascriptRoutes						controllers.ABLoginSignup.javascriptRoutes
+GET		/isIDNumberAvailable/:idnumber			controllers.ABLoginSignup.isIDNumberAvailable(idnumber)
+GET		/jsRoutesUserID							controllers.ABLoginSignup.jsRoutesUserID
+GET		/jsRoutesIDNumber						controllers.ABLoginSignup.jsRoutesIDNumber
 GET		/loginsignup							controllers.ABLoginSignup.loginPage
 POST	/userlogin								controllers.ABLoginSignup.login
 POST	/usersignup								controllers.ABLoginSignup.signup
@@ -19,16 +21,30 @@ GET     /next                       			controllers.ABCatalogList.navigateNext
 GET     /last                       			controllers.ABCatalogList.navigateLast
 GET		/catalog/:id/edit						controllers.ABCatalogDetail.edit(id)
 GET		/catalog/:id/delete						controllers.ABCatalogList.remove(id)
-GET		/newcatalog								controllers.ABCatalogDetail.gotoNewCatalog
-POST	/newcatalog								controllers.ABCatalogDetail.save
+POST	/catalog/save							controllers.ABCatalogDetail.saveUpdate
+GET		/catalog/new							controllers.ABCatalogDetail.gotoNewCatalog
+POST	/catalog/new/save						controllers.ABCatalogDetail.saveNew
 GET		/bookdetail/:catalogid/new				controllers.ABBookDetail.newBook(catalogid)
 POST	/bookdetail/:catalogid/new/save			controllers.ABBookDetail.saveNew(catalogid)
 GET		/bookdetail/:catalogid/:bookid			controllers.ABBookDetail.view(catalogid, bookid)
 GET		/bookdetail/:catalogid/:bookid/edit		controllers.ABBookDetail.edit(catalogid, bookid)
 POST	/bookdetail/:catalogid/:bookid/save		controllers.ABBookDetail.saveUpdate(catalogid, bookid)
+GET		/bookdetail/:catalogid/:bookid/delete	controllers.ABBookDetail.remove(catalogid, bookid)
 GET     /useradmin                   			controllers.ABUserList.listUsers
 #GET     /contactus								controllers.ABContactUs.contactUsPage
 #POST	/contactus								controllers.ABContactUs.send
+GET     /borrow									controllers.ABBorrowBook.borrowPage
+POST    /borrow									controllers.ABBorrowBook.searchUser
+POST    /borrow/start							controllers.ABBorrowBook.startTransaction
+POST    /borrow/add								controllers.ABBorrowBook.addBook
+GET		/borrow/transaction/:seqno				controllers.ABBorrowBook.viewTransaction(seqno)
+GET     /borrow/end								controllers.ABBorrowBook.showConfirmationPage
+POST    /borrow/end								controllers.ABBorrowBook.confirm
+GET 	/return									controllers.ABReturnBook.returnPage
+POST 	/return									controllers.ABReturnBook.searchBook
+POST 	/returnTransaction						controllers.ABReturnBook.returnBook
+GET     /fetchUserInfo/:userid					controllers.ABBorrowBook.fetchUserInfo(userid)
+GET		/jsAdminBorrow							controllers.ABBorrowBook.javascriptRoutes
 GET     /firstUser                     			controllers.ABUserList.navigateFirst
 GET     /prevUser                      			controllers.ABUserList.navigatePrev
 GET     /nextUser                      			controllers.ABUserList.navigateNext

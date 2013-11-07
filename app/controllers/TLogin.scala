@@ -1,7 +1,7 @@
 package controllers
 
 import models.OBUser
-import models.OBUserRole
+import models.common.UserRole
 import models.exception.UserNotFoundException
 import models.form.FormUserPassword
 import play.api.data.Form
@@ -16,8 +16,8 @@ import play.api.mvc.WithHeaders
 import play.mvc.Http.Session
 import services.DBService
 import java.security.MessageDigest
-import common.SecurityUtil._
-import common.CommonUtil._
+import util.SecurityUtil._
+import util.CommonUtil._
 import controllers.ABUserDetail.MODE_ADD
 import controllers.ABUserDetail.MODE_EDIT
 import models.form.FormUser
@@ -30,7 +30,7 @@ import play.api.data.validation.ValidationError
 import org.joda.time.DateTime
 import org.joda.time.Period
 import play.api.Routes
-import common.SecurityUtil
+import util.SecurityUtil
 
 trait TLogin extends Controller {
 
@@ -60,7 +60,7 @@ trait TLogin extends Controller {
       data => {
         // Authenticate the user password.
         val validLogin = try {
-           	val dbPassword = DBService.getPassword(data.username.toUpperCase())
+           	val dbPassword = DBService.getPassword(data.username)
         	val words = dbPassword.split('|')
         	println("DB Passwords = "+words)
         	val salt = words(0)
@@ -76,9 +76,9 @@ trait TLogin extends Controller {
           // Correct password. Redirect the user to the respective home page according to the role.
           try {
             val formUsername = data.username
-            val dbUser = DBService.findByUserID(formUsername)
-            val role = dbUser.role
-            if (role.equals(OBUserRole.ADMIN)) {
+            val user = OBUser.findByUserID(formUsername)
+            val role = user.role
+            if (role.equals(UserRole.ADMIN)) {
               Redirect(routes.ABUserList.listUsers).withSession(
                   Security.username -> formUsername,
                   "menuType" -> role.toString)

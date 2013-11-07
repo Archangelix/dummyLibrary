@@ -1,0 +1,22 @@
+@(myForm: Form[ABBorrowBook.FormBorrow])(implicit session: Session)
+@import viewhelpers._
+<!-- borrow_confirmation.scala.html -->
+<!doctype html>
+<html>
+<head>
+	@inc.common_head()
+</head>
+<body>
+	@menubar_admin()
+	<div class="container">
+	<div class="divMainContainer" id="divBorrowAddBook">
+		<p>Borrow transaction has been successfully activated.</p>
+		<p>Do you want to <a href="#">start another transaction</a> or <a href="#">go back to the home page</a>?</p>
+	</div>
+	</div>
+</body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+<script type="text/javascript" src="@routes.ABBorrowBook.javascriptRoutes"></script>
+</html>
+

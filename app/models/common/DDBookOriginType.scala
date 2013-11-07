@@ -2,12 +2,17 @@ package models.common
 
 import services.DBService
 
-case class DDBookOriginType(code: String, desc: String)
+case class DDBookOrigin(code: String, desc: String)
 
-object DDBookOriginType {
-  private lazy val items = DBService.getBookOriginTypeMap
+object DDBookOrigin{
+  private lazy val items = Map(
+      "new" -> "New",
+      "old" -> "Old"
+  )
   
-  def apply(pCode: String): DDBookOriginType = {
-    DDBookOriginType(pCode, items(pCode))
+  def apply(pCode: String): DDBookOrigin = {
+    DDBookOrigin(pCode, items(pCode))
   }
+
+  def all = items.toList.sortBy(_._2)
 }

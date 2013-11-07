@@ -1,0 +1,144 @@
+@(myForm: Form[ABReturnBook.FormReturn])(implicit session: Session)
+@import viewhelpers._
+<!-- return_search_book.scala.html -->
+<!doctype html>
+<html>
+<head>
+	@inc.common_head()
+	<script>
+		var successFn = function(data) {
+			console.log('Ajax successful!');
+			if (data == 'true') {
+				$('#alert-box').html('Username available!');
+				$('#alert-box').removeClass();
+				$('#alert-box').addClass('ajaxSuccessful');
+				console.log('Username available!');
+			} else {
+				$('#alert-box').html('Username not available!');
+				console.log('Username not available!');
+				$('#alert-box').removeClass();
+				$('#alert-box').addClass('ajaxFailed');
+			}
+		}
+		
+		var errorFn = function(err) {
+			console.log('Ajax failed!');
+			console.debug(err);
+		}
+		
+		var ajax1 = {
+			success: successFn,
+			error: errorFn
+		}
+		
+	</script>
+</head>
+<body>
+	@menubar_admin()
+	<div class="container">
+	<div class="divMainContainer" id="divLoginErrorSignIn">
+		@if(myForm("title").value==None || myForm("title").value.get.trim().equals("")) {
+			<form id="formReturnSearchBook" action="@routes.ABReturnBook.searchBook" method="POST" class="navbar-form">
+				<fieldset>
+					<div class="form-group">
+						@helper.inputText(myForm("bookID"),
+								'id -> "bookID",
+								'_label -> "Book ID",
+								'placeholder -> "Book ID"
+								)
+					</div>
+					<div class="form-group">
+						<input type="submit" name="btnSearch" value='Search' class="btn btn-success"/>
+						<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/'" class="btn btn-danger"/>
+					</div>
+				</fieldset>
+			</form>
+		} else {
+			<form id="formReturnBookDetail" action="@routes.ABReturnBook.returnBook" method="POST" class="navbar-form">
+				<fieldset>
+					<input type="hidden" name='@myForm("transactionID").name' value='@myForm("transactionID").value'>
+					<input type="hidden" name="bookID" value='@myForm("bookID").value'>
+					<div class="row">
+						<div class="form-group col-xs-6">
+							<label>Transaction ID</label>
+							<p>@myForm("transactionID").value</p>
+						</div>
+						<div class="form-group col-xs-6">
+							<label>Borrow Date</label>
+							<p>@myForm("borrowDate").value</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-xs-6">
+							<label>Officer Name</label>
+							<p>@myForm("officerName").value</p>
+						</div>
+						<div class="form-group col-xs-6">
+							<label>Expected Return Date</label>
+							<p>@myForm("expReturnDate").value</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-xs-6">
+							<label>Borrower ID</label>
+							<p>@myForm("borrowerID").value</p>
+						</div>
+						<div class="form-group col-xs-6">
+							<label>Borrower Name</label>
+							<p>@myForm("borrowerName").value</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-xs-6">
+							<label>Borrower Address</label>
+							<p>@myForm("borrowerAddress").value</p>
+						</div>
+						<div class="form-group col-xs-6">
+							<label>Borrower Contact Number</label>
+							<p>@myForm("borrowerContactNo").value</p>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset id="fsBorrowedBooksList">
+					<legend>BOOK INFORMATION</legend>
+					<div class="row">
+						<div class="form-group col-xs-6">
+							<label>Book ID</label>
+							<p>@myForm("bookID").value</p>
+						</div>
+						<div class="form-group col-xs-6">
+							<label>ID Number</label>
+							<p>@myForm("borrowerID").value</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-xs-6">
+							<label>Title</label>
+							<p>@myForm("title").value</p>
+						</div>
+						<div class="form-group col-xs-6">
+							<label>Author</label>
+							<p>@myForm("author").value</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-xs-6">
+							<label>Category</label>
+							<p>@myForm("category").value</p>
+						</div>
+						<div class="form-group col-xs-6">
+							<label>Published Year</label>
+							<p>@myForm("publishedYear").value</p>
+						</div>
+					</div>
+					<input type="submit" name="btnReturn" value='Return this book' class="btn btn-success"/>
+				</fieldset>
+			</form>
+		}
+	</div>
+	</div>
+</body>
+<script src='@routes.Assets.at("javascripts/jquery-2.0.3.js")'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
+</html>
+

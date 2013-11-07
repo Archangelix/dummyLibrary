@@ -1,4 +1,4 @@
-package common
+package util
 
 import play.api.data.validation.Constraint
 import java.util.Date
@@ -23,12 +23,19 @@ object CommonUtil {
     
     def mustBeEmpty(): Constraint[String] = 
       Constraint[String]("constraint.invalidInput") { o =>
+        println("validating race!")
         if (!isBlank(o)) {
+          println("invalid!")
           Invalid(ValidationError("Invalid form input."))
         } else {
+          println("valid!")
           Valid
         }
       }
 
-	def isBlank(str: String) = str==null || str.trim().isEmpty()
+	def isBlank(str: String): Boolean = str==null || str.trim().isEmpty()
+	
+	def isBlank(obj: Option[Any]): Boolean = obj==None
+	
+	def isBlank(list: List[Any]): Boolean = list==null || list.size==0
 }

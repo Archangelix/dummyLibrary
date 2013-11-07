@@ -1,8 +1,8 @@
-package common
+package util
 
 import java.security.MessageDigest
 
-import common.CommonUtil.isBlank
+import util.CommonUtil._
 import play.api.data.FormError
 
 /**

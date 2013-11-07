@@ -1,4 +1,4 @@
-@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[form.FormCatalog])(implicit session: Session)
+@(pCurrentPageIdx: Int, pMaxPageIdx: Int, pList: List[controllers.ABCatalogList.FormCatalogListItem])(implicit session: Session)
 <!-- catalogsList.scala.html -->
 <!doctype html>
 @import helper._
@@ -24,7 +24,7 @@
 			<input type="hidden" name="maxPageIdx" value="@pMaxPageIdx"/>
 			<div align="center">
 			@if(pList.isEmpty) {
-				The catalogs are empty!
+				<p>The catalogs are empty!</p>
 			} else {
 				<table class="list">
 					<tr>
@@ -32,7 +32,7 @@
 						<th width="30%">TITLE</th>
 						<th width="30%">AUTHOR</th>
 						<th width="10%">PUBLISHED YEAR</th>
-						<th width="10%">ACTION</th>
+						<th width="10%" align="center">ACTION</th>
 					</tr>
 					@pList.map { catalog =>
 					<tr>
@@ -41,34 +41,34 @@
 						<td>@catalog.author</td>
 						<td>@catalog.publishedYear</td>
 						<td align="center">
-							<a href="@routes.ABCatalogDetail.edit(catalog.id.get.toString)">Edit</a> /
-							<a href="javascript:removeCatalog('@routes.ABCatalogList.remove(catalog.id.get.toString)')">Remove</a>
+							<a href="@routes.ABCatalogDetail.edit(catalog.seqNo)">Edit</a> /
+							<a href="javascript:removeCatalog('@routes.ABCatalogList.remove(catalog.seqNo)')">Remove</a>
 						</td>
 					</tr>
 					}
 				</table>
+				<br/>
+				<div align="center">
+					Page: @pCurrentPageIdx / @pMaxPageIdx
+					<table>
+						<tr>
+							<td align="center">
+								<a href="@routes.ABCatalogList.navigateFirst">First</a> |
+								<a href="@routes.ABCatalogList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a> |
+								<a href="@routes.ABCatalogList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a> |
+								<a href="@routes.ABCatalogList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=4>
+								
+							</td>
+						</tr>
+					</table>
+				</div>
 			}
 			<br/>
-			<div align="center">
-				Page: @pCurrentPageIdx / @pMaxPageIdx
-				<table>
-					<tr>
-						<td align="center">
-							<a href="@routes.ABCatalogList.navigateFirst">First</a> |
-							<a href="@routes.ABCatalogList.navigatePrev?currentPageIdx=@pCurrentPageIdx">Prev</a> |
-							<a href="@routes.ABCatalogList.navigateNext?currentPageIdx=@pCurrentPageIdx&maxPageIdx=@pMaxPageIdx">Next</a> |
-							<a href="@routes.ABCatalogList.navigateLast?maxPageIdx=@pMaxPageIdx">Last</a>
-						</td>
-					</tr>
-					<tr>
-						<td colspan=4>
-							
-						</td>
-					</tr>
-				</table>
-			</div>
-			<br/>
-			<a href="/newcatalog">Add a new catalog</a>
+			<a href="/catalog/new">Add a new catalog</a>
 			</div>
 			</form>
 	</div>
