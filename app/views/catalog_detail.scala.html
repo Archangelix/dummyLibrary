@@ -27,7 +27,7 @@
 			<form id="formCatalogDetail" action="@routes.ABCatalogDetail.saveUpdate" method="POST" class="navbar-form">
 		}
 			<input type='hidden' name='seqNo' value='@myForm("seqNo").value'/>
-			<input type="hidden" value="@myForm("id").value" name="id"/>
+			<input type="hidden" value='@myForm("id").value' name="id"/>
 			<fieldset>
 				<legend>
 				@if(mode.equals(MODE_ADD)) {
@@ -87,6 +87,7 @@
 			<table class="list">
 				<tr>
 					<th>S/No</th>
+					<th>ID</th>
 					<th>Origin</th>
 					<th>Remarks</th>
 					<th align="center">Action</th>
@@ -94,6 +95,7 @@
 					@repeatWithIndex(myForm("books")) { (book, idx) =>
 					<tr>
 						<td align="center">@(idx+1)</td>
+						<td>@{book("catalogSeqNo").value}.@{book("seqNo").value}</td>
 						<td>@book("originDesc").value</td>
 						<td>@book("remarks").value</td>
 						<td align="center">
