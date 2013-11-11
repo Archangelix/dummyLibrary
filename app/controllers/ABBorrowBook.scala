@@ -15,6 +15,7 @@ import play.api.libs.json.JsNumber
 import play.api.libs.json.JsNull
 import play.api.data.FormError
 import models.exception.BookNotFoundException
+import models.exception.BookNotAvailableException
 import util.CommonUtil._
 import models.OBBook
 import java.text.SimpleDateFormat
@@ -188,7 +189,7 @@ object ABBorrowBook extends Controller with TSecured {
  	}
  
   def addBook = withAuth { implicit officerUserID => implicit req =>
-    println("Entering addBookss.")
+    println("Entering addBooks.")
   	val formBorrower = borrowForm.bindFromRequest()
     formBorrower.fold(
         errorForm => {  
@@ -213,7 +214,6 @@ object ABBorrowBook extends Controller with TSecured {
         		      val updatedTx = CommonService.addNewBook(transactionID, catalogSeqNo, bookSeqNo)
         		      val newForm = borrowForm.fill(FormBorrow(updatedTx))
 		        	  Ok(views.html.borrow_add_book(newForm))
-		        	          
         		    } else {
         		      throw new BookNotFoundException(success.newBookID.get)
         		    }
@@ -226,6 +226,14 @@ object ABBorrowBook extends Controller with TSecured {
 	        				  Seq(new FormError("addError", "This book cannot be found in our system.")), 
 	        				  formBorrower.value)
 	        		BadRequest(views.html.borrow_add_book(newErrorForm))
+	        	  }
+	        	  case (BookNotAvailableException(_)) => {
+	        		  val newErrorForm = Form(
+	        				  formBorrower.mapping, 
+	        				  formBorrower.data, 
+	        				  Seq(new FormError("addError", "This book is currently not available.")), 
+	        				  formBorrower.value)
+	        				  BadRequest(views.html.borrow_add_book(newErrorForm))
 	        	  }
         	  }
         }

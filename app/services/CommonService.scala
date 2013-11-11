@@ -13,6 +13,9 @@ import models.db.DBCatalog
 import models.db.DBTxBorrowDT
 import models.db.DBTxBorrowHD
 import models.db.DBUser
+import models.common.STATUS_BOOK_AVL
+import models.exception.BookNotFoundException
+import models.exception.BookNotAvailableException
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -342,10 +345,15 @@ object CommonService {
 	def addNewBook(pTransactionSeqNo: Int, pCatalogSeqNo: Int, pBookSeqNo: Int)(implicit pOfficerUserID: String) = {
       val catalog = OBCatalog.find(pCatalogSeqNo)
 	  val book = OBBook.find(pCatalogSeqNo, pBookSeqNo)
-	  val transaction = OBTxBorrowHD.find(pTransactionSeqNo, true)
-	  val updatedTx = transaction.addBook(pCatalogSeqNo, pBookSeqNo)
-	  updateTxBorrow(updatedTx, true)
-	  updatedTx
+	  book.status match {
+        case STATUS_BOOK_AVL => {
+        	val transaction = OBTxBorrowHD.find(pTransactionSeqNo, true)
+        			val updatedTx = transaction.addBook(pCatalogSeqNo, pBookSeqNo)
+        			updateTxBorrow(updatedTx, true)
+        			updatedTx
+        }
+        case _ => throw BookNotAvailableException(book.id)
+      }
 	}
 	
 	def createNewCategory(pCategoryName: String)(implicit pOfficerUserID: String) = {
