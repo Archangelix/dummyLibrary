@@ -24,25 +24,17 @@ case class OBBook (
     createUsercode: String, 
     createTimestamp: Date, 
     auditUsercode: String, 
-    auditTimetamp: Date, 
+    auditTimestamp: Date, 
     auditReason: Option[String]
 ) {
 	def activate()(implicit pOfficerUserID: String) = {
 	  val now = CommonService.now
-	  OBBook(
-	      this.seqNo, 
-	      this.catalog, 
-	      this.origin, 
-	      STATUS_BOOK_PEN,
-	      pOfficerUserID,
-	      now,
-	      this.remarks, 
-	      this.isDeleted,
-	      this.createUsercode,
-	      this.createTimestamp,
-	      pOfficerUserID,
-	      now,
-	      this.auditReason
+	  this.copy(
+	      status = STATUS_BOOK_PEN,
+	      statusUsercode = pOfficerUserID,
+	      statusTimestamp = now,
+	      auditUsercode = pOfficerUserID,
+	      auditTimestamp = now
 	  )
 	}
 	
@@ -54,28 +46,20 @@ case class OBBook (
 	
   def setAvailable(implicit pOfficerUserID: String) = {
     val now = CommonService.now
-	OBBook(
-      this.seqNo, 
-      this.catalog, 
-      this.origin, 
-      STATUS_BOOK_AVL,
-      pOfficerUserID,
-      now,
-      this.remarks, 
-      this.isDeleted,
-      this.createUsercode,
-      this.createTimestamp,
-      pOfficerUserID,
-      now,
-      this.auditReason
-    )
+	this.copy(
+	      status = STATUS_BOOK_AVL,
+	      statusUsercode = pOfficerUserID,
+	      statusTimestamp = now,
+	      auditUsercode = pOfficerUserID,
+	      auditTimestamp = now
+	)
   }
 }
     
 object OBBook {
   def apply(pBook: DBBook): OBBook = 
     OBBook(
-      Some(pBook.seqNo), 
+      pBook.seqNo, 
       OBCatalog.find(pBook.catalogSeqNo), 
       DDBookOrigin(pBook.origin), 
       BookStatus(pBook.status),

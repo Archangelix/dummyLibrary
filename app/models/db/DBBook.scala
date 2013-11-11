@@ -10,7 +10,7 @@ import models.OBBook
  */
 case class DBBook (
     catalogSeqNo: Int, 
-    seqNo: Int, 
+    seqNo: Option[Int], 
     remarks: String, 
 	status: String,
 	statusUsercode: String,
@@ -28,7 +28,7 @@ object DBBook {
    def apply(pBook: OBBook): DBBook = 
      DBBook(
         pBook.catalog.seqNo.get, 
-        pBook.seqNo.get, 
+        pBook.seqNo, 
         pBook.remarks, 
         pBook.status.code,
         pBook.statusUsercode,

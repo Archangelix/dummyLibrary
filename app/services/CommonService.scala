@@ -272,7 +272,7 @@ object CommonService {
 	 */
 	def createNewBook(pBook: OBBook)(implicit pOfficerUserID: String) = {
       val newBookSeqNo = CommonService.generateNewBookID(pBook.catalog.seqNo.get)
-	  DBService.createBook(DBBook(pBook))
+	  DBService.createBook(DBBook(pBook.copy(seqNo=Some(newBookSeqNo))))
 	}
 	
 	/**

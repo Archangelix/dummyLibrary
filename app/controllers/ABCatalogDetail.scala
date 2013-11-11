@@ -100,7 +100,7 @@ object ABCatalogDetail extends Controller with TSecured {
 	  val author: String,
 	  val publishedYear: String,
 	  val category: String,
-	  val books: Option[List[FormBook]]
+	  val books: Option[List[FormBook]] = Some(List())
 	) {
 	  def transform()(implicit pOfficerUserID: String = ""): OBCatalog = {
 	    OBCatalog(
@@ -109,7 +109,7 @@ object ABCatalogDetail extends Controller with TSecured {
 	        this.author,
 	        this.publishedYear.toInt,
 	        Category(this.category.toInt),
-	        this.books.get.map(_.transform),
+	        this.books.getOrElse(List()).map(_.transform),
 	        false,
 	        "",
 	        null,

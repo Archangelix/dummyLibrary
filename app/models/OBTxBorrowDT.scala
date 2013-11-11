@@ -57,7 +57,6 @@ class OBTxBorrowDT (
     	None
       )
   }
-
 }
 
 object OBTxBorrowDT {

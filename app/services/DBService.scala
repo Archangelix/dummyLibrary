@@ -55,7 +55,7 @@ object DBService {
       		status~statusUserCode~statusTimestamp~
       		isDeleted~origin~
       		createUsercode~createTimestamp~auditUsercode~auditTimestamp~auditReason => 
-        DBBook (catalogSeqNo, seqNo, remarks, 
+        DBBook (catalogSeqNo, Some(seqNo), remarks, 
             status,statusUserCode,statusTimestamp,
             isDeleted, origin, 
       	    createUsercode, createTimestamp, auditUsercode, auditTimestamp, auditReason)
@@ -89,7 +89,7 @@ object DBService {
     get[Option[String]]("audit_reason") map {
       case seqNo~categorySeqNo~title~author~publishedYear~arrivalDate~isDeleted~
       		createUsercode~createTimestamp~auditUsercode~auditTimestamp~auditReason => 
-        DBCatalog (seqNo, categorySeqNo, title, author, publishedYear, arrivalDate, isDeleted, 
+        DBCatalog (Some(seqNo), categorySeqNo, title, author, publishedYear, arrivalDate, isDeleted, 
             createUsercode, createTimestamp, auditUsercode, auditTimestamp, auditReason)
     }
   }
@@ -307,21 +307,21 @@ object DBService {
 	 * @param pRemarks The book remarks.
 	 */
 	def createBook(pBook: DBBook)(implicit pOfficerUserID: String) = {
+	  println("createBook")
 	  DB.withConnection { implicit c => 
 	    SQL("insert into BOOK (catalog_seqno, seqno, remarks, " +
 	    		"status, status_usercode, status_timestamp, " +
 	    		"is_deleted, origin, " +
 	    		"create_usercode, create_timestamp, audit_usercode, audit_timestamp, audit_reason) " +
 	    	"values ({catalogSeqNo}, {seqno}, {remarks}, " +
-	    		"{status}, {statusUsercode}, {statusTimestamp}" +
+	    		"{status}, {statusUsercode}, now(), " +
 	    		"{isDeleted}, {origin}, " +
 	    		"{createUsercode}, now(), {auditUsercode}, now(), '')")
 	    	.on('catalogSeqNo -> pBook.catalogSeqNo, 
-	            'seqno -> pBook.seqNo, 
+	            'seqno -> pBook.seqNo.get, 
 	            'remarks -> pBook.remarks,
 	            'status -> pBook.status,
 	            'statusUsercode -> pBook.statusUsercode,
-	            'statusTimestamp -> pBook.statusTimestamp,
 	            'isDeleted -> false, 
 	            'origin -> pBook.origin,
 	            'createUsercode -> pOfficerUserID, 

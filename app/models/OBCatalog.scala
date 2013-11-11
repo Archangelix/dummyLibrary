@@ -27,7 +27,7 @@ case class OBCatalog(
 
 object OBCatalog {
   def apply(pCatalog: DBCatalog, pBooks: List[DBBook]): OBCatalog = 
-		 OBCatalog(Some(pCatalog.seqNo), pCatalog.title, pCatalog.author, 
+		 OBCatalog(pCatalog.seqNo, pCatalog.title, pCatalog.author, 
 		     pCatalog.publishedYear, Category(pCatalog.categorySeqNo), pBooks.map(dbBook => OBBook(dbBook)),
 		     pCatalog.isDeleted, 
 		     pCatalog.createUserCode, pCatalog.createTimestamp,

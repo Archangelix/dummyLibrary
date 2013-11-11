@@ -9,7 +9,7 @@ import models.OBCatalog
  * in order to communicate with the database.
  */
 case class DBCatalog (
-    seqNo: Int, 
+    seqNo: Option[Int], 
     categorySeqNo: Int, 
     title: String, 
     author: String,
@@ -25,7 +25,7 @@ case class DBCatalog (
 
 object DBCatalog {
   def apply(pCatalog: OBCatalog): DBCatalog = {
-    DBCatalog(pCatalog.seqNo.get, pCatalog.category.code, 
+    DBCatalog(pCatalog.seqNo, pCatalog.category.code, 
         pCatalog.title, pCatalog.author, pCatalog.publishedYear.toInt, 
         null, false, 
         pCatalog.createUserCode, pCatalog.createTimestamp,

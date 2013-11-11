@@ -139,7 +139,8 @@
 						'id -> "signupIDNumber",
 						'placeholder -> "ID Number",
 						'_label -> "ID Number",
-						'onblur -> "checkIDNumberAvailability()"
+						'onblur -> "checkIDNumberAvailability()",
+						'style -> "text-transform: uppercase;"
 					)
 				</div>
 				<div id='alert-box-idNumber'></div>
@@ -153,10 +154,10 @@
 				</div>
 				<div class="form-group">
 					@helper.select(
-								  signupForm("userRoleID"),
-								  DDUserRoles.all,
-								  '_label -> "User Role",
-								  '_default -> "Please select"
+						  signupForm("userRoleID"),
+						  DDUserRoles.all,
+						  '_label -> "User Role",
+						  '_default -> "Please select"
 					)
 				</div>
 				<div class="form-group">

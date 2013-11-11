@@ -37,20 +37,9 @@ object ABBookDetail extends Controller with TSecured {
 	    remarks: Option[String]) {
     
 	  def merge(pObj: OBBook): OBBook = {
-	    OBBook(
-	      pObj.seqNo ,
-	      pObj.catalog, 
-	      DDBookOrigin(this.originCode.get), 
-	      pObj.status,
-	      pObj.statusUsercode,
-	      pObj.statusTimestamp,
-	      this.remarks.get, 
-	      pObj.isDeleted,
-	      pObj.createUsercode,
-	      pObj.createTimestamp,
-	      pObj.auditUsercode,
-	      pObj.auditTimetamp,
-	      pObj.auditReason
+	    pObj.copy(
+	     origin = DDBookOrigin(this.originCode.get),
+	     remarks = this.remarks.get
 	    )
 	  }
 	  
