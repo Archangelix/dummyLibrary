@@ -963,11 +963,13 @@ object DBService {
 	    val sql = "insert into TX_BORROW_DT " +
 	    		"(hd_seqno, catalog_seqno, book_seqno, " +
 	    		"status, status_usercode, status_timestamp, " +
+	    		"officer_userid, " +
 	    		"create_usercode, create_timestamp, " +
 	    		"audit_usercode, audit_timestamp) " +
 	    	"values " +
 	    		"({hdSeqno}, {catalogSeqNo}, {bookSeqNo}, " +
 	    		"{status}, {statusUsercode}, {statusTimestamp}, " +
+	    		"{officerUserID}, " +
 	    		" {createUserCode}, {createTimestamp}, " +
 	    		" {auditUserCode}, now() " +
 	    		") "
@@ -988,7 +990,8 @@ object DBService {
 	    	    'bookSeqNo -> pDetail.bookSeqNo, 
 	    	    'status -> pDetail.status, 
 	            'statusUsercode -> pDetail.statusUsercode, 
-	            'statusTimestamp ->  statusTimestamp, 
+	            'statusTimestamp ->  statusTimestamp,
+	            'officerUserID -> pOfficerUserID,
 	            'createUserCode -> pDetail.createUsercode, 
 	            'createTimestamp ->  createTimestamp, 
 	            'auditUserCode -> pOfficerUserID
