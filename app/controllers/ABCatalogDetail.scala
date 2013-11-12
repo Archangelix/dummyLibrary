@@ -36,6 +36,7 @@ object ABCatalogDetail extends Controller with TSecured {
     "catalogSeqNo" -> optional(of[Int]),
     "originCode" -> optional(text),
     "originDesc" -> optional(text),
+    "status" -> optional(text),
     "remarks" -> optional(text)
   )(FormBook.apply)(FormBook.unapply)
 
@@ -64,7 +65,8 @@ object ABCatalogDetail extends Controller with TSecured {
 	    seqNo: Option[Int], 
 	    catalogSeqNo: Option[Int], 
 	    originCode: Option[String], 
-	    originDesc: Option[String], 
+	    originDesc: Option[String],
+	    status: Option[String],
 	    remarks: Option[String]) {
     
 	  def transform()(implicit pOfficerUserID: String): OBBook = {
@@ -89,7 +91,7 @@ object ABCatalogDetail extends Controller with TSecured {
 	object FormBook {
 	  def apply(pBook: OBBook): FormBook = {
 	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
-	        Some(pBook.origin.desc), Some(pBook.remarks)
+	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
 	        )
 	  }
 	}

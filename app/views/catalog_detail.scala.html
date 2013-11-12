@@ -89,6 +89,7 @@
 					<th>S/No</th>
 					<th>ID</th>
 					<th>Origin</th>
+					<th>Status</th>
 					<th>Remarks</th>
 					<th align="center">Action</th>
 				</tr>
@@ -97,6 +98,7 @@
 						<td align="center">@(idx+1)</td>
 						<td>@{book("catalogSeqNo").value}.@{book("seqNo").value}</td>
 						<td>@book("originDesc").value</td>
+						<td>@book("status").value</td>
 						<td>@book("remarks").value</td>
 						<td align="center">
 							<a href='@routes.ABBookDetail.edit(book("catalogSeqNo").value.get, book("seqNo").value.get)'>Edit</a> /

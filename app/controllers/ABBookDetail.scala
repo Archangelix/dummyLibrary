@@ -34,6 +34,7 @@ object ABBookDetail extends Controller with TSecured {
 	    catalogSeqNo: Option[Int], 
 	    originCode: Option[String], 
 	    originDesc: Option[String], 
+	    status: Option[String],
 	    remarks: Option[String]) {
     
 	  def merge(pObj: OBBook): OBBook = {
@@ -65,7 +66,7 @@ object ABBookDetail extends Controller with TSecured {
 	object FormBook {
 	  def apply(pBook: OBBook): FormBook = {
 	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
-	        Some(pBook.origin.desc), Some(pBook.remarks)
+	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
 	        )
 	  }
 	}
@@ -76,6 +77,7 @@ object ABBookDetail extends Controller with TSecured {
     "catalogSeqNo" -> optional(of[Int]),
     "originCode" -> optional(text),
     "originDesc" -> optional(text),
+    "status" -> optional(text),
     "remarks" -> optional(text)
   )(FormBook.apply)(FormBook.unapply)
 
@@ -87,7 +89,7 @@ object ABBookDetail extends Controller with TSecured {
   def newBook(pCatalogSeqNo: String) = withAuth {implicit officerUserID => implicit req => 
     // Flashing works only for redirect.
     // Ok(views.html.book_detail(MODE_EDIT, bookForm, pCatalogID)).flashing("catalogID" -> pCatalogID)
-    val newBookForm = bookForm.fill(FormBook(None, None, Some(pCatalogSeqNo.toInt), None, None, None))
+    val newBookForm = bookForm.fill(FormBook(None, None, Some(pCatalogSeqNo.toInt), None, None, None, None))
     Ok(views.html.book_detail(MODE_ADD, newBookForm)).withSession(
         session + ("bookMode" -> MODE_ADD)
     )
