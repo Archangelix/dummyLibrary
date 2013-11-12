@@ -1,13 +1,14 @@
 html {
-	background-image: url('/assets/images/background2.jpeg');
-	background-attachment: fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-	background-size: cover;
+	overflow-y: scroll; 
 }
 
 body {
+	background-image: url('/assets/images/background2.jpeg');
+	background-attachment: fixed;
+  	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
 	padding-top: 50px;
 	bottom: 0;
 }
@@ -220,4 +221,36 @@ p.error, dd.error, ul.error {
 
 #divBorrowAddBook {
 	overflow-x: auto;
+}
+
+.divNotification {
+	display: inline-block;
+	text-align: left;
+	background: yellow;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0;
+	opacity: 0;
+    -webkit-animation: fadeoutmsg 10s; /* Safari and Chrome */
+       -moz-animation: fadeoutmsg 10s; /* Firefox */
+        -ms-animation: fadeoutmsg 10s; /* Internet Explorer */
+         -o-animation: fadeoutmsg 10s; /* Opera */
+            animation: fadeoutmsg 10s;
+}
+
+@-moz-keyframes fadeoutmsg {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@-webkit-keyframes fadeoutmsg {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }

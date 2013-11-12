@@ -366,12 +366,16 @@ object CommonService {
 	}
 
 	def returnBook(pTransactionSeqNo: Int, pBookID: String)(implicit pOfficerUserID: String) = {
+	  println("returnBook")
       val arr = pBookID.split('.')
       val catalogSeqNo = arr(0).toInt
       val bookSeqNo = arr(1).toInt
       val transaction = OBTxBorrowHD.find(pTransactionSeqNo, true)
       val updatedTx = transaction.returnBook(catalogSeqNo, bookSeqNo)
       updateTxBorrow(updatedTx, true)
+      
+      val books = updatedTx.details.map(_.book)
+      books.foreach(updateBook(_))
       updatedTx
 	}
 	

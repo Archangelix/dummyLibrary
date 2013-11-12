@@ -33,6 +33,7 @@ import play.api.mvc.Session
 object ABBorrowBook extends Controller with TSecured {
   
 	case class FormBorrow(
+	  val msg: Option[String],
 	  val adminUsername: Option[String],
 	  val borrowerID: Option[String],
 	  val borrowerName: Option[String],
@@ -43,8 +44,9 @@ object ABBorrowBook extends Controller with TSecured {
 	)
 	
 	object FormBorrow {
-	  def apply(pObj: OBTxBorrowHD): FormBorrow = {
+	  def apply(pObj: OBTxBorrowHD, pMessage: Option[String] = None): FormBorrow = {
 	    FormBorrow(
+	        pMessage,
 	        Some(pObj.officer.name),
 	        Some(pObj.borrower.idNumber),
 	        Some(pObj.borrower.name),
@@ -92,6 +94,7 @@ object ABBorrowBook extends Controller with TSecured {
   
 
   val formBorrowMapping = mapping(
+	  "msg" -> optional(text),
       "adminUsername" -> optional(text),
       "borrowerID" -> optional(text),
       "borrowerName" -> optional(text),
@@ -104,11 +107,12 @@ object ABBorrowBook extends Controller with TSecured {
   val borrowForm = Form[FormBorrow](formBorrowMapping)
   
  def borrowPage = withAuth { implicit officerUserID => implicit req =>
-   Ok(views.html.borrow_search_user(borrowForm.fill(FormBorrow(None, None, None, None, None, None, None))))
+   val msg = flash.get("msg")
+   Ok(views.html.borrow_search_user(borrowForm.fill(FormBorrow(msg, None, None, None, None, None, None, None))))
  }
   
  def borrow = withAuth { implicit officerUserID => implicit req =>
-   Ok(views.html.borrow_search_user(borrowForm.fill(FormBorrow(None, None, None, None, None, None, None))))
+   Ok(views.html.borrow_search_user(borrowForm.fill(FormBorrow(None, None, None, None, None, None, None, None))))
  }
  
  def javascriptRoutes = withAuth { implicit officerUserID => implicit req =>
@@ -178,7 +182,7 @@ object ABBorrowBook extends Controller with TSecured {
             val (borrower, newErrorForm) = validateAndGetBorrower(formBorrower, borrowerID)
             if (borrower!=null) {
 	          Ok(views.html.borrow_search_user(borrowForm.fill(
-	        	      FormBorrow(Some(officerUserID), 
+	        	      FormBorrow(None, Some(officerUserID), 
 	        	          Some(borrower.idNumber), Some(borrower.name), Some(borrower.address), 
 	        	          Some(sdf.format(new Date())), None, None))))
             } else {
@@ -244,7 +248,7 @@ object ABBorrowBook extends Controller with TSecured {
     val transaction = CommonService.getBorrowTransaction(pTransactionSeqNo.toInt, true)
     val borrower = transaction.borrower
     val newForm = borrowForm.fill(
-    	FormBorrow(Some(officerUserID), 
+    	FormBorrow(None, Some(officerUserID), 
           Some(borrower.idNumber), Some(borrower.name), Some(borrower.address), 
           transaction.borrowTimestamp match {
     	  	case Some(x) => Some(sdf.format(x))
@@ -280,7 +284,9 @@ object ABBorrowBook extends Controller with TSecured {
     val transactionSeqNo = session.get("transactionID").get.toInt
     val updatedTransaction = CommonService.activateBorrowTransaction(transactionSeqNo)
     val newForm = borrowForm.fill(FormBorrow(updatedTransaction))
-    Ok(views.html.borrow_success(newForm))
+    Redirect(routes.ABBorrowBook.borrowPage())
+    	.flashing("msg" -> "Transaction is successful.")
+    	.withSession(session - "transactionID")
   }
 
   val sdf = new SimpleDateFormat("dd-M-yyyy")

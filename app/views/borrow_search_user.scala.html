@@ -40,6 +40,9 @@
 </head>
 <body>
 	@menubar_admin()
+	@if(myForm("msg").value!=None) {
+		<div style="text-align:center;"><div class="divNotification">@myForm("msg").value</div></div>
+	}
 	<div class="container">
 	<div class="divMainContainer" id="divLoginErrorSignIn">
 		@if(myForm("borrowerName").value==None || myForm("borrowerName").value.get.trim().equals("")) {
