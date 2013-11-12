@@ -32,6 +32,7 @@ import play.api.data.Mapping
 object ABReturnBook extends Controller with TSecured {
   
 	case class FormReturn(
+	  msg: Option[String],
 	  transactionID: Option[String],
 	  bookID: Option[String],
 	  title: Option[String],
@@ -48,8 +49,9 @@ object ABReturnBook extends Controller with TSecured {
 	  bookRemarks: Option[String]
 	)
 	
-  val formReturnMapping = (isSearch: Boolean) => {
+  val formReturnMapping = 
       mapping(
+          "msg" -> optional(text),
 		  "transactionID" -> optional(text),
 		  "bookID" ->  optional(text) ,
 		  "title" -> optional(text),
@@ -65,12 +67,19 @@ object ABReturnBook extends Controller with TSecured {
 		  "officerName" -> optional(text),
 	      "bookRemarks" -> optional(text)
 	  )(FormReturn.apply)(FormReturn.unapply)
-  }
 	  
-  val returnForm = Form[FormReturn](formReturnMapping(true))
+  val returnForm = Form[FormReturn](formReturnMapping)
   
  def returnPage = withAuth { implicit officerUserID => implicit req =>
-   Ok(views.html.return_search_book(returnForm))
+   val msg = flash.get("msg")
+   val dt = returnForm.data
+   if (!isBlank(msg)) {
+     Ok(views.html.return_search_book(returnForm.copy(
+    		 data = returnForm.data + ("msg" -> msg.get)
+    		 )))
+   } else {
+      Ok(views.html.return_search_book(returnForm))
+   }
  }
   
   def validateAndGetTxDetail(formReturn: Form[FormReturn], pBookID: String):(OBTxBorrowDT, Form[FormReturn]) = {
@@ -121,6 +130,7 @@ object ABReturnBook extends Controller with TSecured {
               val book = txDetail.book
               val catalog = book.catalog
               val newForm = FormReturn(
+                  None,
                   Some(txDetail.header.seqno.get.toString),
                   Some(book.id),
                   Some(catalog.title),
@@ -154,7 +164,8 @@ object ABReturnBook extends Controller with TSecured {
        data => {
          val transactionSeqNo = data.transactionID.get.toInt
          CommonService.returnBook(transactionSeqNo, data.bookID.get)
-         Ok(views.html.return_success())
+         Redirect(routes.ABReturnBook.returnPage)
+         	.flashing("msg" -> "The transaction is successful.")
        }
    )
  }
