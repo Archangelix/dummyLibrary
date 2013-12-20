@@ -21,6 +21,11 @@
 			}
 		}
 
+		function highlightWords( line, word ) {
+		     var regex = new RegExp( '(' + word + ')', 'gi' );
+		     return line.replace( regex, "<b>$1</b>" );
+		}
+
 		function replaceKeyWord(sentence, keyword) {
 			while (sentence.indexOf(keyword)>=0) {
 				sentence = sentence.replace(keyword, "&*(");
@@ -36,7 +41,7 @@
 		function highlightKeywords(str) {
 			$('h4').each(function(idx) {
 				var oldText = $(this).text();
-				var newText = replaceKeyWord(oldText, str);
+				var newText = highlightWords(oldText, str);
 				$(this).html(newText);
 			})
 		}
