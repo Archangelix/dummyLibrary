@@ -52,7 +52,7 @@ object ABBookDetail extends Controller with TSecured {
 	  def merge(pObj: OBBook): OBBook = {
 	    pObj.copy(
 	     origin = DDBookOrigin(this.originCode.get),
-	     remarks = this.remarks.get
+	     remarks = this.remarks.getOrElse("")
 	    )
 	  }
 	  
