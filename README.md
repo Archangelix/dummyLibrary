@@ -1,7 +1,7 @@
 INTRODUCTION
 ============
 
-Dummy Library is a simple web application meant to exercise the Scala & Play framework web application in more practical way. You're very welcome to try with this user login: admin and password: admin.
+Dummy Library is a simple web application meant to exercise the Scala & Play framework web application in more practical way. You're very welcome to try with this ***user login***: admin and ***password***: admin.
 
 FUNCTIONAL SPECIFICATION
 ========================
