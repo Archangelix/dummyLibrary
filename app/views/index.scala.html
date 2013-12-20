@@ -30,7 +30,7 @@
 			case _ => menubar_public(myForm, true)
 		}
 	}}
-	<form action='@routes.ABSearchCatalog.index' method='GET'> 
+	<form action='@routes.ABSearchCatalog.index' method='GET' onSubmit="search(); return false;"> 
 	<div id="mainSearchCatalog" class="searchBox">
 		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here" onkeyup="checkSearchTextbox()">
 		<a id="btnSearch" href="javascript:search()" class="btn" disabled>Search</a>
