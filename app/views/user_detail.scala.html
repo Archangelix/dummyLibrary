@@ -73,7 +73,11 @@
 	@menubar_admin()
 	<div id="divContainer" class="container">
 	<div id="divAdminUser" class="divMainContainer">
-		<form id="formSignup" action="@routes.ABUserDetail.save" method="POST" class="navbar-form">
+		@if(mode.equals(MODE_ADD)) { 
+			<form id="formSignup" action="@routes.ABUserDetail.saveNew" method="POST" class="navbar-form">
+		} else {
+			<form id="formSignup" action='@routes.ABUserDetail.saveUpdate(signupForm("seqNo").value.get)' method="POST" class="navbar-form">
+		}
 			<input type='hidden' name='seqNo' value='@signupForm("seqNo").value'/>
 			<fieldset>
 				<legend>
@@ -96,6 +100,15 @@
 						<label>Username</label>
 						<p>@signupForm("username").value</p>
 						<input type='hidden' name='username' value='@signupForm("username").value'/>
+						@defining(signupForm.errors.filter(_.key.equals("username"))) { errs =>
+							@if(errs.size>0) {
+								<p class="error">
+									@errs.map{ err =>
+										@err.message
+									}
+								</p>
+							}
+						}
 					}
 					<div id='alert-box'></div>
 				</div>

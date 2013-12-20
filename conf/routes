@@ -50,8 +50,9 @@ GET     /prevUser                      			controllers.ABUserList.navigatePrev
 GET     /nextUser                      			controllers.ABUserList.navigateNext
 GET     /lastUser                      			controllers.ABUserList.navigateLast
 GET		/newuser								controllers.ABUserDetail.gotoNewUser
-POST	/newuser								controllers.ABUserDetail.save
+POST	/newuser								controllers.ABUserDetail.saveNew
 GET		/user/:id/edit							controllers.ABUserDetail.edit(id)
+POST	/user/:id/edit							controllers.ABUserDetail.saveUpdate(id)
 GET		/user/:id/delete						controllers.ABUserList.removeUser(id)
 GET		/searchbook								controllers.ABSearchCatalog.index
 GET		/searchbook/:str						controllers.ABSearchCatalog.search(str)

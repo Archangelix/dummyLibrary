@@ -33,9 +33,13 @@ object ABUserDetail extends Controller with TSecured {
       else Invalid(ValidationError("error.minYear", pMinYear))
   }
   
+  val adminUneditable = Constraint[String]("admin.uneditable")(str =>
+    if (str.toLowerCase == "admin") Invalid("User admin is uneditable.")
+    else Valid
+  )
   val formEditUserMapping = mapping(
       "seqNo" -> optional(number),
-      "username" -> nonEmptyText,
+      "username" -> nonEmptyText.verifying(adminUneditable),
       "name" -> nonEmptyText,
       "gender" -> nonEmptyText,
       "race" -> text.verifying(mustBeEmpty), // Prevent robots from submitting the signup form.
@@ -91,14 +95,10 @@ object ABUserDetail extends Controller with TSecured {
         session + ("mode" -> MODE_EDIT))
   }
   
-  def save() = withAuth { implicit officerUserID => implicit req =>
+  def saveNew = withAuth { implicit officerUserID => implicit req =>
     val mode = session.get("mode").getOrElse("")
     println("mode = "+mode)
-    val filledForm = 
-      if (mode.equals(MODE_ADD)) 
-    	Form[FormUser](formNewUserMapping).bindFromRequest() 
-      else 
-        Form[FormUser](formEditUserMapping).bindFromRequest()
+    val filledForm = Form[FormUser](formNewUserMapping).bindFromRequest() 
     filledForm.fold(
       errorForm => {
         errorForm.errors.foreach{ err =>
@@ -106,49 +106,62 @@ object ABUserDetail extends Controller with TSecured {
         }
         BadRequest(views.html.user_detail(mode, filledForm)(session))
       },
-      successForm => {
-        if (mode.equals(MODE_ADD)) {
+        successForm => {
           try {
-        	  val dbUser = OBUser.findByUserID(successForm.userID.toUpperCase())
-        	  val newErrors = Form(filledForm.mapping, filledForm.data, 
-        	      Seq(new FormError("userID", "This User ID is not available.")), filledForm.value)
-        	  println ("Duplicate userid has been found!")
-        	  BadRequest(views.html.user_detail(mode, newErrors)(session))
+            val dbUser = OBUser.findByUserID(successForm.userID.toUpperCase())
+            val newErrors = Form(filledForm.mapping, filledForm.data,
+              Seq(new FormError("userID", "This User ID is not available.")), filledForm.value)
+            println("Duplicate userid has been found!")
+            BadRequest(views.html.user_detail(mode, newErrors)(session))
           } catch {
             case e: UserNotFoundException => {
-            	println ("Ok, valid userid!")
-            	val user = OBUser(successForm)
-            	val errors:Seq[Option[FormError]] = validatePassword(successForm.password, successForm.password2)
-            	if (errors.size>0) {
-	         	  val newErrorForm = Form(filledForm.mapping, filledForm.data, 
-	        	      errors.map(_.get), filledForm.value)
-            		BadRequest(views.html.user_detail(mode, newErrorForm)(session))
-            	} else {
-            		val password = successForm.password
-            		CommonService.createUserAndPassword(user, password)
-            		Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
-            	}
+              println("Ok, valid userid!")
+              val user = OBUser(successForm)
+              val errors: Seq[Option[FormError]] = validatePassword(successForm.password, successForm.password2)
+              if (errors.size > 0) {
+                val newErrorForm = Form(filledForm.mapping, filledForm.data,
+                  errors.map(_.get), filledForm.value)
+                BadRequest(views.html.user_detail(mode, newErrorForm)(session))
+              } else {
+                val password = successForm.password
+                CommonService.createUserAndPassword(user, password)
+                Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
+              }
             }
           }
-        } else {
-            val user = OBUser(successForm)
-            CommonService.updateUser(user)
+        }
+    )
+  }
+  
+  def saveUpdate(id: String) = withAuth { implicit officerUserID => implicit req =>
+    val mode = session.get("mode").getOrElse("")
+    println("mode = "+mode)
+    val filledForm = Form[FormUser](formEditUserMapping).bindFromRequest()
+    filledForm.fold(
+      errorForm => {
+        errorForm.errors.foreach{ err =>
+          println(err.key+": "+err.message)
+        }
+        BadRequest(views.html.user_detail(mode, filledForm)(session))
+      },
+        successForm => {
+          val user = OBUser(successForm)
+          CommonService.updateUser(user)
 
-            val password = successForm.password
-            val errors: Seq[Option[FormError]] = if (!isBlank(password)) {
-              validatePassword(successForm.password, successForm.password2)
-            } else Seq()
-            
-            if (errors.size > 0) {
-              val newErrorForm = Form(filledForm.mapping, filledForm.data,
-                errors.map(_.get), filledForm.value)
-              BadRequest(views.html.user_detail(mode, newErrorForm)(session))
-            } else {
-              CommonService.updatePassword(user.userID, password)
-              Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
-            }
+          val password = successForm.password
+          val errors: Seq[Option[FormError]] = if (!isBlank(password)) {
+            validatePassword(successForm.password, successForm.password2)
+          } else Seq()
+
+          if (errors.size > 0) {
+            val newErrorForm = Form(filledForm.mapping, filledForm.data,
+              errors.map(_.get), filledForm.value)
+            BadRequest(views.html.user_detail(mode, newErrorForm)(session))
+          } else {
+            CommonService.updatePassword(user.userID, password)
+            Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
           }
-      }
+        }
     )
   }
   
