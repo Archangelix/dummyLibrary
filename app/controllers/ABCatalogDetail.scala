@@ -177,7 +177,6 @@ object ABCatalogDetail extends Controller with TSecured {
    * Saving the catalog details.
    */
   def saveNew = withAuth {implicit officerUserID => implicit req =>
-    println("saveNew")
     val tempForm = newCatalogForm.bindFromRequest()
     val mode = session.get("mode").getOrElse(MODE_ADD)
     val username = session.get("username").getOrElse("")

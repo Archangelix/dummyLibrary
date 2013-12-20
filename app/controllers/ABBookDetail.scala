@@ -12,6 +12,18 @@ import services.CommonService
 import models.common.DDBookOrigin
 import models.common.STATUS_BOOK_AVL
 import models.OBCatalog
+import models.common.BookStatus._
+import models.OBBook
+import play.api.data.validation.Constraint
+import models.OBBook
+import models.OBBook
+import play.api.data.validation.Valid
+import models.OBBook
+import models.OBBook
+import play.api.data.validation.Invalid
+import models.OBBook
+import play.api.i18n.Messages
+import models.OBBook
 
 /**
  * Action to handle the book section, including the add, update, delete, and view.
@@ -69,19 +81,28 @@ object ABBookDetail extends Controller with TSecured {
 	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
 	        )
 	  }
+	  
+	  def init(pCatalogSeqNo: Int): FormBook = {
+		FormBook(None, None, Some(pCatalogSeqNo), None, None, Some(STATUS_BOOK_AVL.description), None)	  }
 	}
 
-  val formBookMapping = mapping(
+	val checkOrigin = (pAllowEmptyOrigin: Boolean) => Constraint[Option[String]]("origin.validation") ( str =>
+	  if (!pAllowEmptyOrigin && str==None) {
+	    Invalid(Messages("error.required"))
+	  } else Valid
+	)
+	
+  val formBookMapping = (allowEmptyOrigin: Boolean) => mapping(
     "idx" -> optional(of[Int]),
     "seqNo" -> optional(of[Int]),
     "catalogSeqNo" -> optional(of[Int]),
-    "originCode" -> optional(text),
+    "originCode" -> optional(text).verifying(checkOrigin(allowEmptyOrigin)),
     "originDesc" -> optional(text),
     "status" -> optional(text),
     "remarks" -> optional(text)
   )(FormBook.apply)(FormBook.unapply)
 
-  val bookForm = Form[FormBook] (formBookMapping)
+  val bookForm = (pAllowEmptyOrigin: Boolean) => Form[FormBook] (formBookMapping(pAllowEmptyOrigin))
 
   /**
    * Displaying the book detail page with blank information.
@@ -89,7 +110,7 @@ object ABBookDetail extends Controller with TSecured {
   def newBook(pCatalogSeqNo: String) = withAuth {implicit officerUserID => implicit req => 
     // Flashing works only for redirect.
     // Ok(views.html.book_detail(MODE_EDIT, bookForm, pCatalogID)).flashing("catalogID" -> pCatalogID)
-    val newBookForm = bookForm.fill(FormBook(None, None, Some(pCatalogSeqNo.toInt), None, None, None, None))
+    val newBookForm = bookForm(true).fill(FormBook.init(pCatalogSeqNo.toInt))
     Ok(views.html.book_detail(MODE_ADD, newBookForm)).withSession(
         session + ("bookMode" -> MODE_ADD)
     )
@@ -99,7 +120,7 @@ object ABBookDetail extends Controller with TSecured {
    * Saving the details of the new book.
    */
   def saveNew(pCatalogSeqNo: String) = withAuth { implicit officerUserID => implicit req =>
-    val filledForm = bookForm.bindFromRequest
+    val filledForm = bookForm(false).bindFromRequest
     filledForm.fold(
       error => {
         println("validation failed.")
@@ -121,7 +142,7 @@ object ABBookDetail extends Controller with TSecured {
    * Viewing the book details. The page will be uneditable.
    */
   def view(pCatalogSeqNo: String, pBookSeqNo: String) = withAuth {implicit officerUserID => implicit req => 
-    Ok(views.html.book_detail(MODE_ADD, bookForm))
+    Ok(views.html.book_detail(MODE_ADD, bookForm(true)))
   }
 
   /**
@@ -129,7 +150,7 @@ object ABBookDetail extends Controller with TSecured {
    */
   def edit(pCatalogSeqNo: String, pBookSeqNo: String) = withAuth {implicit officerUserID => implicit req =>
     val dbBook = OBBook.find(pCatalogSeqNo.toInt, pBookSeqNo.toInt)
-    val newBookForm = bookForm.fill(FormBook(dbBook))
+    val newBookForm = bookForm(true).fill(FormBook(dbBook))
     Ok(views.html.book_detail(MODE_EDIT, newBookForm)).withSession(
         session + ("bookMode" -> MODE_EDIT)
     )
@@ -139,7 +160,7 @@ object ABBookDetail extends Controller with TSecured {
    * Saving the details of an existing new book.
    */
   def saveUpdate(pCatalogSeqNo: String, pBookSeqNo: String) = withAuth {implicit officerUserID => implicit req => 
-    val filledForm = bookForm.bindFromRequest
+    val filledForm = bookForm(false).bindFromRequest
     filledForm.fold(
       error => {
         println("validation failed.")
