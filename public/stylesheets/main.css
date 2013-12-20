@@ -216,11 +216,12 @@ p.error, dd.error, ul.error {
 }
 
 #divBorrowAddBook {
-	width: 30em;
+	width: 40em;
+	overflow-x: auto;
 }
 
-#divBorrowAddBook {
-	overflow-x: auto;
+#fsBorrowedBooksList table.list{
+	margin: 1em 0;
 }
 
 .divNotification {

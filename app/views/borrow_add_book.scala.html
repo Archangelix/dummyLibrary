@@ -36,21 +36,6 @@
 			jsRoutes.controllers.ABSearchBorrower.fetchUserInfo(username).ajax(ajax1);
 		}
 
-		function addNewBook() {
-			var booksInput = $("#borrowedBooks input");
-			var newIndex = booksInput.length;
-			if (newIndex==0) {
-				$('#noBookNotice').hide();
-				$('#addNewBookLInk').hide();
-				$('#borrowedBooks').append('<ol></ol>');
-			}
-			$('#borrowedBooks ol').append(
-					'<li><input type="text" id="books['+newIndex+']" name="books['+newIndex+']" ></li>'
-			)
-		<li><input type="text" id="books[0]" name="books[0]" 
-		></li>
-		}
-
 	</script>
 </head>
 <body>
