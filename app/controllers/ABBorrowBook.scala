@@ -191,57 +191,56 @@ object ABBorrowBook extends Controller with TSecured {
           }
       )
  	}
- 
+
   def addBook = withAuth { implicit officerUserID => implicit req =>
-    println("Entering addBooks.")
-  	val formBorrower = borrowForm.bindFromRequest()
-    formBorrower.fold(
-        errorForm => {  
+      println("Entering addBooks.")
+      val formBorrower = borrowForm.bindFromRequest()
+      formBorrower.fold(
+        errorForm => {
           BadRequest(views.html.borrow_add_book(formBorrower))
         },
         success => {
-        	  try {
-        		  if (isBlank(success.newBookID)) {
-	        		val newErrorForm = Form(
-	        				  formBorrower.mapping, 
-	        				  formBorrower.data, 
-	        				  Seq(new FormError("newBookID", "This field must be populated!!!")), 
-	        				  formBorrower.value)
-	        		BadRequest(views.html.borrow_add_book(newErrorForm))
-        		  } else {
-        		    val validBook = OBBook.isValidID(success.newBookID.get)
-        		    if (validBook) {
-        		      val transactionID = session.get("transactionID").get.toInt
-        		      val arr = success.newBookID.get.split('.')
-        		      val catalogSeqNo = arr(0).toInt
-        		      val bookSeqNo = arr(1).toInt
-        		      val updatedTx = CommonService.addNewBook(transactionID, catalogSeqNo, bookSeqNo)
-        		      val newForm = borrowForm.fill(FormBorrow(updatedTx))
-		        	  Ok(views.html.borrow_add_book(newForm))
-        		    } else {
-        		      throw new BookNotFoundException(success.newBookID.get)
-        		    }
-        		  }
-        	  } catch {
-	        	  case (BookNotFoundException(_) | CatalogNotFoundException(_)) => {
-	        		val newErrorForm = Form(
-	        				  formBorrower.mapping, 
-	        				  formBorrower.data, 
-	        				  Seq(new FormError("addError", "This book cannot be found in our system.")), 
-	        				  formBorrower.value)
-	        		BadRequest(views.html.borrow_add_book(newErrorForm))
-	        	  }
-	        	  case (BookNotAvailableException(_)) => {
-	        		  val newErrorForm = Form(
-	        				  formBorrower.mapping, 
-	        				  formBorrower.data, 
-	        				  Seq(new FormError("addError", "This book is currently not available.")), 
-	        				  formBorrower.value)
-	        				  BadRequest(views.html.borrow_add_book(newErrorForm))
-	        	  }
-        	  }
-        }
-    )
+          try {
+            if (isBlank(success.newBookID)) {
+              val newErrorForm = Form(
+                formBorrower.mapping,
+                formBorrower.data,
+                Seq(new FormError("newBookID", "This field must be populated!!!")),
+                formBorrower.value)
+              BadRequest(views.html.borrow_add_book(newErrorForm))
+            } else {
+              val validBook = OBBook.isValidID(success.newBookID.get)
+              if (validBook) {
+                val transactionID = session.get("transactionID").get.toInt
+                val arr = success.newBookID.get.split('.')
+                val catalogSeqNo = arr(0).toInt
+                val bookSeqNo = arr(1).toInt
+                val updatedTx = CommonService.addNewBook(transactionID, catalogSeqNo, bookSeqNo)
+                val newForm = borrowForm.fill(FormBorrow(updatedTx))
+                Ok(views.html.borrow_add_book(newForm))
+              } else {
+                throw new BookNotFoundException(success.newBookID.get)
+              }
+            }
+          } catch {
+            case (BookNotFoundException(_) | CatalogNotFoundException(_)) => {
+              val newErrorForm = Form(
+                formBorrower.mapping,
+                formBorrower.data,
+                Seq(new FormError("addError", "This book cannot be found in our system.")),
+                formBorrower.value)
+              BadRequest(views.html.borrow_add_book(newErrorForm))
+            }
+            case (BookNotAvailableException(_)) => {
+              val newErrorForm = Form(
+                formBorrower.mapping,
+                formBorrower.data,
+                Seq(new FormError("addError", "This book is currently not available.")),
+                formBorrower.value)
+              BadRequest(views.html.borrow_add_book(newErrorForm))
+            }
+          }
+        })
   }
   
   def viewTransaction(pTransactionSeqNo: String) = withAuth { implicit officerUserID => implicit req =>

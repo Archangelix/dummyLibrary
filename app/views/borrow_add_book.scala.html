@@ -112,11 +112,17 @@
 						<tr>
 							<td align="center">@(idx+1)</td>
 							<td>@book("bookID").value</td>
+							<input type="hidden" name='@book("bookID").name' value='@book("bookID").value'/>
 							<td>@book("title").value</td>
+							<input type="hidden" name='@book("title").name' value='@book("title").value'/>
 							<td>@book("author").value</td>
+							<input type="hidden" name='@book("author").name' value='@book("author").value'/>
 							<td>@book("publishedYear").value</td>
+							<input type="hidden" name='@book("publishedYear").name' value='@book("publishedYear").value'/>
 							<td>@book("category").value</td>
+							<input type="hidden" name='@book("category").name' value='@book("category").value'/>
 							<td>@book("remarks").value</td>
+							<input type="hidden" name='@book("remarks").name' value='@book("remarks").value'/>
 						</tr>
 						}
 					</table>

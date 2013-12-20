@@ -1,4 +1,4 @@
-@(myForm: Form[form.FormCategory], list: List[common.Category])(implicit session: Session)
+@(myForm: Form[form.FormCategory], catForm: Form[controllers.ABCategory.FormCatalog])(implicit session: Session)
 @import helper._
 @import viewhelpers._
 
@@ -9,21 +9,21 @@
 <head>
 	@inc.common_head()
 	<script>
-		function updatecategory(rowidx) {
+		function updateCategory(rowidx) {
 			console.log("rowidx = "+rowidx);
-		  var seqno = $('#list'+rowidx).val();
-			$('#selectedid').val(seqno);
+			var seqno = $('#list'+rowidx).val();
+			$('#selectedID').val(seqno);
 			console.log("seqno = "+seqno);
 
 			var newcategoryname = $("#input"+rowidx).val();
-			$('#updatedcategoryname').val(newcategoryname);
+			$('#updatedCategoryName').val(newcategoryname);
 			console.log("newcategoryname = "+newcategoryname);
 			
 			document.forms[0].action = "/categories/"+seqno+"/update";
 			document.forms[0].submit();
 		}
 		
-		function createcategory() {
+		function createCategory() {
 			document.forms[0].submit();
 		}
 	
@@ -37,7 +37,7 @@
 			<input type='hidden' id='selectedID' name='selectedID'/>
 			<input type='hidden' id='updatedCategoryName' name='updatedCategoryName'/>
 			<div align="center">
-			@if(list.isEmpty) {
+			@if(myForm("list").indexes.size==0) {
 				No categories have been created yet!
 			} else {
 				<table class="list">

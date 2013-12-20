@@ -5,5 +5,5 @@ import models.common.Category
 case class FormCategory(
     selectedID: Option[Int], 
     updatedCategoryName: Option[String], 
-    newCategoryName: Option[String], 
+    newCategoryName: String, 
     list: Option[List[Category]])

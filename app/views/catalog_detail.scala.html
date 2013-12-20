@@ -81,7 +81,6 @@
 					<input type="button" name="btnCancel" value='Cancel' onclick="javascript:window.location='/cataloglist'" class="btn btn-danger"/>
 				</div>
 			</fieldset>
-	</form>
 	<div id="divCatalogBooks">
 		<legend>CATALOG BOOKS</legend>
 			@if(myForm("books").indexes.size>0) {
@@ -98,9 +97,16 @@
 					<tr>
 						<td align="center">@(idx+1)</td>
 						<td>@{book("catalogSeqNo").value}.@{book("seqNo").value}</td>
+						<input type="hidden" name='@book("seqNo").name' value='@book("seqNo").value'/>
+						<input type="hidden" name='@book("catalogSeqNo").name' value='@book("catalogSeqNo").value'/>
+						<input type="hidden" name='@book("idx").name' value='@book("seqNo").value'/>
 						<td>@book("originDesc").value</td>
+						<input type="hidden" name='@book("originCode").name' value='@book("originCode").value'/>
+						<input type="hidden" name='@book("originDesc").name' value='@book("originDesc").value'/>
 						<td>@book("status").value</td>
+						<input type="hidden" name='@book("status").name' value='@book("status").value'/>
 						<td>@book("remarks").value</td>
+						<input type="hidden" name='@book("remarks").name' value='@book("remarks").value'/>
 						<td align="center">
 							<a href='@routes.ABBookDetail.edit(book("catalogSeqNo").value.get, book("seqNo").value.get)'>Edit</a> /
 							<a href='javascript:removeBook("@routes.ABBookDetail.remove(book("catalogSeqNo").value.get,  book("seqNo").value.get)")'>Remove</a>
@@ -119,6 +125,7 @@
 				<a href='/bookdetail/@myForm("id").value/new'>Add a new book</a>
 			}
 	</div>
+	</form>
 	</div>
 	</div>
 </body>

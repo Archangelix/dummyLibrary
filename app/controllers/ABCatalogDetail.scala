@@ -167,6 +167,8 @@ object ABCatalogDetail extends Controller with TSecured {
     val catalog = OBCatalog.find(pIDStr.toInt)(true)
     val formCatalog = FormCatalog(catalog)
     val filledForm = updateCatalogForm.fill(formCatalog)
+    val books = filledForm("books")
+    println("Books = "+books)
     
     val username = session.get("username").getOrElse("")
     Ok(views.html.catalog_detail(MODE_EDIT, filledForm)(session)).withSession(
@@ -197,6 +199,7 @@ object ABCatalogDetail extends Controller with TSecured {
   def saveUpdate = withAuth {implicit officerUserID => implicit req =>
     println("saveUpdate!!!")
     val tempForm = updateCatalogForm.bindFromRequest()
+    val tmpBooks= tempForm("books").value
     val mode = session.get("mode").getOrElse(MODE_ADD)
     val username = session.get("username").getOrElse("")
 
