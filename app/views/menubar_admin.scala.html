@@ -18,7 +18,7 @@
 			    	</li>
 		    	</ul>
 			<div id="loginInfo" class="navbar-right">
-				Hi, <strong>@session.get(Security.username).getOrElse("")</strong>! (<a href="/logout">Sign out</a>)
+				Hi, <strong>@session.get(Security.username).getOrElse("")</strong>! (<a id="linkLogout" name="linkLogout" href="/logout">Sign out</a>)
 			</div>
 		</div>
 	</div>

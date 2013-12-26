@@ -6,7 +6,7 @@
 		</div>
 		<div class="navbar-collapse collapse">
 			<div id="loginInfo" class="navbar-right">
-				Hi, <strong>@session.get(Security.username).getOrElse("")</strong>! (<a href="/logout">Sign out</a>)
+				Hi, <strong>@session.get(Security.username).getOrElse("")</strong>! (<a id="linkLogout" href="/logout">Sign out</a>)
 			</div>
 		</div>
 	</div>

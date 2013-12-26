@@ -10,6 +10,7 @@ import models.common.STATUS_BORROW_HD_DFT
 import models.common.BorrowHDStatus
 import models.common.BorrowHDStatus
 import models.common.STATUS_BORROW_HD_COM
+import models.common.STATUS_BORROW_DT_PEN
 
 class OBTxBorrowHD (
 	val seqno: Option[Int],
@@ -68,7 +69,7 @@ class OBTxBorrowHD (
     val txDetail = tempList._1(0)
     val updatedTxDetail = txDetail.returnBook
     val updatedDetails = updatedTxDetail :: tempList._2
-    val unreturnedDetails = tempList._2.filter(x => x.status==STATUS_BORROW_HD_PEN)
+    val unreturnedDetails = tempList._2.filter(x => x.status==STATUS_BORROW_DT_PEN)
     val (updStatus, updStatusUsercode, updStatusTimestamp) = unreturnedDetails.size match {
       case 0 => (STATUS_BORROW_HD_COM, pOfficerUserID, now.get)
       case _ => (this.status, this.statusUsercode, this.statusTimestamp)
