@@ -85,18 +85,18 @@ trait ABBorrowBook extends TSecured { this: Controller =>
   
   def fetchUserInfo(pUserID: String) = withAuth { implicit officerUserID => implicit req =>
     try {
-      println("fetchUserInfo with userID="+pUserID.toUpperCase())
+      logger.debug("fetchUserInfo with userID="+pUserID.toUpperCase())
       val dbUser = objUser.findByUserID(pUserID.toUpperCase())
       val res = JsObject(
 	      "name" -> JsString(dbUser.name) ::
 	      "address" -> JsString(dbUser.address) ::
 	      Nil
 	    ) :: Nil
-      println("Found!")
+      logger.debug("Found!")
       Ok(Json.toJson(res))
     } catch {
       case e: UserNotFoundException => {
-        println("Not found!")
+        logger.debug("Not found!")
         Ok(Json.toJson(JsNull))
       }
     }
@@ -117,7 +117,7 @@ trait ABBorrowBook extends TSecured { this: Controller =>
     	  (dbUser, null)
 	  } catch {
     	  case e: UserNotFoundException => {
-    	    println("User cannot be found!")
+    	    logger.debug("User cannot be found!")
     		val newErrorForm = Form(
     				  formBorrower.mapping, 
     				  formBorrower.data, 
@@ -133,9 +133,9 @@ trait ABBorrowBook extends TSecured { this: Controller =>
  	val formBorrower = borrowForm.bindFromRequest()
     formBorrower.fold(
         errorForm => {
-            println("Wrong validation!")
+            logger.debug("Wrong validation!")
             errorForm.errors.foreach{ err =>
-            	println(err.key+": "+err.message)
+            	logger.debug(err.key+": "+err.message)
             }
             BadRequest(views.html.borrow_search_user(formBorrower))
           },
@@ -155,7 +155,7 @@ trait ABBorrowBook extends TSecured { this: Controller =>
  	}
 
   def addBook = withAuth { implicit officerUserID => implicit req =>
-      println("Entering addBooks.")
+      logger.debug("Entering addBooks.")
       val formBorrower = borrowForm.bindFromRequest()
       formBorrower.fold(
         errorForm => {
@@ -241,7 +241,7 @@ trait ABBorrowBook extends TSecured { this: Controller =>
   }
   
   def confirm = withAuth { implicit officerUserID => implicit req =>
-    println("confirm")
+    logger.debug("confirm")
     val transactionSeqNo = session.get("transactionID").get.toInt
     val updatedTransaction = commonService.activateBorrowTransaction(transactionSeqNo)
     val newForm = borrowForm.fill(ABBorrowBook.FormBorrow(updatedTransaction))

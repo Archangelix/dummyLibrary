@@ -82,7 +82,7 @@ trait ABReturnBook extends TSecured {this: Controller =>
 	  } catch {
     	  case e: Exception => {
     	    e.printStackTrace()
-    	    println("Books cannot be found!")
+    	    logger.debug("Books cannot be found!")
     		val newErrorForm = Form(
     				  formReturn.mapping, 
     				  formReturn.data, 
@@ -98,9 +98,9 @@ trait ABReturnBook extends TSecured {this: Controller =>
  	val mappedForm = returnForm.bindFromRequest
  	mappedForm.fold(
         errorForm => {
-            println("Wrong validations!")
+            logger.debug("Wrong validations!")
             errorForm.errors.foreach{ err =>
-            	println(err.key+": "+err.message)
+            	logger.debug(err.key+": "+err.message)
             }
             BadRequest(views.html.return_search_book(mappedForm))
           },
@@ -137,7 +137,7 @@ trait ABReturnBook extends TSecured {this: Controller =>
  	}
 
  def returnBook = withAuth { implicit officerUserID => implicit req =>
-   println("returnBook")
+   logger.debug("returnBook")
    val mappedForm = returnForm.bindFromRequest
    mappedForm.fold(
        errorForm => {

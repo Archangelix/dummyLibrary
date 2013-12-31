@@ -42,12 +42,12 @@ object PSQLService extends TDBService {
 	 * @return the User model business object.
 	 */
 	def findByUserID(pUserID: String)(implicit pIncludeDeleted: Boolean = false): TDBUser = {
-	  println("findByUserID")
+	  logger.debug("findByUserID")
 	  DB.withConnection{ implicit c => 
 	    val list = SQL("SELECT * FROM USERS WHERE upper(userid)=upper({userID})")
 	    	.on('userID -> pUserID.toUpperCase()).as(dbUserMapping *)
 	    if (list==null || list.size==0) {
-	      println("User "+pUserID+" cannot be found!")
+	      logger.debug("User "+pUserID+" cannot be found!")
 	      throw UserNotFoundException(pUserID)
 	    }
 	    val dbUser = list(0)
@@ -66,7 +66,7 @@ object PSQLService extends TDBService {
 	    val list = SQL("SELECT * FROM USERS WHERE upper(id_number)={idNumber}")
 	    	.on('idNumber -> pIDNumber.toUpperCase()).as(dbUserMapping *)
 	    if (list==null || list.size==0) {
-	      println("ID Number "+pIDNumber+" cannot be found!")
+	      logger.debug("ID Number "+pIDNumber+" cannot be found!")
 	      throw UserNotFoundException(pIDNumber)
 	    }
 	    val dbUser = list(0)
@@ -85,7 +85,7 @@ object PSQLService extends TDBService {
 	    val list = SQL("SELECT * FROM USERS WHERE seqNo={seqNo}")
 	    	.on('seqNo -> pSeqNo).as(dbUserMapping *)
 	    if (list==null || list.size==0) {
-	      println("User with seqNo="+pSeqNo+" cannot be found!")
+	      logger.debug("User with seqNo="+pSeqNo+" cannot be found!")
 	      throw UserNotFoundException(pSeqNo.toString)
 	    }
 	    val dbUser = list(0)
@@ -107,7 +107,7 @@ object PSQLService extends TDBService {
 	    val firstRow = SQL("SELECT password FROM USER_SECURITY WHERE upper(userid)=upper({userID})")
 	    	.on('userID -> pUserID).apply()
 	    if (firstRow.size==0) {
-	      println("User "+pUserID+" cannot be found!")
+	      logger.debug("User "+pUserID+" cannot be found!")
 	      throw UserNotFoundException(pUserID)
 	    }
 	    firstRow.head[String]("password")
@@ -123,7 +123,7 @@ object PSQLService extends TDBService {
 	 * @param pRemarks The book remarks.
 	 */
 	def createBook(pBook: TDBBook)(implicit pOfficerUserID: String) = {
-	  println("createBook")
+	  logger.debug("createBook")
 	  DB.withConnection { implicit c => 
 	    SQL("insert into BOOK (catalog_seqno, seqno, remarks, " +
 	    		"status, status_usercode, status_timestamp, " +
@@ -190,7 +190,7 @@ object PSQLService extends TDBService {
 	 */
 	def findAllBooksByCatalogID(pCatalogSeqNo: Int)
 	(implicit pIncludeDeleted: Boolean = false): List[TDBBook] = {
-	  println("findAllBooksByCatalogID")
+	  logger.debug("findAllBooksByCatalogID")
 	  DB.withConnection { implicit c =>
 	    val sql = 
 	      if (pIncludeDeleted) {
@@ -376,9 +376,9 @@ object PSQLService extends TDBService {
   	 */
 	def updateUser(pUser: TDBUser)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
-	    println("seqno = "+pUser.seqNo)
-	    println("dob = "+pUser.dob)
-	    println("gender = "+pUser.gender)
+	    logger.debug("seqno = "+pUser.seqNo)
+	    logger.debug("dob = "+pUser.dob)
+	    logger.debug("gender = "+pUser.gender)
 	    SQL("update USERS set name={name}, " +
 	    		"	address={address}, " +
 	    		"	dob={dob}, "+ 
@@ -467,7 +467,7 @@ object PSQLService extends TDBService {
 	 * @return The queried book.
 	 */
 	def getBorrowTransaction(pTransactionSeqNo: Int): TDBTxBorrowHD = {
-	  println("getBorrowTransaction")
+	  logger.debug("getBorrowTransaction")
 	  DB.withConnection { implicit c =>
 	    val sql = """
 			select * from tx_borrow_hd where seqno = {seqno} 
@@ -487,7 +487,7 @@ object PSQLService extends TDBService {
 	 * @return The queried book.
 	 */
 	def getTransactionDetailsByID(pTransactionID: Int): List[TDBTxBorrowDT] = {
-	  println("getTransactionDetailByIdD")
+	  logger.debug("getTransactionDetailByIdD")
 	  DB.withConnection { implicit c =>
 	    val sql = "select * from tx_borrow_dt where hd_seqno = {seqno}"
 	  	val list = SQL(sql).on('seqno -> pTransactionID).as(dbTxBorrowDTMapping *)
@@ -496,7 +496,7 @@ object PSQLService extends TDBService {
 	}
 	
 	def findPendingTxByBookID(pCatalogSeqNo: Int, pBookSeqNo: Int): TDBTxBorrowDT = {
-	  println("findPendingTxByBookID")
+	  logger.debug("findPendingTxByBookID")
 	  DB.withConnection { implicit c =>
 	    val sql = """
 	      select * from tx_borrow_dt 
@@ -574,7 +574,7 @@ object PSQLService extends TDBService {
 	  DB.withConnection{ implicit c => 
 	    val firstRow = SQL("SELECT coalesce(max(seqno), 0) maxseqno FROM BOOK WHERE CATALOG_SEQNO={catalogSeqNo}")
 	    	.on('catalogSeqNo -> pCatalogSeqNo).apply().head
-	    println("firstRow = "+firstRow)
+	    logger.debug("firstRow = "+firstRow)
 	    val dbMaxID = firstRow[Int]("maxseqno")
     	dbMaxID+1
 	  }
@@ -610,7 +610,7 @@ object PSQLService extends TDBService {
 	  	
 	  // Convert from List to Map.
 	  val res = Map((list map {s => (s.code, s.desc)}) : _*)
-	  println("Size of countries = "+res.size)
+	  logger.debug("Size of countries = "+res.size)
 	  res
 	}
 
@@ -666,7 +666,7 @@ object PSQLService extends TDBService {
 	    	.on('categoryName -> pCategoryName)
 	    	.as(dbCategoryListMapping *)
 	    if (list==null || list.size==0) {
-	      println("Category "+pCategoryName+" cannot be found!")
+	      logger.debug("Category "+pCategoryName+" cannot be found!")
 	      throw CategoryNotFoundException(pCategoryName)
 	    }
 	    list(0)

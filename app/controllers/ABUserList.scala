@@ -70,8 +70,8 @@ trait ABUserList extends TSecured { this: Controller =>
     val currentPageIdx = req.queryString.get("currentPageIdx").flatMap(_.headOption).get.toInt
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
     val nextPageIdx = if (currentPageIdx>=maxPage) maxPage else currentPageIdx+1
-    println("maxPage = "+maxPage)
-    println("nextPage = "+nextPageIdx)
+    logger.debug("maxPage = "+maxPage)
+    logger.debug("nextPage = "+nextPageIdx)
     val startIdx = (nextPageIdx-1)*PAGE_ROW_CNT+1
   	val endIdx = nextPageIdx*PAGE_ROW_CNT
     val (list1, rowCnt) = commonService.partialUsers(startIdx, endIdx)

@@ -127,7 +127,7 @@ object CommonService extends TCommonService {
 	 * @return The queried book.
 	 */
 	def getBorrowTransaction(pTransactionSeqNo: Int, pIncludeDetails: Boolean): TTxBorrowHD = {
-	  println("getBorrowTransaction")
+	  logger.debug("getBorrowTransaction")
 	  val dbBorrowTxHeader = dbService.getBorrowTransaction(pTransactionSeqNo)
 	  val dbBorrowTxDetails = 
 	    if (pIncludeDetails) {
@@ -461,7 +461,7 @@ object CommonService extends TCommonService {
 	}
 
 	def returnBook(pTransactionSeqNo: Int, pBookID: String)(implicit pOfficerUserID: String) = {
-	  println("returnBook")
+	  logger.debug("returnBook")
       val arr = pBookID.split('.')
       val catalogSeqNo = arr(0).toInt
       val bookSeqNo = arr(1).toInt

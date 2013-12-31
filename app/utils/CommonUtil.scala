@@ -26,12 +26,12 @@ object CommonUtil {
     
     def mustBeEmpty(): Constraint[String] = 
       Constraint[String]("constraint.invalidInput") { o =>
-        println("validating race!")
+        logger.debug("validating race!")
         if (!isBlank(o)) {
-          println("invalid!")
+          logger.debug("invalid!")
           Invalid(ValidationError("Invalid form input."))
         } else {
-          println("valid!")
+          logger.debug("valid!")
           Valid
         }
       }

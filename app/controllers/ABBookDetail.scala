@@ -73,13 +73,13 @@ trait ABBookDetail extends TSecured {this: Controller =>
     val filledForm = bookForm(false).bindFromRequest
     filledForm.fold(
       error => {
-        println("validation failed.")
+        logger.debug("validation failed.")
         val mode = session.get("bookMode").getOrElse(MODE_ADD)
-//        error.errors.foreach(err => println(err.key + ": "+err.message))
+//        error.errors.foreach(err => logger.debug(err.key + ": "+err.message))
         BadRequest(views.html.book_detail(mode, error))
       },
       data => {
-        println("validation successful.")
+        logger.debug("validation successful.")
         val newBook = data.transform()
         commonService.createNewBook(newBook)
     	Redirect(routes.ABCatalogDetail.edit(pCatalogSeqNo))
@@ -113,13 +113,13 @@ trait ABBookDetail extends TSecured {this: Controller =>
     val filledForm = bookForm(false).bindFromRequest
     filledForm.fold(
       error => {
-        println("validation failed.")
+        logger.debug("validation failed.")
         val mode = session.get("bookMode").getOrElse(MODE_ADD)
-//        error.errors.foreach(err => println(err.key + ": "+err.message))
+//        error.errors.foreach(err => logger.debug(err.key + ": "+err.message))
         BadRequest(views.html.book_detail(mode, error))
       },
       data => {
-        println("validation successfuls.")
+        logger.debug("validation successfuls.")
         val dbBook = objBook.find(pCatalogSeqNo.toInt, pBookSeqNo.toInt)
         val book = data.merge(dbBook)
         commonService.updateBook(book)

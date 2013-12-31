@@ -66,16 +66,16 @@ trait ABCategory extends TSecured { this: Controller =>
   }
   
   def saveCreate = withAuth { implicit officerUserID => implicit req => 
-    println("saveCreate Entered!")
+    logger.debug("saveCreate Entered!")
     val filledForm = categoryForm.bindFromRequest
     val filledCatForm = catalogForm.bindFromRequest
     filledForm.fold(
         error => {
-          println("bad!")
-          println("books list = "+filledForm("list"))
+          logger.debug("bad!")
+          logger.debug("books list = "+filledForm("list"))
           BadRequest(views.html.categories_list(error, filledCatForm)(session))
         }, success => {
-        	println("success!")
+        	logger.debug("success!")
    		    val categoryName = success.newCategoryName
    		    if (isBlank(categoryName)) {
         	  val newErrors = Form(filledForm.mapping, filledForm.data, 
@@ -103,10 +103,10 @@ trait ABCategory extends TSecured { this: Controller =>
     val filledCatForm = catalogForm.bindFromRequest
     filledForm.fold(
         error => {
-          println("bad!")
+          logger.debug("bad!")
           BadRequest(views.html.categories_list(error, filledCatForm)(session))
         }, success => {
-          println("success!")
+          logger.debug("success!")
 		  val rowIdx = success.list.get.map(_.code).zipWithIndex.filter(_._1==pSeqNo.toInt)(0)._2
 		  val categoryName = success.updatedCategoryName.getOrElse("")
 		  if (isBlank(categoryName)) {

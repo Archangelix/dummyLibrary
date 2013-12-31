@@ -97,12 +97,12 @@ trait ABCatalogDetail extends TSecured { this: Controller =>
    * Displaying the book detail page with pre-populated catalog information.
    */
   def edit(pIDStr: String) = withAuth {implicit officerUserID => implicit req =>
-    println("edit")
+    logger.debug("edit")
     val catalog = objCatalog.find(pIDStr.toInt)(true)
     val formCatalog = ABCatalogDetail.FormCatalog(catalog)
     val filledForm = updateCatalogForm.fill(formCatalog)
     val books = filledForm("books")
-    println("Books = "+books)
+    logger.debug("Books = "+books)
     
     val username = session.get("username").getOrElse("")
     Ok(views.html.catalog_detail(MODE_EDIT, filledForm)(session)).withSession(
@@ -120,7 +120,7 @@ trait ABCatalogDetail extends TSecured { this: Controller =>
     tempForm.fold(
       errors => {
         tempForm.errors.map {err => 
-          println(err.message)
+          logger.debug(err.message)
         }
         BadRequest(views.html.catalog_detail(mode, tempForm)(session))
       },
@@ -131,7 +131,7 @@ trait ABCatalogDetail extends TSecured { this: Controller =>
   }
 
   def saveUpdate = withAuth {implicit officerUserID => implicit req =>
-    println("saveUpdate!!!")
+    logger.debug("saveUpdate!!!")
     val tempForm = updateCatalogForm.bindFromRequest()
     val tmpBooks= tempForm("books").value
     val mode = session.get("mode").getOrElse(MODE_ADD)
@@ -140,7 +140,7 @@ trait ABCatalogDetail extends TSecured { this: Controller =>
     tempForm.fold(
       errors => {
         tempForm.errors.map {err => 
-          println(err.message)
+          logger.debug(err.message)
         }
         BadRequest(views.html.catalog_detail(mode, tempForm)(session))
       },

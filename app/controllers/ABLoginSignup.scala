@@ -55,7 +55,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
    * Displaying the login page.
    */
   def loginPage = Action { implicit req =>
-    println("ABLoginSignup")
+    logger.debug("ABLoginSignup")
     val username = flash.get("username")
     if (username == None) {
       Ok(views.html.loginsignup(loginForm, Form[FormUser](formNewUserMapping)))
@@ -81,11 +81,11 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
         val validLogin = try {
            	val dbPassword = commonService.getPassword(data.username)
         	val words = dbPassword.split('|')
-        	println("DB Passwords = "+words)
+        	logger.debug("DB Passwords = "+words)
         	val salt = words(0)
         	val saltedDBPassword = words(1)
         	val encryptedUserPwd = hex_digest(salt+data.password)
-        	println("User salted password = "+encryptedUserPwd)
+        	logger.debug("User salted password = "+encryptedUserPwd)
   			saltedDBPassword.equals(encryptedUserPwd)
         } catch {
         	case e: UserNotFoundException => false
@@ -126,7 +126,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
     filledForm.fold(
       errorForm => {
         errorForm.errors.foreach{ err =>
-          println(err.key+": "+err.message)
+          logger.debug(err.key+": "+err.message)
         }
      	val newErrorForm = Form(filledForm.mapping, filledForm.data -- (List("password", "password2")), 
     	      filledForm.errors, filledForm.value)

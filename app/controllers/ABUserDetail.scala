@@ -95,19 +95,19 @@ trait ABUserDetail extends TSecured { this: Controller =>
     val formUser = FormUser(user)
     val filledForm = Form[FormUser](formEditUserMapping).fill(formUser)
     
-    println("filledForm with user userID = "+filledForm("userID").value)
+    logger.debug("filledForm with user userID = "+filledForm("userID").value)
     Ok(views.html.user_detail(MODE_EDIT, filledForm)(session)).withSession(
         session + ("mode" -> MODE_EDIT))
   }
   
   def saveNew = withAuth { implicit officerUserID => implicit req =>
     val mode = session.get("mode").getOrElse("")
-    println("mode = "+mode)
+    logger.debug("mode = "+mode)
     val filledForm = Form[FormUser](formNewUserMapping).bindFromRequest() 
     filledForm.fold(
       errorForm => {
         errorForm.errors.foreach{ err =>
-          println(err.key+": "+err.message)
+          logger.debug(err.key+": "+err.message)
         }
         BadRequest(views.html.user_detail(mode, filledForm)(session))
       },
@@ -116,11 +116,11 @@ trait ABUserDetail extends TSecured { this: Controller =>
             val dbUser = objUser.findByUserID(successForm.userID.toUpperCase())
             val newErrors = Form(filledForm.mapping, filledForm.data,
               Seq(new FormError("userID", "This User ID is not available.")), filledForm.value)
-            println("Duplicate userid has been found!")
+            logger.debug("Duplicate userid has been found!")
             BadRequest(views.html.user_detail(mode, newErrors)(session))
           } catch {
             case e: UserNotFoundException => {
-              println("Ok, valid userid!")
+              logger.debug("Ok, valid userid!")
               val user = objUser(successForm)
               val errors: Seq[Option[FormError]] = validatePassword(successForm.password, successForm.password2)
               if (errors.size > 0) {
@@ -140,12 +140,12 @@ trait ABUserDetail extends TSecured { this: Controller =>
   
   def saveUpdate(id: String) = withAuth { implicit officerUserID => implicit req =>
     val mode = session.get("mode").getOrElse("")
-    println("mode = "+mode)
+    logger.debug("mode = "+mode)
     val filledForm = Form[FormUser](formEditUserMapping).bindFromRequest()
     filledForm.fold(
       errorForm => {
         errorForm.errors.foreach{ err =>
-          println(err.key+": "+err.message)
+          logger.debug(err.key+": "+err.message)
         }
         BadRequest(views.html.user_detail(mode, filledForm)(session))
       },
