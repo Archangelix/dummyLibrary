@@ -11,21 +11,23 @@ import models.common.BorrowHDStatus
 import models.common.BorrowHDStatus
 import models.common.STATUS_BORROW_HD_COM
 import models.common.STATUS_BORROW_DT_PEN
+import models.db.TDBTxBorrowHD
+import models.db.TDBTxBorrowDT
 
 class OBTxBorrowHD (
 	val seqno: Option[Int],
-	val borrower: OBUser,
+	val borrower: TUser,
 	val borrowTimestamp: Option[Date],
-	val officer: OBUser,
+	val officer: TUser,
 	val remarks: Option[String],
 	val status: BorrowHDStatus,
 	val statusUsercode: String,
 	val statusTimestamp: Date,
-	dt: => List[OBTxBorrowDT]
-) {
+	dt: => List[TTxBorrowDT]
+) extends TTxBorrowHD {
   lazy val details = dt
   
-  def addBook(catalogSeqNo: Int, bookSeqNo: Int)(implicit pAdminID: String): OBTxBorrowHD = {
+  def addBook(catalogSeqNo: Int, bookSeqNo: Int)(implicit pAdminID: String): TTxBorrowHD = {
     val book = OBBook.find(catalogSeqNo, bookSeqNo)
     val newOBTxDT = OBTxBorrowDT.init(this, book)
 
@@ -89,14 +91,15 @@ class OBTxBorrowHD (
 }
 
 object OBTxBorrowHD {
+  val objTxBorrowDT = OBTxBorrowDT
   
-  def apply(obj: DBTxBorrowHD, details: List[DBTxBorrowDT]): OBTxBorrowHD = {
+  def apply(obj: TDBTxBorrowHD, details: List[TDBTxBorrowDT]): TTxBorrowHD = {
     lazy val header: OBTxBorrowHD = 
       new OBTxBorrowHD(obj.seqno, OBUser.findByIDNumber(obj.borrowerIDNumber), obj.borrowTimestamp, 
         OBUser.findByUserID(obj.officerUsername), 
         obj.remarks, BorrowHDStatus(obj.status), obj.statusUsercode, obj.statusTimestamp, 
         obDetails)
-    lazy val obDetails: List[OBTxBorrowDT] = details.map((OBTxBorrowDT(_, header)))
+    lazy val obDetails: List[TTxBorrowDT] = details.map((objTxBorrowDT(_, header)))
     header
   }
  
@@ -113,7 +116,7 @@ object OBTxBorrowHD {
         List())
   }
   
-  def find(pTransactionSeqNo: Int, pIncludeDetails: Boolean): OBTxBorrowHD = {
+  def find(pTransactionSeqNo: Int, pIncludeDetails: Boolean): TTxBorrowHD = {
     CommonService.getBorrowTransaction(pTransactionSeqNo, pIncludeDetails)
   }
   

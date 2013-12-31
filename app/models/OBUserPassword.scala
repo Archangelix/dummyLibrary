@@ -6,4 +6,4 @@ package models
 case class OBUserPassword (
     userID: String, 
     password: String
-)
+) extends TUserPassword

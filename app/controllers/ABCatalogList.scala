@@ -8,7 +8,6 @@ import play.api.data.Forms.number
 import play.api.data.Forms.tuple
 import play.api.mvc.Controller
 import services.CommonService
-import models.OBCatalog
 import models.common.CatalogListItem
 
 /**
@@ -60,7 +59,7 @@ object ABCatalogList extends Controller with TSecured {
     val currentPage = Cache.getAs[(List[CatalogListItem], Int, Int)](CURRENT_PAGE)
     Cache.remove(CURRENT_PAGE)
     val (list1, rowCount, currentPageIdx) = currentPage.getOrElse {
-      val res = CommonService.partialCatalogs(1, PAGE_ROW_CNT)
+      val res = commonService.partialCatalogs(1, PAGE_ROW_CNT)
       (res._1, res._2, 1)
     }
     val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
@@ -72,7 +71,7 @@ object ABCatalogList extends Controller with TSecured {
    * Displaying the first page of the catalog list.
    */
   def navigateFirst = withAuth { implicit officerUserID => implicit req =>
-    val (list1, rowCnt) = CommonService.partialCatalogs(1, PAGE_ROW_CNT)
+    val (list1, rowCnt) = commonService.partialCatalogs(1, PAGE_ROW_CNT)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
     Redirect(routes.ABCatalogList.index)
   }
@@ -85,7 +84,7 @@ object ABCatalogList extends Controller with TSecured {
     val nextPageIdx = if (currentPageIdx<=1) 1 else currentPageIdx-1
     val startIdx = (nextPageIdx-1)*PAGE_ROW_CNT+1
   	val endIdx = nextPageIdx*PAGE_ROW_CNT
-    val (list1, rowCnt) = CommonService.partialCatalogs(startIdx, endIdx)
+    val (list1, rowCnt) = commonService.partialCatalogs(startIdx, endIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
     Redirect(routes.ABCatalogList.index)
   }
@@ -101,7 +100,7 @@ object ABCatalogList extends Controller with TSecured {
     println("nextPage = "+nextPageIdx)
   	val startIdx = (maxPage-1)*PAGE_ROW_CNT+1
   	val endIdx = maxPage*PAGE_ROW_CNT
-    val (list1, rowCnt) = CommonService.partialCatalogs(startIdx, endIdx)
+    val (list1, rowCnt) = commonService.partialCatalogs(startIdx, endIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
     Redirect(routes.ABCatalogList.index)
   }
@@ -113,7 +112,7 @@ object ABCatalogList extends Controller with TSecured {
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
   	val startIdx = (maxPage-1)*PAGE_ROW_CNT+1
   	val endIdx = maxPage*PAGE_ROW_CNT
-    val (list1, rowCnt) = CommonService.partialCatalogs(startIdx, endIdx)
+    val (list1, rowCnt) = commonService.partialCatalogs(startIdx, endIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, maxPage))
     Redirect(routes.ABCatalogList.index)
   }
@@ -122,7 +121,7 @@ object ABCatalogList extends Controller with TSecured {
    * Removing a particular catalog from the listing page.
    */
   def remove(pIDStr: String) = withAuth { implicit officerUserID => implicit req =>
-    CommonService.deleteCatalog(pIDStr.toInt)
+    commonService.deleteCatalog(pIDStr.toInt)
     Redirect(routes.ABCatalogList.index())
   }
   

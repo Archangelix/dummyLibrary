@@ -14,15 +14,13 @@ import models.common.Gender
 import models.common.UserListItem
 import models.common.UserRole
 import models.db._
-import models.db._
-import models.exception.BookNotFoundException
 import models.exception.BookNotFoundException
 import models.exception.CatalogNotFoundException
 import models.exception.CategoryNotFoundException
 import models.exception.UserNotFoundException
 import play.api.Play.current
 import play.api.db._
-import util.SecurityUtil
+import utils.SecurityUtil
 import java.sql.SQLException
 import models.common.STATUS_BORROW_HD_DFT
 
@@ -31,190 +29,8 @@ import models.common.STATUS_BORROW_HD_DFT
  * Within this service object the user will process all the database request. 
  * All the results returned from this layer will be in forms of Database objects.
  */
-object DBService {
+object PSQLService extends TDBService {
 
-  /**
-   * START -- All database mappings.
-   */
-  
-  val dbBookMapping = {
-    get[Int]("catalog_seqno") ~
-    get[Int]("seqno") ~
-    get[String]("remarks") ~
-	get[String]("status") ~ 
-	get[String]("status_usercode") ~
-	get[Date]("status_timestamp") ~
-    get[Boolean]("is_deleted") ~
-    get[String]("origin") ~ 
-    get[String]("create_usercode") ~ 
-    get[Date]("create_timestamp") ~ 
-    get[String]("audit_usercode") ~ 
-    get[Date]("audit_timestamp") ~ 
-    get[Option[String]]("audit_reason") map {
-      case catalogSeqNo~seqNo~remarks~
-      		status~statusUserCode~statusTimestamp~
-      		isDeleted~origin~
-      		createUsercode~createTimestamp~auditUsercode~auditTimestamp~auditReason => 
-        DBBook (catalogSeqNo, Some(seqNo), remarks, 
-            status,statusUserCode,statusTimestamp,
-            isDeleted, origin, 
-      	    createUsercode, createTimestamp, auditUsercode, auditTimestamp, auditReason)
-    }
-  }
-
-  val dbCatalogListMapping = {
-    get[Long]("idx") ~
-    get[Int]("seqno") ~
-    get[Int]("category_seqno") ~
-    get[String]("title") ~
-    get[String]("author") ~
-    get[Int]("published_year") map {
-      case idx~seqNo~categorySeqNo~title~author~publishedYear => 
-        CatalogListItem (idx.toInt, seqNo, categorySeqNo, title, author, publishedYear)
-    }
-  }
-
-  val dbCatalogDetailMapping = {
-    get[Int]("seqno") ~
-    get[Int]("category_seqno") ~
-    get[String]("title") ~
-    get[String]("author") ~
-    get[Int]("published_year") ~
-    get[Date]("arrival_date") ~ 
-    get[Boolean]("is_deleted") ~
-    get[String]("create_usercode") ~ 
-    get[Date]("create_timestamp") ~ 
-    get[String]("audit_usercode") ~ 
-    get[Date]("audit_timestamp") ~ 
-    get[Option[String]]("audit_reason") map {
-      case seqNo~categorySeqNo~title~author~publishedYear~arrivalDate~isDeleted~
-      		createUsercode~createTimestamp~auditUsercode~auditTimestamp~auditReason => 
-        DBCatalog (Some(seqNo), categorySeqNo, title, author, publishedYear, arrivalDate, isDeleted, 
-            createUsercode, createTimestamp, auditUsercode, auditTimestamp, auditReason)
-    }
-  }
-
-  val dbUserMapping = {
-	get[Int]("seqNo") ~
-	get[String]("userid") ~
-	get[String]("name") ~
-	get[String]("address") ~
-	get[Date]("dob") ~ 
-	get[Boolean]("gender") ~
-	get[String]("id_number") ~
-	get[Int]("nationality") ~
-	get[Int]("user_role_seqno") ~
-	get[Boolean]("is_deleted") ~ 
-    get[String]("create_usercode") ~ 
-    get[Date]("create_timestamp") ~ 
-    get[String]("audit_usercode") ~ 
-    get[Date]("audit_timestamp") ~ 
-    get[Option[String]]("audit_reason") map {
-	    case seqNo~userID~name~address~dob~gender~idNumber~nationality~userRoleSeqNo~isDeleted~
-	    		createUsercode~createTimestamp~auditUsercode~auditTimestamp~auditReason =>  
-	    	DBUser(seqNo, userID, name, address, dob, gender, idNumber, nationality, userRoleSeqNo, isDeleted,
-	    	    createUsercode, createTimestamp, auditUsercode, auditTimestamp, auditReason)
-	  }
-	}
-	
-	val dbUserListMapping = {
-	  get[Long]("rowIdx") ~
-	  get[Int]("seqNo") ~
-	  get[String]("userID") ~
-	  get[String]("name") ~
-	  get[String]("address") ~
-	  get[Date]("dob") ~ 
-	  get[Boolean]("gender") ~
-	  get[String]("id_number") ~
-	  get[String]("countryname") ~
-	  get[Int]("user_role_seqno") map {
-	    case rowIdx~seqNo~userID~name~address~dob~gender~idNumber~nationality~userRoleSeqNo =>
-	      UserListItem(Some(rowIdx), seqNo, userID, name, address, dob, gender, idNumber, nationality, 
-	          UserRole(userRoleSeqNo).toString)
-	  }
-	}
-	
-	val dbOriginTypeMapping = {
-	  get[String]("code") ~
-	  get[String]("Description") map {
-	    case code~description =>
-	      DDBookOrigin(code, description)
-	  }
-	}
-	
-	val dbCountryMapping = {
-	  get[Int]("seqno") ~
-	  get[String]("name") map {
-	    case id~name =>
-	      DDCountry(id.toString, name)
-	  }
-	}
-	
-	val dbUserRoleMapping = {
-	  get[Int]("seqno") ~
-	  get[String]("name") map {
-	    case id~name =>
-	      DDUserRoles(id.toString, name)
-	  }
-	}
-	
-  val dbCategoryListMapping = {
-    get[Int]("seqno") ~
-    get[String]("name") map {
-      case seqno~name => Category(seqno, name)
-    }
-  }
-
-  val dbTxBorrowHDMapping = {
-	  get[Int]("seqNo") ~
-	  get[String]("borrower_idnumber") ~
-	  get[Option[Date]]("borrow_timestamp") ~
-	  get[String]("officer_userid") ~
-	  get[Option[String]]("remarks") ~
-	  get[String]("status") ~ 
-	  get[String]("status_usercode") ~
-	  get[Date]("status_timestamp") ~
-      get[String]("create_usercode") ~ 
-      get[Date]("create_timestamp") ~ 
-      get[String]("audit_usercode") ~ 
-      get[Date]("audit_timestamp") ~ 
-      get[Option[String]]("audit_reason") map {
-		  	case seqNo~borrowerID~borrowTimestamp~officerUserid~remarks~
-		  		status~statusUserCode~statusTimestamp~
-		  		createUsercode~createTimestamp~auditUsercode~auditTimestamp~auditReason =>
-		  	DBTxBorrowHD(Some(seqNo), borrowerID, borrowTimestamp, officerUserid, remarks, 
-		  	    status, statusUserCode, statusTimestamp,
-		  	    createUsercode, createTimestamp, auditUsercode, auditTimestamp, auditReason)
-		  }
-  }
-  
-	val dbTxBorrowDTMapping = {
-	  get[Int]("hd_seqNo") ~
-	  get[Int]("catalog_seqno") ~
-	  get[Int]("book_seqno") ~
-	  get[String]("status") ~
-	  get[String]("status_usercode") ~
-	  get[Date]("status_timestamp") ~
-      get[String]("create_usercode") ~ 
-      get[Date]("create_timestamp") ~ 
-      get[String]("audit_usercode") ~ 
-      get[Date]("audit_timestamp") ~ 
-      get[Option[String]]("audit_reason") map {
-	    case hdSeqNo~catalogSeqNo~bookSeqNo~
-	    	status~statusUserCode~statusTimestamp~
-	    	createUsercode~createTimestamp~auditUsercode~auditTimestamp~auditReason =>
-	      DBTxBorrowDT(hdSeqNo, catalogSeqNo, bookSeqNo, 
-	          status, statusUserCode, statusTimestamp, 
-	          createUsercode, createTimestamp, auditUsercode, auditTimestamp, auditReason)
-	  }
-	}
-
-  /**
-   * END -- All database mappings.
-   */
-  
-  ///////////////////////////////////////////////////////////////////////////////////////  
-  
   /**
    * START -- All database APIs.
    */
@@ -225,7 +41,7 @@ object DBService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findByUserID(pUserID: String)(implicit pIncludeDeleted: Boolean = false): DBUser = {
+	def findByUserID(pUserID: String)(implicit pIncludeDeleted: Boolean = false): TDBUser = {
 	  println("findByUserID")
 	  DB.withConnection{ implicit c => 
 	    val list = SQL("SELECT * FROM USERS WHERE upper(userid)=upper({userID})")
@@ -245,7 +61,7 @@ object DBService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findUserByIDNumber(pIDNumber: String)(implicit pIncludeDeleted: Boolean = false): DBUser = {
+	def findUserByIDNumber(pIDNumber: String)(implicit pIncludeDeleted: Boolean = false): TDBUser = {
 	  DB.withConnection{ implicit c => 
 	    val list = SQL("SELECT * FROM USERS WHERE upper(id_number)={idNumber}")
 	    	.on('idNumber -> pIDNumber.toUpperCase()).as(dbUserMapping *)
@@ -264,7 +80,7 @@ object DBService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findUserBySeqNo(pSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): DBUser = {
+	def findUserBySeqNo(pSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): TDBUser = {
 	  DB.withConnection{ implicit c => 
 	    val list = SQL("SELECT * FROM USERS WHERE seqNo={seqNo}")
 	    	.on('seqNo -> pSeqNo).as(dbUserMapping *)
@@ -306,7 +122,7 @@ object DBService {
 	 * @param pOrigin The book origin.
 	 * @param pRemarks The book remarks.
 	 */
-	def createBook(pBook: DBBook)(implicit pOfficerUserID: String) = {
+	def createBook(pBook: TDBBook)(implicit pOfficerUserID: String) = {
 	  println("createBook")
 	  DB.withConnection { implicit c => 
 	    SQL("insert into BOOK (catalog_seqno, seqno, remarks, " +
@@ -339,7 +155,7 @@ object DBService {
 	 * @param pOrigin The book origin.
 	 * @param pRemarks The book remarks.
 	 */
-	def updateBook(pBook: DBBook)(implicit pOfficerUserID: String) = {
+	def updateBook(pBook: TDBBook)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    SQL("update BOOK " +
 	    		"set remarks={remarks}, " +
@@ -373,7 +189,7 @@ object DBService {
 	 * @param pCatalogID Catalog ID.
 	 */
 	def findAllBooksByCatalogID(pCatalogSeqNo: Int)
-	(implicit pIncludeDeleted: Boolean = false):List[DBBook] = {
+	(implicit pIncludeDeleted: Boolean = false): List[TDBBook] = {
 	  println("findAllBooksByCatalogID")
 	  DB.withConnection { implicit c =>
 	    val sql = 
@@ -396,7 +212,8 @@ object DBService {
 	 * 
 	 * @param pCatalogID Catalog ID.
 	 */
-	def findBook(pCatalogSeqNo: Int, pBookSeqNo: Int)(implicit pIncludeDeleted: Boolean = false) = {
+	def findBook(pCatalogSeqNo: Int, pBookSeqNo: Int)
+		(implicit pIncludeDeleted: Boolean = false): TDBBook = {
 	  DB.withConnection { implicit c =>
 	    val sql =
 	      if (pIncludeDeleted) {
@@ -468,7 +285,7 @@ object DBService {
   	 * @param pPublishedYear The published year.
   	 * @param pCategory The catalog category.
   	 */
-	def insertCatalog(pCatalog: DBCatalog)(implicit pOfficerUserID: String) = {
+	def insertCatalog(pCatalog: TDBCatalog)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    SQL("insert into CATALOG " +
 	    		"(title, author, published_year, category_seqno, arrival_date, " +
@@ -497,7 +314,7 @@ object DBService {
   	 * @param pPublishedYear The published year.
   	 * @param pCategory The catalog category.
   	 */
-	def updateCatalog(pCatalog: DBCatalog)(implicit pOfficerUserID: String) = {
+	def updateCatalog(pCatalog: TDBCatalog)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    SQL("update CATALOG " +
 	    		"set title = {title}, " +
@@ -524,7 +341,7 @@ object DBService {
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
   	 */
-	def createUser(pUser: DBUser)(implicit pOfficerUserID: String, c: Connection) : Int = {
+	def createUser(pUser: TDBUser)(implicit pOfficerUserID: String, c: Connection) : Int = {
 	  SQL("insert into USERS (userid, name, gender, id_number, address, dob, user_role_seqno, nationality, " +
 	    		"create_usercode, create_timestamp, audit_usercode, audit_timestamp, audit_reason) values " +
 	    		"({userid}, {name}, {gender}, {idNumber}, {address}, {dob}, {userRoleSeqNo}, {nationality}, " +
@@ -541,7 +358,7 @@ object DBService {
 	        .executeUpdate()
 	}
 	
-	def createUserAndPassword(pUser: DBUser, pPassword: String)(implicit pOfficerUserID: String) = {
+	def createUserAndPassword(pUser: TDBUser, pPassword: String)(implicit pOfficerUserID: String) = {
 	  DB.withTransaction { implicit c => 
 	    createUser(pUser)
         createPassword(pUser.userID, pPassword)
@@ -557,7 +374,7 @@ object DBService {
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
   	 */
-	def updateUser(pUser: DBUser)(implicit pOfficerUserID: String) = {
+	def updateUser(pUser: TDBUser)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    println("seqno = "+pUser.seqNo)
 	    println("dob = "+pUser.dob)
@@ -583,13 +400,6 @@ object DBService {
 	            'seqno ->pUser.seqNo)
 	    	.executeUpdate()
 	  }
-	}
-	
-	val generateRandomPassword = {
-	  val sr = new SecureRandom()
-	  var bytes = new Array[Byte](6)
-	  sr.nextBytes(bytes)
-	  bytes.toString
 	}
 	
 	def createPassword(pUserID: String, pPassword: String)(implicit pOfficerUserID: String, c: Connection) = {
@@ -636,7 +446,7 @@ object DBService {
 	 * @param pWithBooks The indicator whether to get the books detail as well or not.
 	 * @return The queried catalog.
 	 */
-	def findCatalogByID(pSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): DBCatalog = {
+	def findCatalogByID(pSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): TDBCatalog = {
 	  DB.withConnection { implicit c =>
 	  	val list = 
 	  	  SQL("select * from CATALOG where SEQNO={seqNo}")
@@ -656,7 +466,7 @@ object DBService {
 	 * @param pID The book ID to be fetched.
 	 * @return The queried book.
 	 */
-	def getBorrowTransaction(pTransactionSeqNo: Int): DBTxBorrowHD = {
+	def getBorrowTransaction(pTransactionSeqNo: Int): TDBTxBorrowHD = {
 	  println("getBorrowTransaction")
 	  DB.withConnection { implicit c =>
 	    val sql = """
@@ -676,7 +486,7 @@ object DBService {
 	 * @param pID The book ID to be fetched.
 	 * @return The queried book.
 	 */
-	def getTransactionDetailsByID(pTransactionID: Int): List[DBTxBorrowDT] = {
+	def getTransactionDetailsByID(pTransactionID: Int): List[TDBTxBorrowDT] = {
 	  println("getTransactionDetailByIdD")
 	  DB.withConnection { implicit c =>
 	    val sql = "select * from tx_borrow_dt where hd_seqno = {seqno}"
@@ -685,7 +495,7 @@ object DBService {
 	  }
 	}
 	
-	def findPendingTxByBookID(pCatalogSeqNo: Int, pBookSeqNo: Int): DBTxBorrowDT = {
+	def findPendingTxByBookID(pCatalogSeqNo: Int, pBookSeqNo: Int): TDBTxBorrowDT = {
 	  println("findPendingTxByBookID")
 	  DB.withConnection { implicit c =>
 	    val sql = """
@@ -709,7 +519,7 @@ object DBService {
 	 * @return <code>None</code> if no duplicates are found. Otherwise it returns the
 	 * list of duplicates.
 	 */
-	def findDuplicates(pCatalog: DBCatalog) = {
+	def findDuplicates(pCatalog: TDBCatalog): Option[List[TDBCatalog]] = {
 	  DB.withConnection { implicit c => 
 	    val res = SQL ("select * from CATALOG where title={title} and author={author} and published_year={publishedYear}")
 	    	.on('title -> pCatalog.title, 
@@ -898,7 +708,7 @@ object DBService {
 	  }
 	}
 
-	def insertTxBorrowHD(pObj: DBTxBorrowHD)(implicit pOfficerUserID: String) = {
+	def insertTxBorrowHD(pObj: TDBTxBorrowHD)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    val sql = "insert into TX_BORROW_HD " +
 	    		"(seqno, borrower_idnumber, officer_userid, remarks, " +
@@ -927,7 +737,7 @@ object DBService {
 	  }
 	}
 	
-	def updateTxBorrowHD(pTxBorrowHD: DBTxBorrowHD)(implicit pOfficerUserID: String) = {
+	def updateTxBorrowHD(pTxBorrowHD: TDBTxBorrowHD)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    SQL("update TX_BORROW_HD " +
 	    		"set borrow_timestamp={borrowTimestamp}, " +
@@ -958,7 +768,7 @@ object DBService {
 	  }
 	}
 	
-	def insertTxBorrowDT(pDetail: DBTxBorrowDT)(implicit pOfficerUserID: String) = {
+	def insertTxBorrowDT(pDetail: TDBTxBorrowDT)(implicit pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    val sql = "insert into TX_BORROW_DT " +
 	    		"(hd_seqno, catalog_seqno, book_seqno, " +
@@ -999,7 +809,7 @@ object DBService {
 	  }
 	}
 	
-	/*def updateTxBorrowDT(pDetail: DBTxBorrowDT, pOfficerUserID: String) = {
+	/*def updateTxBorrowDT(pDetail: TDBTxBorrowDT, pOfficerUserID: String) = {
 	  DB.withConnection { implicit c => 
 	    SQL("update TX_BORROW_DT " +
 	    		"set borrow_timestamp={borrowTimestamp}, " +
@@ -1029,5 +839,4 @@ object DBService {
   	  currentTime
 	}
 	
-  def isBlank(str: String) = str==null || str.trim().equals("")
 }

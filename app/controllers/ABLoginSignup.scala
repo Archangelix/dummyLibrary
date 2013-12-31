@@ -14,8 +14,8 @@ import play.api.mvc.Security
 import play.api.mvc.WithHeaders
 import play.mvc.Http.Session
 import java.security.MessageDigest
-import util.SecurityUtil._
-import util.CommonUtil._
+import utils.SecurityUtil._
+import utils.CommonUtil._
 import controllers.ABUserDetail.MODE_ADD
 import controllers.ABUserDetail.MODE_EDIT
 import models.form.FormUser
@@ -34,7 +34,6 @@ import services.CommonService
  * Action to handle the logging section.
  */
 object ABLoginSignup extends Controller with TSecured with TLogin {
-
   
   val formNewUserMapping = mapping(
       "seqNo" -> optional(of[Int]),
@@ -80,7 +79,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
       data => {
         // Authenticate the user password.
         val validLogin = try {
-           	val dbPassword = CommonService.getPassword(data.username)
+           	val dbPassword = commonService.getPassword(data.username)
         	val words = dbPassword.split('|')
         	println("DB Passwords = "+words)
         	val salt = words(0)
@@ -96,7 +95,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
           // Correct password. Redirect the user to the respective home page according to the role.
           try {
             val formUsername = data.username
-            val user = OBUser.findByUserID(formUsername)
+            val user = objUser.findByUserID(formUsername)
             val role = user.role
             val call = role match {
               case UserRole.ADMIN => routes.ABUserList.listUsers
@@ -135,7 +134,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
       },
       successForm => {
 	      try {
-	    	  val dbUser = OBUser.findByUserID(successForm.userID.toUpperCase())
+	    	  val dbUser = objUser.findByUserID(successForm.userID.toUpperCase())
 	    	  val newErrorForm = Form(filledForm.mapping, 
 	    	      filledForm.data -- (List("password", "password2")), 
 	    	      Seq(new FormError("username", "This User ID is not available.")), filledForm.value)
@@ -144,7 +143,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
 	      } catch {
 	        case e: UserNotFoundException => {
 	        	println ("Ok, valid userid!")
-	        	val user = OBUser(successForm, true)
+	        	val user = objUser(successForm, true)
 	        	val errors:Seq[Option[FormError]] = validatePassword(successForm.password, successForm.password2)
 	        	if (errors.size>0) {
 	         	  val newErrorForm = Form(filledForm.mapping, filledForm.data -- (List("password", "password2")), 
@@ -152,7 +151,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
 	        		BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm))
 	        	} else {
 	        		val password = successForm.password
-	        		CommonService.createUserAndPassword(user, password)
+	        		commonService.createUserAndPassword(user, password)
 	        		Redirect(routes.ABLogin.loginPage()).withSession(session - "mode")
 	        	}
 	        }
@@ -169,7 +168,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
   
   def isUsernameAvailable(pUsername: String) = Action { req =>
     try {
-      val dbUser = OBUser.findByUserID(pUsername.toUpperCase())
+      val dbUser = objUser.findByUserID(pUsername.toUpperCase())
       Ok("false")
     } catch {
       case e: UserNotFoundException => {
@@ -186,7 +185,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
   
   def isIDNumberAvailable(idNumber: String) = Action { req =>
     try {
-      val dbUser = OBUser.findByIDNumber(idNumber.toUpperCase())
+      val dbUser = objUser.findByIDNumber(idNumber.toUpperCase())
       Ok("false")
     } catch {
       case e: UserNotFoundException => {

@@ -1,4 +1,6 @@
-import util.CommonUtil.isBlank
+package models
+
+import utils.CommonUtil.isBlank
 import models.common.DDBookOrigin
 import models.db.DBBook
 import services.CommonService
@@ -6,15 +8,14 @@ import java.util.Date
 import models.common.BookStatus
 import models.common.STATUS_BOOK_PEN
 import models.common.STATUS_BOOK_AVL
-
-package models{
-
+import models.db.TDBBook
+	
 /**
  * Book business object. This is the object used for all business processes.
  */
 case class OBBook (
     seqNo: Option[Int],
-    catalog: OBCatalog,
+    catalog: TCatalog,
     origin: DDBookOrigin, 
 	status: BookStatus,
 	statusUsercode: String,
@@ -26,7 +27,7 @@ case class OBBook (
     auditUsercode: String, 
     auditTimestamp: Date, 
     auditReason: Option[String]
-) {
+) extends TBook {
 	def activate()(implicit pOfficerUserID: String) = {
 	  val now = CommonService.now
 	  this.copy(
@@ -46,7 +47,7 @@ case class OBBook (
 	
   def setAvailable(implicit pOfficerUserID: String) = {
     val now = CommonService.now
-	this.copy(
+	copy(
 	      status = STATUS_BOOK_AVL,
 	      statusUsercode = pOfficerUserID,
 	      statusTimestamp = now,
@@ -54,10 +55,16 @@ case class OBBook (
 	      auditTimestamp = now
 	)
   }
+  
+  def artificialCopy(pSeqNo: Option[Int]): TBook = copy(seqNo = pSeqNo)
+  
+  def artificialCopy(pBookOrigin: DDBookOrigin, pRemarks: String): TBook = 
+  	copy(origin = pBookOrigin, remarks = pRemarks)
+
 }
     
 object OBBook {
-  def apply(pBook: DBBook): OBBook = 
+  def apply(pBook: TDBBook): TBook = 
     OBBook(
       pBook.seqNo, 
       OBCatalog.find(pBook.catalogSeqNo), 
@@ -90,5 +97,4 @@ object OBBook {
   def find(catalogSeqNo: Int, bookSeqNo: Int) = 
     OBBook(CommonService.findBook(catalogSeqNo, bookSeqNo))
 
-}
 }

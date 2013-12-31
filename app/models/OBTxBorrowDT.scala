@@ -7,10 +7,11 @@ import services.CommonService
 import models.common.STATUS_BORROW_DT_PEN
 import models.common.STATUS_BORROW_DT_DFT
 import models.common.STATUS_BORROW_DT_RET
+import models.db.TDBTxBorrowDT
 
 class OBTxBorrowDT (
-	hd: => OBTxBorrowHD,
-	val book: OBBook,
+	hd: => TTxBorrowHD,
+	val book: TBook,
 	val status: BorrowDTStatus,
 	val statusUsercode: String,
 	val statusTimestamp: Date,
@@ -18,7 +19,8 @@ class OBTxBorrowDT (
 	val createTimestamp: Date,
 	val auditUsercode: String,
 	val auditTimestamp: Date,
-	val auditReason: Option[String]) {
+	val auditReason: Option[String]
+) extends TTxBorrowDT {
 	
   lazy val header = hd
   
@@ -61,7 +63,7 @@ class OBTxBorrowDT (
 
 object OBTxBorrowDT {
       
-  def apply(obj: DBTxBorrowDT, pBorrowHD: OBTxBorrowHD): OBTxBorrowDT = {
+  def apply(obj: TDBTxBorrowDT, pBorrowHD: TTxBorrowHD): TTxBorrowDT = {
     new OBTxBorrowDT(
         pBorrowHD, 
         OBBook.find(obj.catalogSeqNo, obj.bookSeqNo), 
@@ -76,7 +78,7 @@ object OBTxBorrowDT {
         )
   }
   
-  def init(pBorrowHD: OBTxBorrowHD, pBook: OBBook)(implicit pOfficerID: String) = {
+  def init(pBorrowHD: TTxBorrowHD, pBook: TBook)(implicit pOfficerID: String) = {
     new OBTxBorrowDT(
         pBorrowHD, 
         pBook, 

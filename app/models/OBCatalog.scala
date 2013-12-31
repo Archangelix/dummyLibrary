@@ -6,6 +6,8 @@ import models.common.Category
 import models.common.CatalogListItem
 import services.CommonService
 import java.util.Date
+import models.db.TDBCatalog
+import models.db.TDBBook
 
 /**
  * Catalog business object. This is the object used for all business processes.
@@ -16,19 +18,21 @@ case class OBCatalog(
   author: String, 
   publishedYear: Int, 
   category: Category,
-  books: List[OBBook],
+  books: List[TBook],
   isDeleted: Boolean,
   createUserCode: String, 
   createTimestamp: Date, 
   auditUserCode: String, 
   auditTimestamp: Date, 
   auditReason: Option[String]
-)
+) extends TCatalog
 
 object OBCatalog {
-  def apply(pCatalog: DBCatalog, pBooks: List[DBBook]): OBCatalog = 
+  val objBook = OBBook
+  
+  def apply(pCatalog: TDBCatalog, pBooks: List[TDBBook]): TCatalog = 
 		 OBCatalog(pCatalog.seqNo, pCatalog.title, pCatalog.author, 
-		     pCatalog.publishedYear, Category(pCatalog.categorySeqNo), pBooks.map(dbBook => OBBook(dbBook)),
+		     pCatalog.publishedYear, Category(pCatalog.categorySeqNo), pBooks.map(dbBook => objBook(dbBook)),
 		     pCatalog.isDeleted, 
 		     pCatalog.createUserCode, pCatalog.createTimestamp,
 		     pCatalog.auditUserCode, pCatalog.auditTimestamp, pCatalog.auditReason
@@ -36,7 +40,7 @@ object OBCatalog {
 
   def find(pCatalogSeqNo: Int)
   		(implicit pIncludeBooks: Boolean = false, 
-  		    pIncludeDeletedBook: Boolean = false): OBCatalog = {
+  		    pIncludeDeletedBook: Boolean = false): TCatalog = {
       CommonService.findCatalogByID(pCatalogSeqNo)(pIncludeBooks)
   }
 

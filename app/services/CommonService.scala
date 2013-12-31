@@ -1,21 +1,105 @@
 package services
 
-import models.OBBook
-import models.OBCatalog
-import models.OBTxBorrowDT
-import models.OBTxBorrowHD
-import models.OBUser
+import models.TBook
+import models.TCatalog
+import models.TTxBorrowDT
+import models.TTxBorrowHD
+import models.TUser
 import models.common.CatalogListItem
 import models.common.CatalogListItem
 import models.common.UserListItem
-import models.db.DBBook
-import models.db.DBCatalog
-import models.db.DBTxBorrowDT
-import models.db.DBTxBorrowHD
-import models.db.DBUser
+import models.db.TDBBook
+import models.db.TDBCatalog
+import models.db.TDBTxBorrowDT
+import models.db.TDBTxBorrowHD
+import models.db.TDBUser
 import models.common.STATUS_BOOK_AVL
 import models.exception.BookNotFoundException
 import models.exception.BookNotAvailableException
+import models.TBook
+import models.db.TDBBook
+import models.TTxBorrowDT
+import models.TTxBorrowHD
+import models.db.TDBTxBorrowHD
+import models.TUser
+import models.TBook
+import models.db.TDBUser
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.OBTxBorrowHD
+import models.db.TDBCatalog
+import models.db.TDBBook
+import models.TTxBorrowDT
+import models.db.TDBTxBorrowHD
+import models.TUser
+import models.TBook
+import models.db.TDBUser
+import models.OBTxBorrowDT
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.db.TDBCatalog
+import models.db.TDBBook
+import models.db.TDBTxBorrowHD
+import models.TUser
+import models.TBook
+import models.db.TDBUser
+import models.db.DBTxBorrowHD
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.db.TDBCatalog
+import models.db.TDBBook
+import models.db.TDBTxBorrowHD
+import models.TUser
+import models.db.DBTxBorrowDT
+import models.TBook
+import models.db.TDBUser
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.db.TDBCatalog
+import models.db.TDBBook
+import models.db.DBCatalog
+import models.db.TDBTxBorrowHD
+import models.TUser
+import models.TBook
+import models.db.TDBUser
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.db.TDBCatalog
+import models.db.TDBBook
+import models.db.DBUser
+import models.db.TDBTxBorrowHD
+import models.TUser
+import models.TBook
+import models.db.TDBUser
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.db.TDBCatalog
+import models.db.TDBBook
+import models.OBUser
+import models.db.TDBTxBorrowHD
+import models.TUser
+import models.TBook
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.db.TDBCatalog
+import models.db.TDBBook
+import models.db.DBBook
+import models.db.TDBTxBorrowHD
+import models.TBook
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.db.TDBBook
+import models.db.TDBTxBorrowHD
+import models.TBook
+import models.db.TDBTxBorrowDT
+import models.TCatalog
+import models.OBCatalog
+import models.db.TDBBook
+import models.db.TDBTxBorrowHD
+import models.TBook
+import models.OBBook
+import models.db.TDBTxBorrowDT
+import models.TCatalog
 
 /**
  * This object serves as a bridge between the Business layer and Database layer.
@@ -23,7 +107,18 @@ import models.exception.BookNotAvailableException
  * All the results returned from this layer will already be in forms of 
  * Business Object instead of Database object.
  */
-object CommonService {
+object CommonService extends TCommonService {
+  override val dbService = PSQLService
+  override val objTxBorrowHD = OBTxBorrowHD
+  override val objTxBorrowDT = OBTxBorrowDT
+  override val objDBTxBorrowHD = DBTxBorrowHD
+  override val objDBTxBorrowDT = DBTxBorrowDT
+  override val objDBCatalog = DBCatalog
+  override val objDBUser = DBUser
+  override val objDBBook = DBBook
+  override val objUser = OBUser
+  override val objCatalog = OBCatalog
+  override val objBook = OBBook
   
 	/**
 	 * Fetch a book based on the ID. 
@@ -31,16 +126,16 @@ object CommonService {
 	 * @param pID The book ID to be fetched.
 	 * @return The queried book.
 	 */
-	def getBorrowTransaction(pTransactionSeqNo: Int, pIncludeDetails: Boolean): OBTxBorrowHD = {
+	def getBorrowTransaction(pTransactionSeqNo: Int, pIncludeDetails: Boolean): TTxBorrowHD = {
 	  println("getBorrowTransaction")
-	  val dbBorrowTxHeader = DBService.getBorrowTransaction(pTransactionSeqNo)
+	  val dbBorrowTxHeader = dbService.getBorrowTransaction(pTransactionSeqNo)
 	  val dbBorrowTxDetails = 
 	    if (pIncludeDetails) {
-	      DBService.getTransactionDetailsByID(pTransactionSeqNo)
+	      dbService.getTransactionDetailsByID(pTransactionSeqNo)
 	    } else {
 	      List()
 	    }
-	  val res = OBTxBorrowHD(dbBorrowTxHeader, dbBorrowTxDetails)
+	  val res = objTxBorrowHD(dbBorrowTxHeader, dbBorrowTxDetails)
 	  res
 	}
 	
@@ -50,20 +145,20 @@ object CommonService {
 	 * @param pID The book ID to be fetched.
 	 * @return The queried book.
 	 */
-	def getTransactionDetailsByID(pTransactionSeqNo: Int): List[OBTxBorrowDT] = {
+	def getTransactionDetailsByID(pTransactionSeqNo: Int): List[TTxBorrowDT] = {
 	  val header = getBorrowTransaction(pTransactionSeqNo, false)
-	  val dbList = DBService.getTransactionDetailsByID(pTransactionSeqNo)
-	  val res = dbList.map(OBTxBorrowDT(_, header))
+	  val dbList = dbService.getTransactionDetailsByID(pTransactionSeqNo)
+	  val res = dbList.map(objTxBorrowDT(_, header))
 	  res
 	}
 
-	def startTransaction(pTxBorrowHD: OBTxBorrowHD)(implicit pOfficerUserID: String) = 
-	  DBService.insertTxBorrowHD(DBTxBorrowHD(pTxBorrowHD))
+	def startTransaction(pTxBorrowHD: TTxBorrowHD)(implicit pOfficerUserID: String) = 
+	  dbService.insertTxBorrowHD(objDBTxBorrowHD(pTxBorrowHD))
 
-	def findPendingTxByBookID(pCatalogSeqNo: Int, pBookSeqNo: Int): OBTxBorrowDT = {
-	  val dbDetail = DBService.findPendingTxByBookID(pCatalogSeqNo, pBookSeqNo)
+	def findPendingTxByBookID(pCatalogSeqNo: Int, pBookSeqNo: Int): TTxBorrowDT = {
+	  val dbDetail = dbService.findPendingTxByBookID(pCatalogSeqNo, pBookSeqNo)
 	  val header = getBorrowTransaction(dbDetail.hdSeqNo, false)
-	  val res = (OBTxBorrowDT(dbDetail, header))
+	  val res = (objTxBorrowDT(dbDetail, header))
 	  res
 	}
 	  
@@ -74,8 +169,8 @@ object CommonService {
 	 * @return <code>None</code> if no duplicates are found. Otherwise it returns the
 	 * list of duplicates.
 	 */
-	def findDuplicates(pCatalog: OBCatalog) = 
-	  DBService.findDuplicates(DBCatalog(pCatalog))
+	def findDuplicates(pCatalog: TCatalog): Option[List[TDBCatalog]] = 
+	  dbService.findDuplicates(objDBCatalog(pCatalog))
 	  
 	/**
 	 * Fetches the list of catalogs for a particular page without the books information.
@@ -95,12 +190,12 @@ object CommonService {
 	 * @return The list of catalogs for a particular page with / without the books information.
 	 */
 	def partialCatalogs(startIdx: Int, endIdx: Int, pWithBooks: Boolean): (List[CatalogListItem], Int) = { 
-	  val res = DBService.partialCatalogs(startIdx, endIdx, pWithBooks)
+	  val res = dbService.partialCatalogs(startIdx, endIdx, pWithBooks)
 	  res
 	}
 	
 	def searchCatalogs(pStr: String): List[CatalogListItem] = {
-	  val res = DBService.searchCatalogs(pStr)
+	  val res = dbService.searchCatalogs(pStr)
 	  res
 	}
 
@@ -114,7 +209,7 @@ object CommonService {
 	 * @return the password stored in the database.
 	 */
 	def getPassword(pUserID: String): String = {
-	  DBService.getPassword(pUserID)
+	  dbService.getPassword(pUserID)
 	}
 	
   	/**
@@ -124,8 +219,8 @@ object CommonService {
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
   	 */
-	def createUserAndPassword(pUser: OBUser, pPassword: String)(implicit pOfficerUserID: String = "GUEST") = {
-	  DBService.createUserAndPassword(DBUser(pUser), pPassword) 
+	def createUserAndPassword(pUser: TUser, pPassword: String)(implicit pOfficerUserID: String = "GUEST") = {
+	  dbService.createUserAndPassword(objDBUser(pUser), pPassword) 
 	}
 	
   	/**
@@ -136,16 +231,16 @@ object CommonService {
   	 * @param pAuthor The author.
   	 * @param pPublishedYear The published year.
   	 */
-	def updateUser(pUser: OBUser)(implicit pOfficerUserID: String) = {
-	  DBService.updateUser(DBUser(pUser))
+	def updateUser(pUser: TUser)(implicit pOfficerUserID: String) = {
+	  dbService.updateUser(objDBUser(pUser))
 	}
 	
 	def updatePassword(pUserID: String, pPassword: String)(implicit pOfficerUserID: String) = {
-	  DBService.updatePassword(pUserID, pPassword)
+	  dbService.updatePassword(pUserID, pPassword)
 	}
 	
 	def softDeleteUser(pSeqNo: Int)(implicit pOfficerUserID: String) = {
-	  DBService.softDeleteUser(pSeqNo)
+	  dbService.softDeleteUser(pSeqNo)
 	}
 	
 	/**
@@ -156,7 +251,7 @@ object CommonService {
 	 * @return The list of users for a particular page.
 	 */ 
 	def partialUsers(startIdx: Int, endIdx: Int): (List[UserListItem], Int) = {
-	  val res = DBService.partialUsers(startIdx, endIdx)
+	  val res = dbService.partialUsers(startIdx, endIdx)
 	  res
 	}
 	
@@ -166,9 +261,9 @@ object CommonService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findByUserID(pUserID: String)(implicit pIncludeDeleted: Boolean = false): OBUser = {
-	  val dbUser = DBService.findByUserID(pUserID)
-	  val res = OBUser(dbUser)
+	def findByUserID(pUserID: String)(implicit pIncludeDeleted: Boolean = false): TUser = {
+	  val dbUser = dbService.findByUserID(pUserID)
+	  val res = objUser(dbUser)
 	  res
 	}
 	
@@ -178,9 +273,9 @@ object CommonService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findUserByIDNumber(pIDNumber: String)(implicit pIncludeDeleted: Boolean = false): OBUser = {
-	  val dbUser = DBService.findUserByIDNumber(pIDNumber)
-	  val res = OBUser(dbUser)
+	def findUserByIDNumber(pIDNumber: String)(implicit pIncludeDeleted: Boolean = false): TUser = {
+	  val dbUser = dbService.findUserByIDNumber(pIDNumber)
+	  val res = objUser(dbUser)
 	  res
 	}
 	
@@ -190,9 +285,9 @@ object CommonService {
 	 * @param pUserID The User ID.
 	 * @return the User model business object.
 	 */
-	def findUserBySeqNo(pSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): OBUser = {
-	  val dbUser = DBService.findUserBySeqNo(pSeqNo)
-	  val res = OBUser(dbUser)
+	def findUserBySeqNo(pSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): TUser = {
+	  val dbUser = dbService.findUserBySeqNo(pSeqNo)
+	  val res = objUser(dbUser)
 	  res
 	}
 	
@@ -204,8 +299,8 @@ object CommonService {
   	 * @param pPublishedYear The published year.
   	 * @param pCategory The catalog category.
   	 */
-	def createNewCatalog(pCatalog: OBCatalog)(implicit pOfficerUserID: String) = {
-	  DBService.insertCatalog(DBCatalog(pCatalog))
+	def createNewCatalog(pCatalog: TCatalog)(implicit pOfficerUserID: String) = {
+	  dbService.insertCatalog(objDBCatalog(pCatalog))
 	}
 	
   	/**
@@ -217,10 +312,10 @@ object CommonService {
   	 * @param pPublishedYear The published year.
   	 * @param pCategory The catalog category.
   	 */
-	def updateCatalog(pCatalog: OBCatalog)(implicit pOfficerUserID: String) = 
-	  DBService.updateCatalog(DBCatalog(pCatalog))
+	def updateCatalog(pCatalog: TCatalog)(implicit pOfficerUserID: String) = 
+	  dbService.updateCatalog(objDBCatalog(pCatalog))
 
-	def deleteCatalog(pSeqNo: Int) = DBService.deleteCatalog(pSeqNo)
+	def deleteCatalog(pSeqNo: Int) = dbService.deleteCatalog(pSeqNo)
 	
 	/**
 	 * Fetch a catalog based on the ID. The details may or may not include books information
@@ -232,15 +327,15 @@ object CommonService {
 	 */
 	def findCatalogByID(pCatalogSeqNo: Int)
 		(implicit pWithBooks: Boolean = false, 
-		    pIncludeDeletedBook: Boolean = false): OBCatalog = {
+		    pIncludeDeletedBook: Boolean = false): TCatalog = {
       val books = 
 	      if (pWithBooks) {
-	    	  DBService.findAllBooksByCatalogID(pCatalogSeqNo)(pIncludeDeletedBook)
+	    	  dbService.findAllBooksByCatalogID(pCatalogSeqNo)(pIncludeDeletedBook)
 	      } else {
 	    	  List()
 	      }
-	  val dbCatalog = DBService.findCatalogByID(pCatalogSeqNo)(pWithBooks)
-	  val res = (OBCatalog(dbCatalog, books))
+	  val dbCatalog = dbService.findCatalogByID(pCatalogSeqNo)(pWithBooks)
+	  val res = (objCatalog(dbCatalog, books))
 	  res
 	}
 	
@@ -251,7 +346,7 @@ object CommonService {
 	 * @return the ID of the new book.
 	 */
 	def generateNewBookID(pCatalogSeqNo: Int): Int = {
-	  DBService.generateNewBookID(pCatalogSeqNo)
+	  dbService.generateNewBookID(pCatalogSeqNo)
 	}
 	
 	/**
@@ -262,7 +357,7 @@ object CommonService {
 	 * @param pCatalogID Catalog ID.
 	 */
 	def findBook(pCatalogSeqNo: Int, pBookSeqNo: Int)(implicit pIncludeDeleted: Boolean = false) = {
-	  DBService.findBook(pCatalogSeqNo, pBookSeqNo)
+	  dbService.findBook(pCatalogSeqNo, pBookSeqNo)
 	}
 	
 	/**
@@ -273,9 +368,9 @@ object CommonService {
 	 * @param pOrigin The book origin.
 	 * @param pRemarks The book remarks.
 	 */
-	def createNewBook(pBook: OBBook)(implicit pOfficerUserID: String) = {
+	def createNewBook(pBook: TBook)(implicit pOfficerUserID: String) = {
       val newBookSeqNo = CommonService.generateNewBookID(pBook.catalog.seqNo.get)
-	  DBService.createBook(DBBook(pBook.copy(seqNo=Some(newBookSeqNo))))
+	  dbService.createBook(objDBBook(pBook.artificialCopy(Some(newBookSeqNo))))
 	}
 	
 	/**
@@ -286,8 +381,8 @@ object CommonService {
 	 * @param pOrigin The book origin.
 	 * @param pRemarks The book remarks.
 	 */
-	def updateBook(pBook: OBBook)(implicit pOfficerUserID: String) = {
-	  DBService.updateBook(DBBook(pBook))
+	def updateBook(pBook: TBook)(implicit pOfficerUserID: String) = {
+	  dbService.updateBook(objDBBook(pBook))
 	}
 	
 	/**
@@ -296,7 +391,7 @@ object CommonService {
 	 * @param pID Book ID.
 	 */
 	def deleteBook(pCatalogSeqNo: Int, pBookSeqNo: Int)(implicit pOfficerUserID: String) = {
-	  DBService.deleteBook(pCatalogSeqNo, pBookSeqNo)
+	  dbService.deleteBook(pCatalogSeqNo, pBookSeqNo)
 	}
 	
 	/**
@@ -306,48 +401,48 @@ object CommonService {
 	 * 
 	 * @param pCatalogID Catalog ID.
 	 */
-	def findAllBooksByCatalogID(pCatalogSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): List[OBBook] = {
-	  val list = DBService.findAllBooksByCatalogID(pCatalogSeqNo)
-	  val res = list.map(OBBook(_))
+	def findAllBooksByCatalogID(pCatalogSeqNo: Int)(implicit pIncludeDeleted: Boolean = false): List[TBook] = {
+	  val list = dbService.findAllBooksByCatalogID(pCatalogSeqNo)
+	  val res = list.map(objBook(_))
 	  res
 	}
 	
-	def updateTxBorrow(pTxBorrow: OBTxBorrowHD, pIncludeDetails: Boolean)(implicit pOfficerUserID: String) = {
-	  DBService.updateTxBorrowHD(DBTxBorrowHD(pTxBorrow))
+	def updateTxBorrow(pTxBorrow: TTxBorrowHD, pIncludeDetails: Boolean)(implicit pOfficerUserID: String) = {
+	  dbService.updateTxBorrowHD(objDBTxBorrowHD(pTxBorrow))
 	  if (pIncludeDetails) {
-	    DBService.deleteTxBorrowDetails(pTxBorrow.seqno.get)
+	    dbService.deleteTxBorrowDetails(pTxBorrow.seqno.get)
 	    val details = pTxBorrow.details
 	    details.foreach(detail => {
-	      DBService.insertTxBorrowDT(DBTxBorrowDT(detail))
+	      dbService.insertTxBorrowDT(objDBTxBorrowDT(detail))
 	    })
 	  }
 	} 
 
     def activateBorrowTransaction(transactionSeqNo: Int)(implicit pOfficerUserID: String) = {
-      val dbTransaction = OBTxBorrowHD.find(transactionSeqNo, true)
+      val dbTransaction = objTxBorrowHD.find(transactionSeqNo, true)
       val transaction = dbTransaction.activate
 
       // Update transaction header.
-	  DBService.updateTxBorrowHD(DBTxBorrowHD(transaction))
+	  dbService.updateTxBorrowHD(objDBTxBorrowHD(transaction))
 	  
 	  // Update transaction details.
-      DBService.deleteTxBorrowDetails(transaction.seqno.get)
+      dbService.deleteTxBorrowDetails(transaction.seqno.get)
 	  val details = transaction.details
-	  details.foreach(x => DBService.insertTxBorrowDT(DBTxBorrowDT(x)))
+	  details.foreach(x => dbService.insertTxBorrowDT(objDBTxBorrowDT(x)))
 	  
 	  // Update books.
 	  val books = transaction.details.map(_.book)
-	  books.foreach(x => DBService.updateBook(DBBook(x)))
+	  books.foreach(x => dbService.updateBook(objDBBook(x)))
 	  
 	  transaction
 	}
 	
 	def addNewBook(pTransactionSeqNo: Int, pCatalogSeqNo: Int, pBookSeqNo: Int)(implicit pOfficerUserID: String) = {
-      val catalog = OBCatalog.find(pCatalogSeqNo)
-	  val book = OBBook.find(pCatalogSeqNo, pBookSeqNo)
+      val catalog = objCatalog.find(pCatalogSeqNo)
+	  val book = objBook.find(pCatalogSeqNo, pBookSeqNo)
 	  book.status match {
         case STATUS_BOOK_AVL => {
-        	val transaction = OBTxBorrowHD.find(pTransactionSeqNo, true)
+        	val transaction = objTxBorrowHD.find(pTransactionSeqNo, true)
         			val updatedTx = transaction.addBook(pCatalogSeqNo, pBookSeqNo)
         			updateTxBorrow(updatedTx, true)
         			updatedTx
@@ -357,12 +452,12 @@ object CommonService {
 	}
 	
 	def createNewCategory(pCategoryName: String)(implicit pOfficerUserID: String) = {
-		DBService.createCategory(pCategoryName, pOfficerUserID)  
+		dbService.createCategory(pCategoryName, pOfficerUserID)  
 	}
 	
     
 	def updateCategory(pCategorySeqNo: Int, pCategoryName: String)(implicit pOfficerUserID: String) = {
-		DBService.updateCategory(pCategorySeqNo, pCategoryName)
+		dbService.updateCategory(pCategorySeqNo, pCategoryName)
 	}
 
 	def returnBook(pTransactionSeqNo: Int, pBookID: String)(implicit pOfficerUserID: String) = {
@@ -370,7 +465,7 @@ object CommonService {
       val arr = pBookID.split('.')
       val catalogSeqNo = arr(0).toInt
       val bookSeqNo = arr(1).toInt
-      val transaction = OBTxBorrowHD.find(pTransactionSeqNo, true)
+      val transaction = objTxBorrowHD.find(pTransactionSeqNo, true)
       val updatedTx = transaction.returnBook(catalogSeqNo, bookSeqNo)
       updateTxBorrow(updatedTx, true)
       
@@ -380,6 +475,6 @@ object CommonService {
 	}
 	
 	def now(): java.util.Date = {
-	  DBService.now()
+	  dbService.now()
 	}
 }

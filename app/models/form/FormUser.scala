@@ -1,7 +1,7 @@
 package models.form
 
 import java.util.Date
-import models.OBUser
+import models.TUser
 import java.text.SimpleDateFormat
 
 /**
@@ -29,7 +29,7 @@ case class FormUser(
 )
 
 object FormUser {
-  def apply(pUser: OBUser): FormUser = {
+  def apply(pUser: TUser): FormUser = {
     FormUser(pUser.seqNo, pUser.userID, pUser.name, pUser.gender.toString(), "",
         pUser.idNumber, pUser.address,
         pUser.dob,

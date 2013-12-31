@@ -3,6 +3,7 @@ package models.db
 import java.util.Date
 import models.OBUser
 import models.common.Gender
+import models.TUser
 
 /**
  * User model database object. A business object has to be mapped to / from this database object 
@@ -24,10 +25,10 @@ case class DBUser (
     auditUsercode: String, 
     auditTimestamp: Date, 
     auditReason: Option[String]
-)
+) extends TDBUser
 
 object DBUser {
-  def apply(pUser: OBUser): DBUser = {
+  def apply(pUser: TUser): TDBUser = {
     DBUser(pUser.seqNo.getOrElse(0), pUser.userID, pUser.name, pUser.address, pUser.dob, 
         pUser.gender==Gender.MALE, pUser.idNumber, pUser.nationality, 
         pUser.role.seqNo, pUser.isDeleted, 

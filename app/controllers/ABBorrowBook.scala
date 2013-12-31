@@ -16,21 +16,29 @@ import play.api.libs.json.JsNull
 import play.api.data.FormError
 import models.exception.BookNotFoundException
 import models.exception.BookNotAvailableException
-import util.CommonUtil._
-import models.OBBook
+import utils.CommonUtil._
+import models.TBook
 import java.text.SimpleDateFormat
 import models.db.DBBook
 import models.db.DBCatalog
-import models.OBCatalog
+import models.TCatalog
 import models.exception.CatalogNotFoundException
 import services.CommonService
-import models.OBUser
-import models.OBTxBorrowDT
-import models.OBTxBorrowHD
+import models.TUser
+import models.TTxBorrowDT
+import models.TTxBorrowHD
 import play.api.i18n.Messages
 import play.api.mvc.Session
+import models.OBTxBorrowHD
+import models.TUser
+import models.TUser
+import models.OBUser
+import models.OBBook
 
 object ABBorrowBook extends Controller with TSecured {
+  val objTxBorrowHD = OBTxBorrowHD
+  val objUser = OBUser
+  val objBook = OBBook
   
 	case class FormBorrow(
 	  val msg: Option[String],
@@ -44,7 +52,7 @@ object ABBorrowBook extends Controller with TSecured {
 	)
 	
 	object FormBorrow {
-	  def apply(pObj: OBTxBorrowHD, pMessage: Option[String] = None): FormBorrow = {
+	  def apply(pObj: TTxBorrowHD, pMessage: Option[String] = None): FormBorrow = {
 	    FormBorrow(
 	        pMessage,
 	        Some(pObj.officer.name),
@@ -69,7 +77,7 @@ object ABBorrowBook extends Controller with TSecured {
       publishedYear: Option[String], category: Option[String], remarks: Option[String])
       
     object BorrowBookItem {
-		def apply(pDetail: OBTxBorrowDT): BorrowBookItem = {
+		def apply(pDetail: TTxBorrowDT): BorrowBookItem = {
 		  val book = pDetail.book;
 		  val catalog = book.catalog
 		  BorrowBookItem(
@@ -124,7 +132,7 @@ object ABBorrowBook extends Controller with TSecured {
   def fetchUserInfo(pUserID: String) = withAuth { implicit officerUserID => implicit req =>
     try {
       println("fetchUserInfo with userID="+pUserID.toUpperCase())
-      val dbUser = OBUser.findByUserID(pUserID.toUpperCase())
+      val dbUser = objUser.findByUserID(pUserID.toUpperCase())
       val res = JsObject(
 	      "name" -> JsString(dbUser.name) ::
 	      "address" -> JsString(dbUser.address) ::
@@ -141,7 +149,7 @@ object ABBorrowBook extends Controller with TSecured {
   }
   
   def validateAndGetBorrower(formBorrower: Form[FormBorrow], pBorrowerID: String)
-  	(implicit officerUserID: String):(OBUser, Form[FormBorrow]) = {
+  	(implicit officerUserID: String):(TUser, Form[FormBorrow]) = {
     if (isBlank(pBorrowerID)) {
 	  val newErrorForm = Form(
 			  formBorrower.mapping, 
@@ -151,7 +159,7 @@ object ABBorrowBook extends Controller with TSecured {
       (null, newErrorForm)
     } else {
 	  try {
-    	  val dbUser = OBUser.findByIDNumber(pBorrowerID.toUpperCase())
+    	  val dbUser = objUser.findByIDNumber(pBorrowerID.toUpperCase())
     	  (dbUser, null)
 	  } catch {
     	  case e: UserNotFoundException => {
@@ -209,13 +217,13 @@ object ABBorrowBook extends Controller with TSecured {
                 formBorrower.value)
               BadRequest(views.html.borrow_add_book(newErrorForm))
             } else {
-              val validBook = OBBook.isValidID(success.newBookID.get)
+              val validBook = objBook.isValidID(success.newBookID.get)
               if (validBook) {
                 val transactionID = session.get("transactionID").get.toInt
                 val arr = success.newBookID.get.split('.')
                 val catalogSeqNo = arr(0).toInt
                 val bookSeqNo = arr(1).toInt
-                val updatedTx = CommonService.addNewBook(transactionID, catalogSeqNo, bookSeqNo)
+                val updatedTx = commonService.addNewBook(transactionID, catalogSeqNo, bookSeqNo)
                 val newForm = borrowForm.fill(FormBorrow(updatedTx))
                 Ok(views.html.borrow_add_book(newForm))
               } else {
@@ -244,7 +252,7 @@ object ABBorrowBook extends Controller with TSecured {
   }
   
   def viewTransaction(pTransactionSeqNo: String) = withAuth { implicit officerUserID => implicit req =>
-    val transaction = CommonService.getBorrowTransaction(pTransactionSeqNo.toInt, true)
+    val transaction = commonService.getBorrowTransaction(pTransactionSeqNo.toInt, true)
     val borrower = transaction.borrower
     val newForm = borrowForm.fill(
     	FormBorrow(None, Some(officerUserID), 
@@ -264,8 +272,8 @@ object ABBorrowBook extends Controller with TSecured {
     val borrowerName = form("borrowerName").value
     val borrowerAddress = form("borrowerAddress").value
     
-    val newTransaction = OBTxBorrowHD.generateNewTransaction(borrowerID.get)
-    val transactionID = CommonService.startTransaction(newTransaction)
+    val newTransaction = objTxBorrowHD.generateNewTransaction(borrowerID.get)
+    val transactionID = commonService.startTransaction(newTransaction)
     val currentDateStr = sdf.format(new Date())
     val newSession = session + ("transactionID" -> transactionID.toString)
     Redirect(routes.ABBorrowBook.viewTransaction(transactionID.toString)).withSession(newSession)
@@ -273,7 +281,7 @@ object ABBorrowBook extends Controller with TSecured {
  
   def showConfirmationPage = withAuth { implicit officerUserID => implicit req =>
     val transactionSeqNo = session.get("transactionID").get.toInt
-    val transaction = OBTxBorrowHD.find(transactionSeqNo, true)
+    val transaction = objTxBorrowHD.find(transactionSeqNo, true)
     val newForm = borrowForm.fill(FormBorrow(transaction))
     Ok(views.html.borrow_confirmation(newForm))
   }
@@ -281,7 +289,7 @@ object ABBorrowBook extends Controller with TSecured {
   def confirm = withAuth { implicit officerUserID => implicit req =>
     println("confirm")
     val transactionSeqNo = session.get("transactionID").get.toInt
-    val updatedTransaction = CommonService.activateBorrowTransaction(transactionSeqNo)
+    val updatedTransaction = commonService.activateBorrowTransaction(transactionSeqNo)
     val newForm = borrowForm.fill(FormBorrow(updatedTransaction))
     Redirect(routes.ABBorrowBook.borrowPage())
     	.flashing("msg" -> "Transaction is successful.")

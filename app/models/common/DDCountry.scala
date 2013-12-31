@@ -1,11 +1,13 @@
 package models.common
 
-import services.DBService
+import services.PSQLService
 
 case class DDCountry(code: String, desc: String)
 
 object DDCountry {
-  private lazy val items = DBService.getCountryMap
+  val dbService = PSQLService
+  
+  private lazy val items = dbService.getCountryMap
   
   def apply(pCode: String): DDCountry = {
     DDCountry(pCode, items(pCode))

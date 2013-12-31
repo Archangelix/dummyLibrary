@@ -1,8 +1,8 @@
 package models.db
 
 import java.util.Date
-
 import models.OBTxBorrowDT
+import models.TTxBorrowDT
 
 case class DBTxBorrowDT (
 	hdSeqNo: Int,
@@ -16,10 +16,10 @@ case class DBTxBorrowDT (
 	auditUsercode: String,
 	auditTimestamp: Date,
 	auditReason: Option[String]
-)
+) extends TDBTxBorrowDT
 
 object DBTxBorrowDT {
-  def apply(obj: OBTxBorrowDT): DBTxBorrowDT = {
+  def apply(obj: TTxBorrowDT): DBTxBorrowDT = {
     DBTxBorrowDT(
         obj.header.seqno.get, 
         obj.book.catalog.seqNo.get,

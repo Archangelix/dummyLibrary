@@ -13,23 +13,19 @@ import models.common.DDBookOrigin
 import models.common.STATUS_BOOK_AVL
 import models.OBCatalog
 import models.common.BookStatus._
-import models.OBBook
 import play.api.data.validation.Constraint
-import models.OBBook
-import models.OBBook
 import play.api.data.validation.Valid
-import models.OBBook
-import models.OBBook
 import play.api.data.validation.Invalid
-import models.OBBook
 import play.api.i18n.Messages
-import models.OBBook
+import models.TBook
 
 /**
  * Action to handle the book section, including the add, update, delete, and view.
  */
-object ABBookDetail extends Controller with TSecured {
-
+trait ABBookDetail {this: Controller with TSecured =>
+  val objBook = OBBook
+  val objCatalog = OBCatalog
+  
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
   
@@ -40,52 +36,6 @@ object ABBookDetail extends Controller with TSecured {
     ("new" -> "New"),
     ("old" -> "Old"))
     
-	case class FormBook(
-	    idx: Option[Int], 
-	    seqNo: Option[Int], 
-	    catalogSeqNo: Option[Int], 
-	    originCode: Option[String], 
-	    originDesc: Option[String], 
-	    status: Option[String],
-	    remarks: Option[String]) {
-    
-	  def merge(pObj: OBBook): OBBook = {
-	    pObj.copy(
-	     origin = DDBookOrigin(this.originCode.get),
-	     remarks = this.remarks.getOrElse("")
-	    )
-	  }
-	  
-	  def transform()(implicit pOfficerUserID: String): OBBook = {
-	    OBBook(
-	      None,
-	      OBCatalog.find(this.catalogSeqNo.get.toInt), 
-	      DDBookOrigin(this.originCode.get), 
-	      STATUS_BOOK_AVL,
-	      pOfficerUserID,
-	      null,
-	      this.remarks.getOrElse(""), 
-	      false,
-	      pOfficerUserID,
-	      null,
-	      pOfficerUserID,
-	      null,
-	      None
-	    )
-	  }
-  	}
-	
-	object FormBook {
-	  def apply(pBook: OBBook): FormBook = {
-	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
-	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
-	        )
-	  }
-	  
-	  def init(pCatalogSeqNo: Int): FormBook = {
-		FormBook(None, None, Some(pCatalogSeqNo), None, None, Some(STATUS_BOOK_AVL.description), None)	  }
-	}
-
 	val checkOrigin = (pAllowEmptyOrigin: Boolean) => Constraint[Option[String]]("origin.validation") ( str =>
 	  if (!pAllowEmptyOrigin && str==None) {
 	    Invalid(Messages("error.required"))
@@ -100,9 +50,9 @@ object ABBookDetail extends Controller with TSecured {
     "originDesc" -> optional(text),
     "status" -> optional(text),
     "remarks" -> optional(text)
-  )(FormBook.apply)(FormBook.unapply)
+  )(ABBookDetail.FormBook.apply)(ABBookDetail.FormBook.unapply)
 
-  val bookForm = (pAllowEmptyOrigin: Boolean) => Form[FormBook] (formBookMapping(pAllowEmptyOrigin))
+  val bookForm = (pAllowEmptyOrigin: Boolean) => Form[ABBookDetail.FormBook] (formBookMapping(pAllowEmptyOrigin))
 
   /**
    * Displaying the book detail page with blank information.
@@ -110,7 +60,7 @@ object ABBookDetail extends Controller with TSecured {
   def newBook(pCatalogSeqNo: String) = withAuth {implicit officerUserID => implicit req => 
     // Flashing works only for redirect.
     // Ok(views.html.book_detail(MODE_EDIT, bookForm, pCatalogID)).flashing("catalogID" -> pCatalogID)
-    val newBookForm = bookForm(true).fill(FormBook.init(pCatalogSeqNo.toInt))
+    val newBookForm = bookForm(true).fill(ABBookDetail.FormBook.init(pCatalogSeqNo.toInt))
     Ok(views.html.book_detail(MODE_ADD, newBookForm)).withSession(
         session + ("bookMode" -> MODE_ADD)
     )
@@ -131,7 +81,7 @@ object ABBookDetail extends Controller with TSecured {
       data => {
         println("validation successful.")
         val newBook = data.transform()
-        CommonService.createNewBook(newBook)
+        commonService.createNewBook(newBook)
     	Redirect(routes.ABCatalogDetail.edit(pCatalogSeqNo))
       }
     )
@@ -149,8 +99,8 @@ object ABBookDetail extends Controller with TSecured {
    * Displaying the book detail page with pre-populated book information.
    */
   def edit(pCatalogSeqNo: String, pBookSeqNo: String) = withAuth {implicit officerUserID => implicit req =>
-    val dbBook = OBBook.find(pCatalogSeqNo.toInt, pBookSeqNo.toInt)
-    val newBookForm = bookForm(true).fill(FormBook(dbBook))
+    val dbBook = objBook.find(pCatalogSeqNo.toInt, pBookSeqNo.toInt)
+    val newBookForm = bookForm(true).fill(ABBookDetail.FormBook(dbBook))
     Ok(views.html.book_detail(MODE_EDIT, newBookForm)).withSession(
         session + ("bookMode" -> MODE_EDIT)
     )
@@ -170,9 +120,9 @@ object ABBookDetail extends Controller with TSecured {
       },
       data => {
         println("validation successfuls.")
-        val dbBook = OBBook.find(pCatalogSeqNo.toInt, pBookSeqNo.toInt)
+        val dbBook = objBook.find(pCatalogSeqNo.toInt, pBookSeqNo.toInt)
         val book = data.merge(dbBook)
-        CommonService.updateBook(book)
+        commonService.updateBook(book)
     	Redirect(routes.ABCatalogDetail.edit(pCatalogSeqNo))
       }
     )
@@ -182,9 +132,57 @@ object ABBookDetail extends Controller with TSecured {
    * Removing a book listed for a certain a catalog.
    */
   def remove(pCatalogID: String, pBookID: String) = withAuth {implicit officerUserID => implicit req => 
-    CommonService.deleteBook(pCatalogID.toInt, pBookID.toInt)
+    commonService.deleteBook(pCatalogID.toInt, pBookID.toInt)
     Redirect(routes.ABCatalogDetail.edit(pCatalogID))
   }
 
+}
+
+object ABBookDetail extends Controller with ABBookDetail with TSecured {
+	case class FormBook(
+	    idx: Option[Int], 
+	    seqNo: Option[Int], 
+	    catalogSeqNo: Option[Int], 
+	    originCode: Option[String], 
+	    originDesc: Option[String], 
+	    status: Option[String],
+	    remarks: Option[String]) {
+    
+	  def merge(pObj: TBook): TBook = {
+	    pObj.artificialCopy(
+	     DDBookOrigin(this.originCode.get),
+	     this.remarks.getOrElse("")
+	    )
+	  }
+	  
+	  def transform()(implicit pOfficerUserID: String): TBook = {
+	    OBBook(
+	      None,
+	      objCatalog.find(this.catalogSeqNo.get.toInt), 
+	      DDBookOrigin(this.originCode.get), 
+	      STATUS_BOOK_AVL,
+	      pOfficerUserID,
+	      null,
+	      this.remarks.getOrElse(""), 
+	      false,
+	      pOfficerUserID,
+	      null,
+	      pOfficerUserID,
+	      null,
+	      None
+	    )
+	  }
+  	}
+	
+	object FormBook {
+	  def apply(pBook: TBook): FormBook = {
+	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
+	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
+	        )
+	  }
+	  
+	  def init(pCatalogSeqNo: Int): FormBook = {
+		FormBook(None, None, Some(pCatalogSeqNo), None, None, Some(STATUS_BOOK_AVL.description), None)	  }
+	}
 
 }

@@ -1,7 +1,5 @@
 package models.common
 
-import services.DBService
-
 case class DDUserRoles(code: String, desc: String)
 
 object DDUserRoles {

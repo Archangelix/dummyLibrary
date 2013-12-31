@@ -14,10 +14,10 @@ import play.api.mvc.Results._
 import play.api.mvc.Security
 import play.api.mvc.WithHeaders
 import play.mvc.Http.Session
-import services.DBService
+import services.TDBService
 import java.security.MessageDigest
-import util.SecurityUtil._
-import util.CommonUtil._
+import utils.SecurityUtil._
+import utils.CommonUtil._
 import controllers.ABUserDetail.MODE_ADD
 import controllers.ABUserDetail.MODE_EDIT
 import models.form.FormUser
@@ -30,10 +30,12 @@ import play.api.data.validation.ValidationError
 import org.joda.time.DateTime
 import org.joda.time.Period
 import play.api.Routes
-import util.SecurityUtil
+import services.PSQLService
 
 trait TLogin extends Controller {
-
+  val dbService = PSQLService
+  val objUser = OBUser
+  
   val formUserLoginMapping = mapping (
           "username" -> nonEmptyText,
           "password" -> nonEmptyText
@@ -60,12 +62,12 @@ trait TLogin extends Controller {
       data => {
         // Authenticate the user password.
         val validLogin = try {
-           	val dbPassword = DBService.getPassword(data.username)
+           	val dbPassword = dbService.getPassword(data.username)
         	val words = dbPassword.split('|')
         	println("DB Passwords = "+words)
         	val salt = words(0)
         	val saltedDBPassword = words(1)
-        	val encryptedUserPwd = SecurityUtil.hex_digest(salt+data.password)
+        	val encryptedUserPwd = hex_digest(salt+data.password)
         	println("User salted password = "+encryptedUserPwd)
   			saltedDBPassword.equals(encryptedUserPwd)
         } catch {
@@ -76,7 +78,7 @@ trait TLogin extends Controller {
           // Correct password. Redirect the user to the respective home page according to the role.
           try {
             val formUsername = data.username
-            val user = OBUser.findByUserID(formUsername)
+            val user = objUser.findByUserID(formUsername)
             val role = user.role
             if (role.equals(UserRole.ADMIN)) {
               Redirect(routes.ABUserList.listUsers).withSession(

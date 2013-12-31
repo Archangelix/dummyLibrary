@@ -1,7 +1,5 @@
 package models.common
 
-import services.DBService
-
 case class DDCategories(code: String, desc: String)
 
 object DDCategories {

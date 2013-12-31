@@ -16,20 +16,18 @@ import play.api.libs.json.JsNull
 import play.api.data.FormError
 import play.api.mvc.Controller
 import models.exception.BookNotFoundException
-import util.CommonUtil._
-import models.OBBook
+import utils.CommonUtil._
 import java.text.SimpleDateFormat
 import models.db.DBBook
 import models.db.DBCatalog
-import models.OBCatalog
 import models.exception.CatalogNotFoundException
 import services.CommonService
-import models.OBUser
-import models.OBTxBorrowDT
-import models.OBTxBorrowHD
 import play.api.data.Mapping
+import models.TTxBorrowDT
+import models.OBTxBorrowDT
 
 object ABReturnBook extends Controller with TSecured {
+  val objTxBorrowDT = OBTxBorrowDT
   
 	case class FormReturn(
 	  msg: Option[String],
@@ -82,7 +80,7 @@ object ABReturnBook extends Controller with TSecured {
    }
  }
   
-  def validateAndGetTxDetail(formReturn: Form[FormReturn], pBookID: String):(OBTxBorrowDT, Form[FormReturn]) = {
+  def validateAndGetTxDetail(formReturn: Form[FormReturn], pBookID: String):(TTxBorrowDT, Form[FormReturn]) = {
     if (isBlank(pBookID)) {
 	  val newErrorForm = Form(
 			  formReturn.mapping, 
@@ -95,7 +93,7 @@ object ABReturnBook extends Controller with TSecured {
 	      val arr = pBookID.split('.')
 	      val catalogSeqNo = arr(0).toInt
 	      val bookSeqNo = arr(1).toInt
-    	  val dbBook = OBTxBorrowDT.findPendingTxDetailByBookID(catalogSeqNo, bookSeqNo)
+    	  val dbBook = objTxBorrowDT.findPendingTxDetailByBookID(catalogSeqNo, bookSeqNo)
     	  (dbBook, null)
 	  } catch {
     	  case e: Exception => {
@@ -163,7 +161,7 @@ object ABReturnBook extends Controller with TSecured {
        },
        data => {
          val transactionSeqNo = data.transactionID.get.toInt
-         CommonService.returnBook(transactionSeqNo, data.bookID.get)
+         commonService.returnBook(transactionSeqNo, data.bookID.get)
          Redirect(routes.ABReturnBook.returnPage)
          	.flashing("msg" -> "The transaction is successful.")
        }

@@ -1,6 +1,6 @@
 package models.form
 
-import models.OBBook
+import models.TBook
 
 /**
  * Book form object. A business object has to be mapped to / from this form object 
@@ -20,7 +20,7 @@ case class FormBook(
 )
 
 object FormBook {
-  def apply(pBook: OBBook): FormBook = {
+  def apply(pBook: TBook): FormBook = {
     FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
         Some(pBook.origin.desc), Some(pBook.remarks)
         )

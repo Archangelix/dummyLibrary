@@ -1,4 +1,4 @@
-package util
+package utils
 
 import play.api.data.validation.Constraint
 import java.util.Date

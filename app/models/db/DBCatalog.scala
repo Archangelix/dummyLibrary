@@ -3,6 +3,7 @@ package models.db
 import java.util.Date
 import models.form.FormCatalog
 import models.OBCatalog
+import models.TCatalog
 
 /**
  * Catalog database object. A business object has to be mapped to / from this database object 
@@ -21,10 +22,10 @@ case class DBCatalog (
     auditUserCode: String, 
     auditTimestamp: Date, 
     auditReason: Option[String]
-)
+) extends TDBCatalog
 
 object DBCatalog {
-  def apply(pCatalog: OBCatalog): DBCatalog = {
+  def apply(pCatalog: TCatalog): TDBCatalog = {
     DBCatalog(pCatalog.seqNo, pCatalog.category.code, 
         pCatalog.title, pCatalog.author, pCatalog.publishedYear.toInt, 
         null, false, 

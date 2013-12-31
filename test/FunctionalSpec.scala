@@ -14,13 +14,16 @@ import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.scalatest.Matchers
-import org.openqa.selenium.support.ui.ExpectedCondition
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+
 
 /**
  * add your integration spec here.
  * An integration test will fire up a whole play application in a real (or headless) browser
  */ 
-class FunctionalSpec extends FlatSpec with Matchers {
+@RunWith(classOf[JUnitRunner])
+object FunctionalSpec extends FlatSpec with Matchers {
   
   val HOST = "http://localhost:9000/"
   val file = new File("C:/Program Files (x86)/Internet Explorer/IEDriverServer.exe");

@@ -1,6 +1,5 @@
 package controllers
 
-import models.OBUser
 import models.form.FormUser
 import play.api.Play.current
 import play.api.cache.Cache
@@ -66,7 +65,7 @@ object ABUserList extends Controller with TSecured {
     val currentPage = Cache.getAs[(List[UserListItem], Int, Int)](CURRENT_PAGE)
     Cache.remove(CURRENT_PAGE)
     val (list1, rowCount, currentPageIdx) = currentPage.getOrElse {
-      val res = CommonService.partialUsers(1, PAGE_ROW_CNT)
+      val res = commonService.partialUsers(1, PAGE_ROW_CNT)
       (res._1, res._2, 1)
     }
     val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
@@ -78,7 +77,7 @@ object ABUserList extends Controller with TSecured {
    * Displaying the first page of the user list.
    */
   def navigateFirst = withAuth { implicit officerUserID => implicit req =>
-    val (list1, rowCnt) = CommonService.partialUsers(1, PAGE_ROW_CNT)
+    val (list1, rowCnt) = commonService.partialUsers(1, PAGE_ROW_CNT)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, 1))
     Redirect(routes.ABUserList.listUsers())
   }
@@ -91,7 +90,7 @@ object ABUserList extends Controller with TSecured {
     val nextPageIdx = if (currentPageIdx<=1) 1 else currentPageIdx-1
     val startIdx = (nextPageIdx-1)*PAGE_ROW_CNT+1
   	val endIdx = nextPageIdx*PAGE_ROW_CNT
-    val (list1, rowCnt) = CommonService.partialUsers(startIdx, endIdx)
+    val (list1, rowCnt) = commonService.partialUsers(startIdx, endIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
     Redirect(routes.ABUserList.listUsers())
   }
@@ -107,7 +106,7 @@ object ABUserList extends Controller with TSecured {
     println("nextPage = "+nextPageIdx)
     val startIdx = (nextPageIdx-1)*PAGE_ROW_CNT+1
   	val endIdx = nextPageIdx*PAGE_ROW_CNT
-    val (list1, rowCnt) = CommonService.partialUsers(startIdx, endIdx)
+    val (list1, rowCnt) = commonService.partialUsers(startIdx, endIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, nextPageIdx))
     Redirect(routes.ABUserList.listUsers())
   }
@@ -119,7 +118,7 @@ object ABUserList extends Controller with TSecured {
     val maxPage = req.queryString.get(MAX_PAGE_IDX).flatMap(_.headOption).get.toInt
     val startIdx = (maxPage-1)*PAGE_ROW_CNT+1
   	val endIdx = maxPage*PAGE_ROW_CNT
-    val (list1, rowCnt) = CommonService.partialUsers(startIdx, endIdx)
+    val (list1, rowCnt) = commonService.partialUsers(startIdx, endIdx)
     Cache.set(CURRENT_PAGE, (list1, rowCnt, maxPage))
     Redirect(routes.ABUserList.listUsers())
   }
@@ -128,7 +127,7 @@ object ABUserList extends Controller with TSecured {
    * Removing a particular user from the listing page.
    */
   def removeUser(pSeqNo: String) = withAuth { implicit officerUserID => implicit req => 
-    CommonService.softDeleteUser(pSeqNo.toInt)
+    commonService.softDeleteUser(pSeqNo.toInt)
     Redirect(routes.ABUserList.listUsers())
   }
   

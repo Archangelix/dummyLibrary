@@ -14,8 +14,8 @@ import models.common.Category
 import models.common.CatalogListItem
 import models.OBCatalog
 
-
 object ABSearchCatalog extends Controller with TSecured with TLogin {
+  val objCatalog = OBCatalog
 
   case class FormCatalogListItem(
       idx: String,
@@ -50,7 +50,7 @@ object ABSearchCatalog extends Controller with TSecured with TLogin {
   }
   
   def search(pStr: String) = Action { implicit req =>
-	val catalogList = OBCatalog.search(pStr)
+	val catalogList = objCatalog.search(pStr)
     Ok(views.html.search_catalog(loginForm, pStr, catalogList.map(FormCatalogListItem(_))))
   }
 }

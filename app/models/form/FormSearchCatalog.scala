@@ -1,6 +1,6 @@
 package models.form
 
-import models.OBCatalog
+import models.TCatalog
 
 /**
  * Book form object. A business object has to be mapped to / from this form object 
@@ -17,7 +17,7 @@ case class FormSearchCatalog(
     caseSensitive: String)
 
 object FormSearchCatalog {
-  def apply(pCatalog: OBCatalog, pCaseSensitive: Boolean): FormSearchCatalog = {
+  def apply(pCatalog: TCatalog, pCaseSensitive: Boolean): FormSearchCatalog = {
     FormSearchCatalog("", pCatalog.author, pCatalog.title, if (pCaseSensitive) "Y" else "N")
   }
 }

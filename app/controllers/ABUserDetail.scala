@@ -2,8 +2,8 @@ package controllers
 
 import java.text.SimpleDateFormat
 import java.util.Date
-import util.SecurityUtil._
-import util.CommonUtil._
+import utils.SecurityUtil._
+import utils.CommonUtil._
 import models.OBUser
 import models.common.DDCountry
 import models.common.DDUserRoles
@@ -19,19 +19,24 @@ import play.api.data.validation.Valid
 import play.api.data.validation.ValidationError
 import play.api.mvc.Controller
 import services.CommonService
+import java.util.Calendar
 /**
  * Action to handle the user section, including the add, update, delete, and view.
  */
 object ABUserDetail extends Controller with TSecured {
-
+  val objUser = OBUser
+  
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
   
-  def minYear(pMinYear: Int): Constraint[Date] = 
-    Constraint[Date]("constraint.minYear", pMinYear) { o => 
-      if (o.getYear >= pMinYear) Valid
+  def minYear(pMinYear: Int): Constraint[Date] =
+    Constraint[Date]("constraint.minYear", pMinYear) { o =>
+      var cal = Calendar.getInstance();
+      cal.setTime(o);
+      val year = cal.get(Calendar.YEAR);
+      if (year >= pMinYear) Valid
       else Invalid(ValidationError("error.minYear", pMinYear))
-  }
+    }
   
   val adminUneditable = Constraint[String]("admin.uneditable")(str =>
     if (str.toLowerCase == "admin") Invalid("User admin is uneditable.")
@@ -86,7 +91,7 @@ object ABUserDetail extends Controller with TSecured {
    * Displaying the book detail page with pre-populated user information.
    */
   def edit(pSeqNo: String) = withAuth { implicit officerUserID => implicit req =>
-    val user= OBUser.find(pSeqNo.toInt)
+    val user= objUser.find(pSeqNo.toInt)
     val formUser = FormUser(user)
     val filledForm = Form[FormUser](formEditUserMapping).fill(formUser)
     
@@ -108,7 +113,7 @@ object ABUserDetail extends Controller with TSecured {
       },
         successForm => {
           try {
-            val dbUser = OBUser.findByUserID(successForm.userID.toUpperCase())
+            val dbUser = objUser.findByUserID(successForm.userID.toUpperCase())
             val newErrors = Form(filledForm.mapping, filledForm.data,
               Seq(new FormError("userID", "This User ID is not available.")), filledForm.value)
             println("Duplicate userid has been found!")
@@ -116,7 +121,7 @@ object ABUserDetail extends Controller with TSecured {
           } catch {
             case e: UserNotFoundException => {
               println("Ok, valid userid!")
-              val user = OBUser(successForm)
+              val user = objUser(successForm)
               val errors: Seq[Option[FormError]] = validatePassword(successForm.password, successForm.password2)
               if (errors.size > 0) {
                 val newErrorForm = Form(filledForm.mapping, filledForm.data,
@@ -124,7 +129,7 @@ object ABUserDetail extends Controller with TSecured {
                 BadRequest(views.html.user_detail(mode, newErrorForm)(session))
               } else {
                 val password = successForm.password
-                CommonService.createUserAndPassword(user, password)
+                commonService.createUserAndPassword(user, password)
                 Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
               }
             }
@@ -145,8 +150,8 @@ object ABUserDetail extends Controller with TSecured {
         BadRequest(views.html.user_detail(mode, filledForm)(session))
       },
         successForm => {
-          val user = OBUser(successForm)
-          CommonService.updateUser(user)
+          val user = objUser(successForm)
+          commonService.updateUser(user)
 
           val password = successForm.password
           val errors: Seq[Option[FormError]] = if (!isBlank(password)) {
@@ -158,7 +163,7 @@ object ABUserDetail extends Controller with TSecured {
               errors.map(_.get), filledForm.value)
             BadRequest(views.html.user_detail(mode, newErrorForm)(session))
           } else {
-            CommonService.updatePassword(user.userID, password)
+            commonService.updatePassword(user.userID, password)
             Redirect(routes.ABUserList.listUsers()).withSession(session - "mode")
           }
         }

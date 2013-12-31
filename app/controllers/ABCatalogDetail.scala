@@ -15,18 +15,22 @@ import play.api.i18n.Messages
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
-import util.CommonUtil._
-import services.CommonService
+import utils.CommonUtil._
 import models.OBBook
 import models.common.Category
 import models.common.DDBookOrigin
 import models.common.STATUS_BOOK_AVL
+import models.TCatalog
+import models.TBook
+import services.CommonService
 
 /**
  * Action to handle the catalog section, including the add, update, delete, and view.
  */
 object ABCatalogDetail extends Controller with TSecured {
-
+  val objCatalog = OBCatalog
+  val objBook = OBBook
+  
   val MODE_ADD = "ADD"
   val MODE_EDIT = "EDIT"
   
@@ -69,10 +73,10 @@ object ABCatalogDetail extends Controller with TSecured {
 	    status: Option[String],
 	    remarks: Option[String]) {
     
-	  def transform()(implicit pOfficerUserID: String): OBBook = {
-	    OBBook(
+	  def transform()(implicit pOfficerUserID: String): TBook = {
+	    objBook(
 	      None,
-	      OBCatalog.find(this.catalogSeqNo.get.toInt), 
+	      objCatalog.find(this.catalogSeqNo.get.toInt), 
 	      DDBookOrigin(this.originCode.get), 
 	      STATUS_BOOK_AVL,
 	      pOfficerUserID,
@@ -89,7 +93,7 @@ object ABCatalogDetail extends Controller with TSecured {
   }
 	
 	object FormBook {
-	  def apply(pBook: OBBook): FormBook = {
+	  def apply(pBook: TBook): FormBook = {
 	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
 	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
 	        )
@@ -104,8 +108,8 @@ object ABCatalogDetail extends Controller with TSecured {
 	  val category: String,
 	  val books: Option[List[FormBook]] = Some(List())
 	) {
-	  def transform()(implicit pOfficerUserID: String = ""): OBCatalog = {
-	    OBCatalog(
+	  def transform()(implicit pOfficerUserID: String = ""): TCatalog = {
+	    objCatalog(
 	        this.seqNo,
 	        this.title,
 	        this.author,
@@ -123,7 +127,7 @@ object ABCatalogDetail extends Controller with TSecured {
 	}
 	
 	object FormCatalog {
-	  def apply(pCatalog: OBCatalog): FormCatalog = {
+	  def apply(pCatalog: TCatalog): FormCatalog = {
 	    FormCatalog(pCatalog.seqNo,pCatalog.title, pCatalog.author, 
 	        pCatalog.publishedYear.toString, pCatalog.category.code.toString, 
 	        Some(pCatalog.books.map(FormBook(_))))
@@ -144,7 +148,7 @@ object ABCatalogDetail extends Controller with TSecured {
       formCatalog =>
         formCatalog.seqNo == None || {
           // There shouldn't be any duplicate catalogs in the database.
-          val dbCatalogs = CommonService.findDuplicates(formCatalog.transform)
+          val dbCatalogs = commonService.findDuplicates(formCatalog.transform)
           dbCatalogs.size == 0 || dbCatalogs.size == 1 && dbCatalogs.get(0).seqNo == formCatalog.seqNo
         }
     }))
@@ -164,7 +168,7 @@ object ABCatalogDetail extends Controller with TSecured {
    */
   def edit(pIDStr: String) = withAuth {implicit officerUserID => implicit req =>
     println("edit")
-    val catalog = OBCatalog.find(pIDStr.toInt)(true)
+    val catalog = objCatalog.find(pIDStr.toInt)(true)
     val formCatalog = FormCatalog(catalog)
     val filledForm = updateCatalogForm.fill(formCatalog)
     val books = filledForm("books")
@@ -191,7 +195,7 @@ object ABCatalogDetail extends Controller with TSecured {
         BadRequest(views.html.catalog_detail(mode, tempForm)(session))
       },
       data => {
-        val catalogSeqNo = CommonService.createNewCatalog(data.transform)
+        val catalogSeqNo = commonService.createNewCatalog(data.transform)
         Redirect(routes.ABBookDetail.newBook(catalogSeqNo.toString)).withSession(session - "mode")
       })
   }
@@ -212,7 +216,7 @@ object ABCatalogDetail extends Controller with TSecured {
       },
       data => {
         val catalog = data.transform
-        CommonService.updateCatalog(catalog)
+        commonService.updateCatalog(catalog)
         Redirect(routes.ABCatalogList.index()).withSession(session - "mode")
       })
   }

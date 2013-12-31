@@ -1,11 +1,12 @@
-import util.CommonUtil._
+package controllers {
+
+import utils.CommonUtil._
 import models.form.FormBook
 import models.OBBook
 import models.OBCatalog
 import models.common.DDBookOrigin
 import models.common.STATUS_BOOK_AVL
-
-package controllers {
+import models.TBook
 
 import models.exception.CategoryNotFoundException
 import models.form.FormCategory
@@ -19,7 +20,9 @@ import models.common.Category
 import play.api.data.format.Formats._
 
 object ABCategory extends Controller with TSecured {
-
+  val objCatalog = OBCatalog
+  val objBook = OBBook
+  
   val categoryMapping = mapping(
       "selectedID" -> optional(number),
       "updatedCategoryName" -> optional(text),
@@ -43,10 +46,10 @@ object ABCategory extends Controller with TSecured {
 	    status: Option[String],
 	    remarks: Option[String]) {
     
-	  def transform()(implicit pOfficerUserID: String): OBBook = {
-	    OBBook(
+	  def transform()(implicit pOfficerUserID: String): TBook = {
+	    objBook(
 	      None,
-	      OBCatalog.find(this.catalogSeqNo.get.toInt), 
+	      objCatalog.find(this.catalogSeqNo.get.toInt), 
 	      DDBookOrigin(this.originCode.get), 
 	      STATUS_BOOK_AVL,
 	      pOfficerUserID,
@@ -63,7 +66,7 @@ object ABCategory extends Controller with TSecured {
   }
 	
 	object FormBook {
-	  def apply(pBook: OBBook): FormBook = {
+	  def apply(pBook: TBook): FormBook = {
 	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
 	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
 	        )
@@ -94,7 +97,7 @@ object ABCategory extends Controller with TSecured {
   def listCategories = withAuth { implicit officerUserID => implicit req => 
     val list1 = Category.alls
     val filledForm = categoryForm.fill(FormCategory(None, None, "", Some(list1)))
-    val catalog = OBCatalog.find(1)(true)
+    val catalog = objCatalog.find(1)(true)
     val formCatalog = FormCatalog(Some(catalog.books.map(FormBook(_))))
     val filledCatForm = catalogForm.fill(formCatalog)
     Ok(views.html.categories_list(filledForm, filledCatForm)(session))
@@ -124,7 +127,7 @@ object ABCategory extends Controller with TSecured {
 			      BadRequest(views.html.categories_list(newErrors, filledCatForm)(session))
 			    } catch {
 			      case e: CategoryNotFoundException => {
-			    	  CommonService.createNewCategory(categoryName)
+			    	  commonService.createNewCategory(categoryName)
 			    	  Redirect(routes.ABCategory.listCategories())
 			      }
 			    }
@@ -161,7 +164,7 @@ object ABCategory extends Controller with TSecured {
 				  }
 	          }
 			  if (isEligibleForUpdate) {
-				CommonService.updateCategory(selectedSeqNo, categoryName)
+				commonService.updateCategory(selectedSeqNo, categoryName)
 				Redirect(routes.ABCategory.listCategories())
 			  } else {
 	        	val newErrors = Form(filledForm.mapping, filledForm.data, 

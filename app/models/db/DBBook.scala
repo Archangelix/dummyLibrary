@@ -3,6 +3,7 @@ package models.db
 import java.util.Date
 import models.form.FormBook
 import models.OBBook
+import models.TBook
 
 /**
  * Book database object. A business object has to be mapped to / from this database object 
@@ -22,10 +23,10 @@ case class DBBook (
     auditUsercode: String, 
     auditTimetamp: Date, 
     auditReason: Option[String]
-    )
+    ) extends TDBBook
 
 object DBBook {
-   def apply(pBook: OBBook): DBBook = 
+   def apply(pBook: TBook): DBBook = 
      DBBook(
         pBook.catalog.seqNo.get, 
         pBook.seqNo, 

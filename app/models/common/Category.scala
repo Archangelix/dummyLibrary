@@ -1,20 +1,23 @@
 package models.common
 
-import services.DBService
+import services.PSQLService
+
 
 case class Category(code: Int, name: String) {
   override def toString() = name
 }
 
 object Category {
-  private def items = DBService.getCategoriesMap
+  val dbService = PSQLService
+  
+  private def items = dbService.getCategoriesMap
 
   def apply(pID: Int): Category = Category(pID, items(pID.toString))
   
   def all = items
   
-  def alls = DBService.listAllCategories()
+  def alls = dbService.listAllCategories()
   
-  def findByName(pCategoryName: String) = DBService.findCategoryByName(pCategoryName)
+  def findByName(pCategoryName: String) = dbService.findCategoryByName(pCategoryName)
   
 }
