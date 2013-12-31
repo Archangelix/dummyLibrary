@@ -1,4 +1,4 @@
-package controllers {
+package controllers
 
 import utils.CommonUtil._
 import models.form.FormBook
@@ -18,8 +18,10 @@ import play.api.data.FormError
 import services.CommonService
 import models.common.Category
 import play.api.data.format.Formats._
+import utils.CommonUtil._
+import utils.Constants._
 
-object ABCategory extends Controller with TSecured {
+trait ABCategory extends TSecured { this: Controller => 
   val objCatalog = OBCatalog
   val objBook = OBBook
   
@@ -37,46 +39,6 @@ object ABCategory extends Controller with TSecured {
      
   val categoryForm = Form[FormCategory](categoryMapping)
 
-  case class FormBook(
-	    idx: Option[Int], 
-	    seqNo: Option[Int], 
-	    catalogSeqNo: Option[Int], 
-	    originCode: Option[String], 
-	    originDesc: Option[String],
-	    status: Option[String],
-	    remarks: Option[String]) {
-    
-	  def transform()(implicit pOfficerUserID: String): TBook = {
-	    objBook(
-	      None,
-	      objCatalog.find(this.catalogSeqNo.get.toInt), 
-	      DDBookOrigin(this.originCode.get), 
-	      STATUS_BOOK_AVL,
-	      pOfficerUserID,
-	      null,
-	      this.remarks.getOrElse(""), 
-	      false,
-	      pOfficerUserID,
-	      null,
-	      pOfficerUserID,
-	      null,
-	      None
-	    )
-	  }
-  }
-	
-	object FormBook {
-	  def apply(pBook: TBook): FormBook = {
-	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
-	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
-	        )
-	  }
-	}
-  
-  	case class FormCatalog(
-	  val books: Option[List[FormBook]] = Some(List())
-	)
-	
 	val formCatalogMapping = mapping(
 	    "books" -> optional(list(mapping(
 		    "idx" -> optional(of[Int]),
@@ -86,10 +48,10 @@ object ABCategory extends Controller with TSecured {
 		    "originDesc" -> optional(text),
 		    "status" -> optional(text),
 		    "remarks" -> optional(text)
-		  )(FormBook.apply)(FormBook.unapply))
-	  ))(FormCatalog.apply)(FormCatalog.unapply)
+		  )(ABCategory.FormBook.apply)(ABCategory.FormBook.unapply))
+	  ))(ABCategory.FormCatalog.apply)(ABCategory.FormCatalog.unapply)
 	  
-  val catalogForm = Form[FormCatalog](formCatalogMapping)
+  val catalogForm = Form[ABCategory.FormCatalog](formCatalogMapping)
 	  
   /**
    * Displaying the list of users for a corresponding page index.
@@ -98,7 +60,7 @@ object ABCategory extends Controller with TSecured {
     val list1 = Category.alls
     val filledForm = categoryForm.fill(FormCategory(None, None, "", Some(list1)))
     val catalog = objCatalog.find(1)(true)
-    val formCatalog = FormCatalog(Some(catalog.books.map(FormBook(_))))
+    val formCatalog = ABCategory.FormCatalog(Some(catalog.books.map(ABCategory.FormBook(_))))
     val filledCatForm = catalogForm.fill(formCatalog)
     Ok(views.html.categories_list(filledForm, filledCatForm)(session))
   }
@@ -177,4 +139,47 @@ object ABCategory extends Controller with TSecured {
   }
 
 }
+
+object ABCategory extends Controller with ABCategory {
+  
+  case class FormBook(
+	    idx: Option[Int], 
+	    seqNo: Option[Int], 
+	    catalogSeqNo: Option[Int], 
+	    originCode: Option[String], 
+	    originDesc: Option[String],
+	    status: Option[String],
+	    remarks: Option[String]) {
+    
+	  def transform()(implicit pOfficerUserID: String): TBook = {
+	    objBook(
+	      None,
+	      objCatalog.find(this.catalogSeqNo.get.toInt), 
+	      DDBookOrigin(this.originCode.get), 
+	      STATUS_BOOK_AVL,
+	      pOfficerUserID,
+	      null,
+	      this.remarks.getOrElse(""), 
+	      false,
+	      pOfficerUserID,
+	      null,
+	      pOfficerUserID,
+	      null,
+	      None
+	    )
+	  }
+  }
+	
+	object FormBook {
+	  def apply(pBook: TBook): FormBook = {
+	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
+	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)
+	        )
+	  }
+	}
+  
+  	case class FormCatalog(
+	  val books: Option[List[FormBook]] = Some(List())
+	)
+	
 }

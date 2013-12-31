@@ -13,25 +13,13 @@ import play.mvc.Http.Session
 import models.common.Category
 import models.common.CatalogListItem
 import models.OBCatalog
+import utils.CommonUtil._
 
-object ABSearchCatalog extends Controller with TSecured with TLogin {
+trait ABSearchCatalog extends TSecured with TLogin { this: Controller => 
+  override val logger = generateLogger(this)
+  
   val objCatalog = OBCatalog
 
-  case class FormCatalogListItem(
-      idx: String,
-	  title: String,
-	  author: String, 
-	  publishedYear: Int,
-	  category: String
-  )
-  
-  object FormCatalogListItem {
-    def apply(pCatalog: CatalogListItem): FormCatalogListItem = {
-      FormCatalogListItem(pCatalog.idx.toString, pCatalog.title, pCatalog.author, pCatalog.publishedYear, 
-          Category(pCatalog.categorySeqNo).toString)
-    }
-  }
-  
   val formSearchCatalogMapping = mapping(
       "searchKeyword" -> text,
       "author" -> text,
@@ -51,6 +39,25 @@ object ABSearchCatalog extends Controller with TSecured with TLogin {
   
   def search(pStr: String) = Action { implicit req =>
 	val catalogList = objCatalog.search(pStr)
-    Ok(views.html.search_catalog(loginForm, pStr, catalogList.map(FormCatalogListItem(_))))
+    Ok(views.html.search_catalog(loginForm, pStr, catalogList.map(ABSearchCatalog.FormCatalogListItem(_))))
   }
+}
+
+object ABSearchCatalog extends Controller with ABSearchCatalog {
+  
+  case class FormCatalogListItem(
+      idx: String,
+	  title: String,
+	  author: String, 
+	  publishedYear: Int,
+	  category: String
+  )
+  
+  object FormCatalogListItem {
+    def apply(pCatalog: CatalogListItem): FormCatalogListItem = {
+      FormCatalogListItem(pCatalog.idx.toString, pCatalog.title, pCatalog.author, pCatalog.publishedYear, 
+          Category(pCatalog.categorySeqNo).toString)
+    }
+  }
+  
 }

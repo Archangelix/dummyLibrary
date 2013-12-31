@@ -66,8 +66,11 @@ import models.OBTxBorrowDT
 import models.db.DBTxBorrowHD
 import models.OBTxBorrowHD
 import models.OBCatalog
+import utils.CommonUtil._
 
 trait TCommonService {
+  val logger = generateLogger(this)
+  
   val dbService = PSQLService
   val objTxBorrowHD = OBTxBorrowHD
   val objTxBorrowDT = OBTxBorrowDT

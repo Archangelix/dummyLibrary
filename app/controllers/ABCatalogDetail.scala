@@ -23,16 +23,16 @@ import models.common.STATUS_BOOK_AVL
 import models.TCatalog
 import models.TBook
 import services.CommonService
+import utils.CommonUtil._
+import utils.Constants._
 
 /**
  * Action to handle the catalog section, including the add, update, delete, and view.
  */
-object ABCatalogDetail extends Controller with TSecured {
+trait ABCatalogDetail extends TSecured { this: Controller => 
+  
   val objCatalog = OBCatalog
   val objBook = OBBook
-  
-  val MODE_ADD = "ADD"
-  val MODE_EDIT = "EDIT"
   
   val formBookMapping = mapping(
     "idx" -> optional(of[Int]),
@@ -42,7 +42,7 @@ object ABCatalogDetail extends Controller with TSecured {
     "originDesc" -> optional(text),
     "status" -> optional(text),
     "remarks" -> optional(text)
-  )(FormBook.apply)(FormBook.unapply)
+  )(ABCatalogDetail.FormBook.apply)(ABCatalogDetail.FormBook.unapply)
 
   val validYear: Constraint[String] = Constraint[String]("valid.year")(str => 
 	  if (isBlank(str)) {
@@ -63,6 +63,97 @@ object ABCatalogDetail extends Controller with TSecured {
 	    }
 	  }
   )
+  
+  val formCatalogMapping = mapping(
+      "id" -> optional(of[Int]),
+      "title" -> nonEmptyText,
+      "author" -> nonEmptyText,
+      "publishedYear" -> text.verifying(validYear),
+      "category" -> nonEmptyText,
+      "books" -> optional(list(formBookMapping))
+    )(ABCatalogDetail.FormCatalog.apply)(ABCatalogDetail.FormCatalog.unapply)
+
+  val newCatalogForm = Form[ABCatalogDetail.FormCatalog](
+    formCatalogMapping verifying ("Duplicate catalog found.", {
+      formCatalog =>
+        formCatalog.seqNo == None || {
+          // There shouldn't be any duplicate catalogs in the database.
+          val dbCatalogs = commonService.findDuplicates(formCatalog.transform)
+          dbCatalogs.size == 0 || dbCatalogs.size == 1 && dbCatalogs.get(0).seqNo == formCatalog.seqNo
+        }
+    }))
+
+  val updateCatalogForm = Form[ABCatalogDetail.FormCatalog](formCatalogMapping)
+  
+  /**
+   * Displaying the catalog detail page with blank information.
+   */
+  def gotoNewCatalog() = withAuth {implicit officerUserID => implicit req =>
+    Ok(views.html.catalog_detail(MODE_ADD, newCatalogForm)(session)).withSession(
+        session + ("mode" -> MODE_ADD))
+  }
+
+  /**
+   * Displaying the book detail page with pre-populated catalog information.
+   */
+  def edit(pIDStr: String) = withAuth {implicit officerUserID => implicit req =>
+    println("edit")
+    val catalog = objCatalog.find(pIDStr.toInt)(true)
+    val formCatalog = ABCatalogDetail.FormCatalog(catalog)
+    val filledForm = updateCatalogForm.fill(formCatalog)
+    val books = filledForm("books")
+    println("Books = "+books)
+    
+    val username = session.get("username").getOrElse("")
+    Ok(views.html.catalog_detail(MODE_EDIT, filledForm)(session)).withSession(
+        session + ("mode" -> MODE_EDIT))
+  }
+  
+  /**
+   * Saving the catalog details.
+   */
+  def saveNew = withAuth {implicit officerUserID => implicit req =>
+    val tempForm = newCatalogForm.bindFromRequest()
+    val mode = session.get("mode").getOrElse(MODE_ADD)
+    val username = session.get("username").getOrElse("")
+
+    tempForm.fold(
+      errors => {
+        tempForm.errors.map {err => 
+          println(err.message)
+        }
+        BadRequest(views.html.catalog_detail(mode, tempForm)(session))
+      },
+      data => {
+        val catalogSeqNo = commonService.createNewCatalog(data.transform)
+        Redirect(routes.ABBookDetail.newBook(catalogSeqNo.toString)).withSession(session - "mode")
+      })
+  }
+
+  def saveUpdate = withAuth {implicit officerUserID => implicit req =>
+    println("saveUpdate!!!")
+    val tempForm = updateCatalogForm.bindFromRequest()
+    val tmpBooks= tempForm("books").value
+    val mode = session.get("mode").getOrElse(MODE_ADD)
+    val username = session.get("username").getOrElse("")
+
+    tempForm.fold(
+      errors => {
+        tempForm.errors.map {err => 
+          println(err.message)
+        }
+        BadRequest(views.html.catalog_detail(mode, tempForm)(session))
+      },
+      data => {
+        val catalog = data.transform
+        commonService.updateCatalog(catalog)
+        Redirect(routes.ABCatalogList.index()).withSession(session - "mode")
+      })
+  }
+
+}
+
+object ABCatalogDetail extends Controller with ABCatalogDetail{
   
   case class FormBook(
 	    idx: Option[Int], 
@@ -133,92 +224,5 @@ object ABCatalogDetail extends Controller with TSecured {
 	        Some(pCatalog.books.map(FormBook(_))))
 	  }
 	}
-
-  val formCatalogMapping = mapping(
-      "id" -> optional(of[Int]),
-      "title" -> nonEmptyText,
-      "author" -> nonEmptyText,
-      "publishedYear" -> text.verifying(validYear),
-      "category" -> nonEmptyText,
-      "books" -> optional(list(formBookMapping))
-    )(FormCatalog.apply)(FormCatalog.unapply)
-
-  val newCatalogForm = Form[FormCatalog](
-    formCatalogMapping verifying ("Duplicate catalog found.", {
-      formCatalog =>
-        formCatalog.seqNo == None || {
-          // There shouldn't be any duplicate catalogs in the database.
-          val dbCatalogs = commonService.findDuplicates(formCatalog.transform)
-          dbCatalogs.size == 0 || dbCatalogs.size == 1 && dbCatalogs.get(0).seqNo == formCatalog.seqNo
-        }
-    }))
-
-  val updateCatalogForm = Form[FormCatalog](formCatalogMapping)
-  
-  /**
-   * Displaying the catalog detail page with blank information.
-   */
-  def gotoNewCatalog() = withAuth {implicit officerUserID => implicit req =>
-    Ok(views.html.catalog_detail(MODE_ADD, newCatalogForm)(session)).withSession(
-        session + ("mode" -> MODE_ADD))
-  }
-
-  /**
-   * Displaying the book detail page with pre-populated catalog information.
-   */
-  def edit(pIDStr: String) = withAuth {implicit officerUserID => implicit req =>
-    println("edit")
-    val catalog = objCatalog.find(pIDStr.toInt)(true)
-    val formCatalog = FormCatalog(catalog)
-    val filledForm = updateCatalogForm.fill(formCatalog)
-    val books = filledForm("books")
-    println("Books = "+books)
-    
-    val username = session.get("username").getOrElse("")
-    Ok(views.html.catalog_detail(MODE_EDIT, filledForm)(session)).withSession(
-        session + ("mode" -> MODE_EDIT))
-  }
-  
-  /**
-   * Saving the catalog details.
-   */
-  def saveNew = withAuth {implicit officerUserID => implicit req =>
-    val tempForm = newCatalogForm.bindFromRequest()
-    val mode = session.get("mode").getOrElse(MODE_ADD)
-    val username = session.get("username").getOrElse("")
-
-    tempForm.fold(
-      errors => {
-        tempForm.errors.map {err => 
-          println(err.message)
-        }
-        BadRequest(views.html.catalog_detail(mode, tempForm)(session))
-      },
-      data => {
-        val catalogSeqNo = commonService.createNewCatalog(data.transform)
-        Redirect(routes.ABBookDetail.newBook(catalogSeqNo.toString)).withSession(session - "mode")
-      })
-  }
-
-  def saveUpdate = withAuth {implicit officerUserID => implicit req =>
-    println("saveUpdate!!!")
-    val tempForm = updateCatalogForm.bindFromRequest()
-    val tmpBooks= tempForm("books").value
-    val mode = session.get("mode").getOrElse(MODE_ADD)
-    val username = session.get("username").getOrElse("")
-
-    tempForm.fold(
-      errors => {
-        tempForm.errors.map {err => 
-          println(err.message)
-        }
-        BadRequest(views.html.catalog_detail(mode, tempForm)(session))
-      },
-      data => {
-        val catalog = data.transform
-        commonService.updateCatalog(catalog)
-        Redirect(routes.ABCatalogList.index()).withSession(session - "mode")
-      })
-  }
 
 }

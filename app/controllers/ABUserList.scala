@@ -13,40 +13,10 @@ import models.common.UserListItem
 import models.common.Gender
 import java.text.SimpleDateFormat
 import services.CommonService
+import utils.CommonUtil._
+import utils.Constants._
 
-object ABUserList extends Controller with TSecured {
-  /**
-   * COMMON CONSTANTS
-   */
-  val PAGE_ROW_CNT = 5
-  
-  
-  case class FormUserListItem(
-    rowIdx: String,
-    seqNo: String,
-    userID: String, 
-    name: String, 
-    gender: String,
-    race: String,
-    idNumber: String, 
-    address: String,
-    dob: String,
-    userRoleName: String,
-    nationality: String
-  )
-  
-  object FormUserListItem{
-    def apply(pItem: UserListItem): FormUserListItem = {
-      FormUserListItem(pItem.idx.get.toString, pItem.seqNo.toString,
-          pItem.userID, pItem.name, Gender(pItem.gender).toString, "", pItem.idNumber, pItem.address, 
-          sdf.format(pItem.dob), pItem.userRoleName, pItem.nationality)
-    }
-  }
-
-  val CURRENT_PAGE = "userCurrentPage"
-  val CURRENT_PAGE_IDX = "userCurrentPageIdx"
-  val MAX_PAGE_IDX = "maxPageIdx"
-  val ITEMS_PER_VIEW = 5 
+trait ABUserList extends TSecured { this: Controller => 
     
   val listingForm = Form (
     tuple (
@@ -54,8 +24,6 @@ object ABUserList extends Controller with TSecured {
       "maxPageIdx" -> number
     )
   )
-  
-  val sdf = new SimpleDateFormat("dd-M-yyyy")
   
   /**
    * Displaying the list of users for a corresponding page index.
@@ -70,7 +38,7 @@ object ABUserList extends Controller with TSecured {
     }
     val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
     Ok(views.html.user_list(currentPageIdx, maxPage, 
-        list1.map(FormUserListItem(_)))(session))
+        list1.map(ABUserList.FormUserListItem(_)))(session))
   }
   
   /**
@@ -133,4 +101,31 @@ object ABUserList extends Controller with TSecured {
   
   
   def isBlank(str: String) = str==null || str.trim().equals("")
+}
+
+object ABUserList extends Controller with ABUserList {
+  
+  case class FormUserListItem(
+    rowIdx: String,
+    seqNo: String,
+    userID: String, 
+    name: String, 
+    gender: String,
+    race: String,
+    idNumber: String, 
+    address: String,
+    dob: String,
+    userRoleName: String,
+    nationality: String
+  )
+  
+  object FormUserListItem{
+    def apply(pItem: UserListItem): FormUserListItem = {
+      FormUserListItem(pItem.idx.get.toString, pItem.seqNo.toString,
+          pItem.userID, pItem.name, Gender(pItem.gender).toString, "", pItem.idNumber, pItem.address, 
+          sdf.format(pItem.dob), pItem.userRoleName, pItem.nationality)
+    }
+  }
+
+  val sdf = new SimpleDateFormat("dd-M-yyyy")
 }

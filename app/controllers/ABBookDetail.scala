@@ -18,16 +18,16 @@ import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
 import play.api.i18n.Messages
 import models.TBook
+import utils.CommonUtil._
+import utils.Constants._
 
 /**
  * Action to handle the book section, including the add, update, delete, and view.
  */
-trait ABBookDetail {this: Controller with TSecured =>
+trait ABBookDetail extends TSecured {this: Controller =>
+  
   val objBook = OBBook
   val objCatalog = OBCatalog
-  
-  val MODE_ADD = "ADD"
-  val MODE_EDIT = "EDIT"
   
     /**
      * Dropdown items for the 'Origin' type.
@@ -138,7 +138,8 @@ trait ABBookDetail {this: Controller with TSecured =>
 
 }
 
-object ABBookDetail extends Controller with ABBookDetail with TSecured {
+object ABBookDetail extends Controller with ABBookDetail {
+  
 	case class FormBook(
 	    idx: Option[Int], 
 	    seqNo: Option[Int], 
@@ -175,6 +176,7 @@ object ABBookDetail extends Controller with ABBookDetail with TSecured {
   	}
 	
 	object FormBook {
+	  
 	  def apply(pBook: TBook): FormBook = {
 	    FormBook(None, pBook.seqNo, pBook.catalog.seqNo, Some(pBook.origin.code), 
 	        Some(pBook.origin.desc), Some(pBook.status.description), Some(pBook.remarks)

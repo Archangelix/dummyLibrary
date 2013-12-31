@@ -25,28 +25,11 @@ import services.CommonService
 import play.api.data.Mapping
 import models.TTxBorrowDT
 import models.OBTxBorrowDT
+import utils.CommonUtil._
 
-object ABReturnBook extends Controller with TSecured {
+trait ABReturnBook extends TSecured {this: Controller => 
   val objTxBorrowDT = OBTxBorrowDT
   
-	case class FormReturn(
-	  msg: Option[String],
-	  transactionID: Option[String],
-	  bookID: Option[String],
-	  title: Option[String],
-	  author: Option[String],
-	  category: Option[String],
-	  publishedYear: Option[String],
-	  borrowDate: Option[String],
-	  expReturnDate: Option[String],
-	  borrowerID: Option[String],
-	  borrowerName: Option[String],
-	  borrowerAddress: Option[String],
-	  borrowerContactNo: Option[String],
-	  officerName: Option[String],
-	  bookRemarks: Option[String]
-	)
-	
   val formReturnMapping = 
       mapping(
           "msg" -> optional(text),
@@ -64,9 +47,9 @@ object ABReturnBook extends Controller with TSecured {
 		  "borrowerContactNo" -> optional(text),
 		  "officerName" -> optional(text),
 	      "bookRemarks" -> optional(text)
-	  )(FormReturn.apply)(FormReturn.unapply)
+	  )(ABReturnBook.FormReturn.apply)(ABReturnBook.FormReturn.unapply)
 	  
-  val returnForm = Form[FormReturn](formReturnMapping)
+  val returnForm = Form[ABReturnBook.FormReturn](formReturnMapping)
   
  def returnPage = withAuth { implicit officerUserID => implicit req =>
    val msg = flash.get("msg")
@@ -80,7 +63,8 @@ object ABReturnBook extends Controller with TSecured {
    }
  }
   
-  def validateAndGetTxDetail(formReturn: Form[FormReturn], pBookID: String):(TTxBorrowDT, Form[FormReturn]) = {
+  def validateAndGetTxDetail(formReturn: Form[ABReturnBook.FormReturn], pBookID: String):
+	  (TTxBorrowDT, Form[ABReturnBook.FormReturn]) = {
     if (isBlank(pBookID)) {
 	  val newErrorForm = Form(
 			  formReturn.mapping, 
@@ -127,7 +111,7 @@ object ABReturnBook extends Controller with TSecured {
               val borrower = header.borrower
               val book = txDetail.book
               val catalog = book.catalog
-              val newForm = FormReturn(
+              val newForm = ABReturnBook.FormReturn(
                   None,
                   Some(txDetail.header.seqno.get.toString),
                   Some(book.id),
@@ -169,4 +153,26 @@ object ABReturnBook extends Controller with TSecured {
  }
   
   val sdf = new SimpleDateFormat("dd-M-yyyy")
+}
+
+object ABReturnBook extends Controller with ABReturnBook {
+  
+	case class FormReturn(
+	  msg: Option[String],
+	  transactionID: Option[String],
+	  bookID: Option[String],
+	  title: Option[String],
+	  author: Option[String],
+	  category: Option[String],
+	  publishedYear: Option[String],
+	  borrowDate: Option[String],
+	  expReturnDate: Option[String],
+	  borrowerID: Option[String],
+	  borrowerName: Option[String],
+	  borrowerAddress: Option[String],
+	  borrowerContactNo: Option[String],
+	  officerName: Option[String],
+	  bookRemarks: Option[String]
+	)
+	
 }

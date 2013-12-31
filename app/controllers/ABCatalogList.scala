@@ -9,41 +9,15 @@ import play.api.data.Forms.tuple
 import play.api.mvc.Controller
 import services.CommonService
 import models.common.CatalogListItem
+import utils.CommonUtil._
+import utils.Constants._
 
 /**
  * Action to handle the catalog listing section. A catalog can be removed
  * from this listing page.
  */
-object ABCatalogList extends Controller with TSecured {
+trait ABCatalogList extends TSecured { this: Controller => 
   
-  /**
-   * COMMON CONSTANTS
-   */
-  val PAGE_ROW_CNT = 5
-  
-  case class FormCatalogListItem(
-      idx: String,
-      seqNo: String,
-	  title: String,
-	  author: String, 
-	  publishedYear: Int,
-	  category: String
-  )
-  
-  object FormCatalogListItem {
-    def apply(pCatalog: CatalogListItem): FormCatalogListItem = {
-      FormCatalogListItem(pCatalog.idx.toString, pCatalog.seqNo.toString, 
-          pCatalog.title, pCatalog.author, pCatalog.publishedYear, 
-          Category(pCatalog.categorySeqNo).toString)
-    }
-  }
-  
-  val CURRENT_PAGE = "currentPage"
-  val CURRENT_PAGE_IDX = "currentPageIdx"
-  val MAX_PAGE_IDX = "maxPageIdx"
-  val CURRENT_LIST = "currentList"
-  val ITEMS_PER_VIEW = 5 
-    
   val listingForm = Form (
     tuple (
       "currentPageIdx" -> number,
@@ -64,7 +38,7 @@ object ABCatalogList extends Controller with TSecured {
     }
     val maxPage = ((rowCount-1) / ITEMS_PER_VIEW)+1
     Ok(views.html.catalog_list(currentPageIdx, maxPage, 
-        list1.map(FormCatalogListItem(_)))(session))
+        list1.map(ABCatalogList.FormCatalogListItem(_)))(session))
   }
   
   /**
@@ -126,4 +100,25 @@ object ABCatalogList extends Controller with TSecured {
   }
   
   def isBlank(str: String) = str==null || str.trim().equals("")
+}
+
+object ABCatalogList extends Controller with ABCatalogList {
+  
+  case class FormCatalogListItem(
+      idx: String,
+      seqNo: String,
+	  title: String,
+	  author: String, 
+	  publishedYear: Int,
+	  category: String
+  )
+  
+  object FormCatalogListItem {
+    def apply(pCatalog: CatalogListItem): FormCatalogListItem = {
+      FormCatalogListItem(pCatalog.idx.toString, pCatalog.seqNo.toString, 
+          pCatalog.title, pCatalog.author, pCatalog.publishedYear, 
+          Category(pCatalog.categorySeqNo).toString)
+    }
+  }
+  
 }

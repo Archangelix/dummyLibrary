@@ -4,11 +4,14 @@ import java.security.MessageDigest
 
 import utils.CommonUtil._
 import play.api.data.FormError
+import utils.CommonUtil._
 
 /**
  * This object is used as a security utility, mainly used for login authentication.
  */
 object SecurityUtil {
+  val logger = generateLogger(this)
+  
   val sha256 = MessageDigest.getInstance("SHA-256")
 
   def hex_digest(s: String): String = {

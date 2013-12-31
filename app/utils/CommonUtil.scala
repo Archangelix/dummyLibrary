@@ -7,8 +7,11 @@ import play.api.data.validation.Invalid
 import play.api.data.validation.Valid
 import org.joda.time.Period
 import play.api.data.validation.ValidationError
+import org.slf4j.LoggerFactory
 
 object CommonUtil {
+  val logger = generateLogger(this)
+  
     def validDOB(): Constraint[Date] = 
 	    Constraint[Date]("constraint.validDate") { o =>
 	      val currentTime = DateTime.now
@@ -32,6 +35,8 @@ object CommonUtil {
           Valid
         }
       }
+    
+    def generateLogger(pObj: Any) = LoggerFactory.getLogger(pObj.getClass().getName())
 
 	def isBlank(str: String): Boolean = str==null || str.trim().isEmpty()
 	

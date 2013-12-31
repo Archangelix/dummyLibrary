@@ -4,9 +4,6 @@ import org.specs2.mutable._
 
 import play.api.test._
 import play.api.test.Helpers._
-import org.scalatest.FunSuite
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 
 /**
  * Add your spec here.

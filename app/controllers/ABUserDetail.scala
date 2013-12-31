@@ -20,14 +20,14 @@ import play.api.data.validation.ValidationError
 import play.api.mvc.Controller
 import services.CommonService
 import java.util.Calendar
+import utils.CommonUtil._
+import utils.Constants._
+
 /**
  * Action to handle the user section, including the add, update, delete, and view.
  */
-object ABUserDetail extends Controller with TSecured {
+trait ABUserDetail extends TSecured { this: Controller => 
   val objUser = OBUser
-  
-  val MODE_ADD = "ADD"
-  val MODE_EDIT = "EDIT"
   
   def minYear(pMinYear: Int): Constraint[Date] =
     Constraint[Date]("constraint.minYear", pMinYear) { o =>
@@ -171,4 +171,8 @@ object ABUserDetail extends Controller with TSecured {
   }
   
   def isBlank(str: String) = str==null || str.trim().equals("")
+}
+
+object ABUserDetail extends Controller with ABUserDetail {
+  
 }

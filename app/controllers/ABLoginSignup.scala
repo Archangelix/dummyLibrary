@@ -16,8 +16,6 @@ import play.mvc.Http.Session
 import java.security.MessageDigest
 import utils.SecurityUtil._
 import utils.CommonUtil._
-import controllers.ABUserDetail.MODE_ADD
-import controllers.ABUserDetail.MODE_EDIT
 import models.form.FormUser
 import java.util.Date
 import play.api.data.FormError
@@ -29,11 +27,13 @@ import org.joda.time.DateTime
 import org.joda.time.Period
 import play.api.Routes
 import services.CommonService
+import utils.CommonUtil._
 
 /**
  * Action to handle the logging section.
  */
-object ABLoginSignup extends Controller with TSecured with TLogin {
+trait ABLoginSignup extends TLogin with TSecured { this: Controller => 
+  override val logger = generateLogger(this)
   
   val formNewUserMapping = mapping(
       "seqNo" -> optional(of[Int]),
@@ -54,7 +54,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
   /**
    * Displaying the login page.
    */
-  override def loginPage = Action { implicit req =>
+  def loginPage = Action { implicit req =>
     println("ABLoginSignup")
     val username = flash.get("username")
     if (username == None) {
@@ -70,7 +70,7 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
   /**
    * Login authentication.
    */
-  override def login = Action { implicit req =>
+  def login = Action { implicit req =>
     val tempForm = loginForm.bindFromRequest
     tempForm.fold (
       error => {
@@ -194,4 +194,8 @@ object ABLoginSignup extends Controller with TSecured with TLogin {
     }
   }
   
+}
+
+object ABLoginSignup extends Controller with ABLoginSignup {
+
 }

@@ -26,8 +26,10 @@ import models.db.TDBTxBorrowHD
 import models.db.TDBUser
 import play.api.Play.current
 import play.api.db.DB
+import utils.CommonUtil._
 
 trait TDBService {
+  val logger = generateLogger(this)
 
   /**
    * START -- All database mappings.

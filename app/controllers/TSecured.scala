@@ -8,11 +8,14 @@ import play.api.mvc.Result
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import services.CommonService
+import utils.CommonUtil._
 
 /**
  * The authentication template to be used in all pages that need authentication.
  */
 trait TSecured {
+  val logger = generateLogger(this)
+  
   val commonService = CommonService
 
   def username(request: RequestHeader) = {
@@ -25,7 +28,7 @@ trait TSecured {
    * @param request The request header.
    */
   def onAuthorized(request: RequestHeader) = {
-    println("User not authorized")
+    logger.debug("User not authorized")
     Results.Redirect(routes.ABLogin.loginPage)
   }
 
@@ -36,7 +39,7 @@ trait TSecured {
    */
   def withAuth(f: => String => Request[AnyContent] => Result) = {
     Security.Authenticated(username, onAuthorized) { user =>
-      println("Entering withAuth")
+      logger.debug("Entering withAuth")
       Action(request => f(user)(request))
     }
   }
