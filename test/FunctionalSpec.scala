@@ -111,4 +111,20 @@ class FunctionalSpec extends FlatSpec with Matchers {
     driver.getPageSource() should include("List of Categories")
   }
   
+  "The admin" should "have access to books borrow page" in withDriver { implicit driver =>
+    driver get HOST
+    loginAdmin
+    driver get (HOST + "/borrow")
+
+    driver.getPageSource() should include("BORROWER INFORMATION")
+  }
+  
+  "The admin" should "have access to books return page" in withDriver { implicit driver =>
+    driver get HOST
+    loginAdmin
+    driver get (HOST + "/return")
+
+    driver.getPageSource() should include("Book ID")
+  }
+  
 }
