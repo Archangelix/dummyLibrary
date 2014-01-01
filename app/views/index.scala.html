@@ -13,12 +13,19 @@
 			}
 			
 			function checkSearchTextbox() {
+				console.log("checked!");
 				var searchText = $('#txtSearch').val();
 				if (searchText == "") {
 					$('#btnSearch').attr("disabled", "disabled");
+					// alert('disabled');
 				} else {
 					$('#btnSearch').removeAttr("disabled");
+					// alert('enabled');
 				}
+			}
+			function timeoutCheckSearchTextbox() {
+				alert('timeout?');
+				setTimeout(checkSearchTextbox(), 100);
 			}
 		</script>
 	</head>
@@ -32,22 +39,14 @@
 	}}
 	<form action='@routes.ABSearchCatalog.index' method='GET' onSubmit="search(); return false;"> 
 	<div id="mainSearchCatalog" class="searchBox">
-		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here" onkeyup="checkSearchTextbox()">
-		<a id="btnSearch" href="javascript:search()" class="btn" disabled>Search</a>
+		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here">
+		<a id="btnSearch" href="javascript:if ($('#txtSearch').val()!='') search()" class="btn">Search</a>
 	</div>
 	</form>
 </body>
 	<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
 	<script>
-		$(document).ready(function() {
-		  $("#txtSearch").keydown(function(event){
-		    if( (event.keyCode == 13) && ($('#btnSearch').attr("disabled") === "disabled") ) {
-		      event.preventDefault();
-		      return false;
-		    }
-		  });
-		  $("#txtSearch").focus();
-		});			
 		checkSignInEnable();
 	</script>
 </html>
+
