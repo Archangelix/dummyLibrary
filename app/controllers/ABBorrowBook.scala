@@ -41,8 +41,6 @@ trait ABBorrowBook extends TSecured { this: Controller =>
   val objUser = OBUser
   val objBook = OBBook
 
-  val borrowForm = Form[ABBorrowBook.FormBorrow](formBorrowMapping)
-  
   val formBookMapping = mapping(
     "bookID" -> optional(text),
     "title" -> optional(text),
@@ -63,6 +61,8 @@ trait ABBorrowBook extends TSecured { this: Controller =>
       "newBookID" -> optional(text),
       "books" -> optional(list(formBookMapping))
   )(ABBorrowBook.FormBorrow.apply)(ABBorrowBook.FormBorrow.unapply)
+  
+  val borrowForm = Form[ABBorrowBook.FormBorrow](formBorrowMapping)
   
   val sdf = new SimpleDateFormat("dd-M-yyyy")
 
