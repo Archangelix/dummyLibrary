@@ -11,22 +11,6 @@
 				var url = '/searchbook/'+$('#txtSearch').val();
 				window.location=url;
 			}
-			
-			function checkSearchTextbox() {
-				console.log("checked!");
-				var searchText = $('#txtSearch').val();
-				if (searchText == "") {
-					$('#btnSearch').attr("disabled", "disabled");
-					// alert('disabled');
-				} else {
-					$('#btnSearch').removeAttr("disabled");
-					// alert('enabled');
-				}
-			}
-			function timeoutCheckSearchTextbox() {
-				alert('timeout?');
-				setTimeout(checkSearchTextbox(), 100);
-			}
 		</script>
 	</head>
 <body>
@@ -37,7 +21,7 @@
 			case _ => menubar_public(myForm, true)
 		}
 	}}
-	<form action='@routes.ABSearchCatalog.index' method='GET' onSubmit="search(); return false;"> 
+	<form action='@routes.ABSearchCatalog.index' method='GET' onSubmit="if ($('#txtSearch').val()!='') search(); else return false;"> 
 	<div id="mainSearchCatalog" class="searchBox">
 		<input id="txtSearch" name="searchKeyword" placeholder="Enter keywords here">
 		<a id="btnSearch" href="javascript:if ($('#txtSearch').val()!='') search()" class="btn">Search</a>
@@ -45,8 +29,5 @@
 	</form>
 </body>
 	<script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
-	<script>
-		checkSignInEnable();
-	</script>
 </html>
 
