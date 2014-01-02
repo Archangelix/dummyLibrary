@@ -14,7 +14,7 @@ import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.scalatest.Matchers
-
+import play.api.Play.current
 
 /**
  * add your integration spec here.
@@ -27,6 +27,7 @@ class FunctionalSpec extends FlatSpec with Matchers {
   System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
 
   def withDriver(f: FirefoxDriver => Unit) = { 
+    val n = if (play.api.Play.isTest) "abc" else "def"
     val driver = new FirefoxDriver
     try {
       f(driver)
@@ -84,7 +85,6 @@ class FunctionalSpec extends FlatSpec with Matchers {
     
     driver.getPageSource() should not include("List of Users")
     driver.getPageSource() should include("Search")
-    Thread.sleep(5000)
   }
   
   "The admin" should "have access to user admin page" in withDriver { implicit driver => 
