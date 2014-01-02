@@ -27,7 +27,6 @@ class FunctionalSpec extends FlatSpec with Matchers {
   System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
 
   def withDriver(f: FirefoxDriver => Unit) = { 
-    val n = if (play.api.Play.isTest) "abc" else "def"
     val driver = new FirefoxDriver
     try {
       f(driver)

@@ -16,7 +16,7 @@ object ApplicationBuild extends Build {
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+	initialCommands in console := """new play.core.StaticApplication(new java.io.File("."))""" 
   )
 
 }

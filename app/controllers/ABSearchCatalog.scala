@@ -33,8 +33,9 @@ trait ABSearchCatalog extends TSecured with TLogin { this: Controller =>
    * Displaying the login page.
    */
   def index = Action { implicit req =>
-    val filledForm = searchCatalogForm.fill(FormSearchCatalog("", "", "", ""))
-    Ok(views.html.search_catalog(loginForm, "", List()))
+//    val filledForm = searchCatalogForm.fill(FormSearchCatalog("", "", "", ""))
+    Redirect(routes.ABSearchCatalog.search(req.getQueryString("searchKeyword").getOrElse("")))
+//    Ok(views.html.search_catalog(loginForm, "", List()))
   }
   
   def search(pStr: String) = Action { implicit req =>
