@@ -708,7 +708,7 @@ object PSQLService extends TDBService {
 	  }
 	}
 
-	def insertTxBorrowHD(pObj: TDBTxBorrowHD)(implicit pOfficerUserID: String) = {
+	def insertTxBorrowHD(pObj: TDBTxBorrowHD)(implicit pOfficerUserID: String): Int = {
 	  DB.withConnection { implicit c => 
 	    val sql = "insert into TX_BORROW_HD " +
 	    		"(seqno, borrower_idnumber, officer_userid, remarks, " +

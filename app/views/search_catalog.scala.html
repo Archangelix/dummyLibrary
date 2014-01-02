@@ -44,6 +44,11 @@
 				var newText = highlightWords(oldText, str);
 				$(this).html(newText);
 			})
+			$('h4 + em').each(function(idx) {
+				var oldText = $(this).text();
+				var newText = highlightWords(oldText, str);
+				$(this).html(newText);
+			})
 		}
 		
 	</script>

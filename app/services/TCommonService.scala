@@ -99,7 +99,7 @@ trait TCommonService {
 	 */
 	def getTransactionDetailsByID(pTransactionSeqNo: Int): List[TTxBorrowDT]
 
-	def startTransaction(pTxBorrowHD: TTxBorrowHD)(implicit pOfficerUserID: String)
+	def startTransaction(pTxBorrowHD: TTxBorrowHD)(implicit pOfficerUserID: String): Int
 
 	def findPendingTxByBookID(pCatalogSeqNo: Int, pBookSeqNo: Int): TTxBorrowDT
 	  

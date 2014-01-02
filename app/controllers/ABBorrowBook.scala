@@ -221,6 +221,7 @@ trait ABBorrowBook extends TSecured { this: Controller =>
   }
   
   def startTransaction = withAuth { implicit officerUserID => implicit req =>
+    logger.debug("Entering startTransaction")
     val form = borrowForm.bindFromRequest
     val borrowerID = form("borrowerID").value
     val borrowerName = form("borrowerName").value
@@ -228,6 +229,7 @@ trait ABBorrowBook extends TSecured { this: Controller =>
     
     val newTransaction = objTxBorrowHD.generateNewTransaction(borrowerID.get)
     val transactionID = commonService.startTransaction(newTransaction)
+    logger.debug("A new transaction is generated with ID = "+transactionID)
     val currentDateStr = sdf.format(new Date())
     val newSession = session + ("transactionID" -> transactionID.toString)
     Redirect(routes.ABBorrowBook.viewTransaction(transactionID.toString)).withSession(newSession)
