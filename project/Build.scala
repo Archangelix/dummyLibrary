@@ -11,12 +11,13 @@ object ApplicationBuild extends Build {
     // Add your project dependencies here,
     jdbc,
     anorm,
+    cache,
     "postgresql" % "postgresql" % "9.1-901.jdbc4"
   )
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-	initialCommands in console := """new play.core.StaticApplication(new java.io.File("."))""" 
+	javaOptions in Test += "-Dconfig.file=conf/test.conf"
   )
 
 }
