@@ -9,9 +9,9 @@ import models.common.UserRole
 import play.api.mvc.Security
 import play.api.data.Form
 import play.api.data.FormError
+import services.PSQLService
 
 trait ABLogin extends TLogin { this: Controller => 
-  
   /**
    * Displaying the login page.
    */
@@ -44,6 +44,7 @@ trait ABLogin extends TLogin { this: Controller =>
         }
         
         if (validLogin) {
+          println("valid login")
           // Correct password. Redirect the user to the respective home page according to the role.
           try {
             val formUsername = data.username
@@ -65,6 +66,7 @@ trait ABLogin extends TLogin { this: Controller =>
             }
           }
         } else {
+          println("wrong login")
           // Wrong password. Return to login page.
           val errorForm = Form(tempForm.mapping, 
               Map("username"->data.username, "password" -> ""), 
@@ -81,5 +83,6 @@ trait ABLogin extends TLogin { this: Controller =>
  * Action to handle the logging section.
  */
 object ABLogin extends Controller with ABLogin {
+  override val dbService = PSQLService
 	// Handled in trait TLogin
 }
