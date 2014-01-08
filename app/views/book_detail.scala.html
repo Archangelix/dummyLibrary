@@ -1,7 +1,6 @@
-@(mode: String, myForm: Form[controllers.ABBookDetail.FormBook])(implicit session: Session)
+@(mode: String, myForm: Form[controllers.ABBookDetail.FormBook], ddBookOrigin: Seq[(String, String)])(implicit session: Session)
 @import views.html.helper._
 @import utils.Constants._
-@import models.common.DDBookOrigin
 
 <!doctype html>
 <html>
@@ -29,7 +28,7 @@
 				</legend>
 				<div class="form-group">
 					@select(myForm("originCode"),
-								  DDBookOrigin.all,
+								  ddBookOrigin,
 								  '_label -> "Origin",
 								  '_default -> "Please select",
 									'class -> "form-control"

@@ -44,7 +44,6 @@ trait ABLogin extends TLogin { this: Controller =>
         }
         
         if (validLogin) {
-          println("valid login")
           // Correct password. Redirect the user to the respective home page according to the role.
           try {
             val formUsername = data.username
@@ -66,7 +65,6 @@ trait ABLogin extends TLogin { this: Controller =>
             }
           }
         } else {
-          println("wrong login")
           // Wrong password. Return to login page.
           val errorForm = Form(tempForm.mapping, 
               Map("username"->data.username, "password" -> ""), 

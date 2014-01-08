@@ -29,6 +29,7 @@ trait ABBookDetail extends TSecured {this: Controller =>
   val objBook = OBBook
   val objCatalog = OBCatalog
   
+  val ddBookOrigin = DDBookOrigin.all
     /**
      * Dropdown items for the 'Origin' type.
      */
@@ -61,7 +62,7 @@ trait ABBookDetail extends TSecured {this: Controller =>
     // Flashing works only for redirect.
     // Ok(views.html.book_detail(MODE_EDIT, bookForm, pCatalogID)).flashing("catalogID" -> pCatalogID)
     val newBookForm = bookForm(true).fill(ABBookDetail.FormBook.init(pCatalogSeqNo.toInt))
-    Ok(views.html.book_detail(MODE_ADD, newBookForm)).withSession(
+    Ok(views.html.book_detail(MODE_ADD, newBookForm, ddBookOrigin)).withSession(
         session + ("bookMode" -> MODE_ADD)
     )
   }
@@ -76,7 +77,7 @@ trait ABBookDetail extends TSecured {this: Controller =>
         logger.debug("validation failed.")
         val mode = session.get("bookMode").getOrElse(MODE_ADD)
 //        error.errors.foreach(err => logger.debug(err.key + ": "+err.message))
-        BadRequest(views.html.book_detail(mode, error))
+        BadRequest(views.html.book_detail(mode, error, ddBookOrigin))
       },
       data => {
         logger.debug("validation successful.")
@@ -92,7 +93,7 @@ trait ABBookDetail extends TSecured {this: Controller =>
    * Viewing the book details. The page will be uneditable.
    */
   def view(pCatalogSeqNo: String, pBookSeqNo: String) = withAuth {implicit officerUserID => implicit req => 
-    Ok(views.html.book_detail(MODE_ADD, bookForm(true)))
+    Ok(views.html.book_detail(MODE_ADD, bookForm(true), ddBookOrigin))
   }
 
   /**
@@ -101,7 +102,7 @@ trait ABBookDetail extends TSecured {this: Controller =>
   def edit(pCatalogSeqNo: String, pBookSeqNo: String) = withAuth {implicit officerUserID => implicit req =>
     val dbBook = objBook.find(pCatalogSeqNo.toInt, pBookSeqNo.toInt)
     val newBookForm = bookForm(true).fill(ABBookDetail.FormBook(dbBook))
-    Ok(views.html.book_detail(MODE_EDIT, newBookForm)).withSession(
+    Ok(views.html.book_detail(MODE_EDIT, newBookForm, ddBookOrigin)).withSession(
         session + ("bookMode" -> MODE_EDIT)
     )
   }
@@ -116,7 +117,7 @@ trait ABBookDetail extends TSecured {this: Controller =>
         logger.debug("validation failed.")
         val mode = session.get("bookMode").getOrElse(MODE_ADD)
 //        error.errors.foreach(err => logger.debug(err.key + ": "+err.message))
-        BadRequest(views.html.book_detail(mode, error))
+        BadRequest(views.html.book_detail(mode, error, ddBookOrigin))
       },
       data => {
         logger.debug("validation successfuls.")

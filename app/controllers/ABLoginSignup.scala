@@ -28,12 +28,15 @@ import org.joda.time.Period
 import play.api.Routes
 import services.CommonService
 import utils.CommonUtil._
+import models.common.DDCountry
 
 /**
  * Action to handle the logging section.
  */
 trait ABLoginSignup extends TLogin with TSecured { this: Controller => 
   override val logger = generateLogger(this)
+  
+  val ddNationality = DDCountry.all
   
   val formNewUserMapping = mapping(
       "seqNo" -> optional(of[Int]),
@@ -58,12 +61,12 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
     logger.debug("ABLoginSignup")
     val username = flash.get("username")
     if (username == None) {
-      Ok(views.html.loginsignup(loginForm, Form[FormUser](formNewUserMapping)))
+      Ok(views.html.loginsignup(loginForm, Form[FormUser](formNewUserMapping), ddNationality))
     } else {
       val errorForm = Form(loginForm.mapping, 
           Map("username"->username.get, "password" -> ""), 
           Seq(new FormError("", "Invalid user / password" )), loginForm.value)
-      BadRequest (views.html.loginsignup(errorForm, Form[FormUser](formNewUserMapping)))
+      BadRequest (views.html.loginsignup(errorForm, Form[FormUser](formNewUserMapping), ddNationality))
     }
   }
   
@@ -74,7 +77,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
     val tempForm = loginForm.bindFromRequest
     tempForm.fold (
       error => {
-        BadRequest(views.html.loginsignup(error, Form[FormUser](formNewUserMapping)))
+        BadRequest(views.html.loginsignup(error, Form[FormUser](formNewUserMapping), ddNationality))
       },
       data => {
         // Authenticate the user password.
@@ -107,7 +110,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
           } catch {
             case e: Exception => {
               e.printStackTrace()
-              BadRequest(views.html.loginsignup(tempForm, Form[FormUser](formNewUserMapping)))
+              BadRequest(views.html.loginsignup(tempForm, Form[FormUser](formNewUserMapping), ddNationality))
             }
           }
         } else {
@@ -115,7 +118,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
           val errorForm = Form(tempForm.mapping, 
               Map("username"->data.username, "password" -> ""), 
               Seq(new FormError("", "Invalid user / password" )), tempForm.value)
-          BadRequest (views.html.loginsignup(errorForm, Form[FormUser](formNewUserMapping)))
+          BadRequest (views.html.loginsignup(errorForm, Form[FormUser](formNewUserMapping), ddNationality))
         }
       }
     )
@@ -130,7 +133,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
         }
      	val newErrorForm = Form(filledForm.mapping, filledForm.data -- (List("password", "password2")), 
     	      filledForm.errors, filledForm.value)
-    	BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm))
+    	BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm, ddNationality))
       },
       successForm => {
 	      try {
@@ -139,7 +142,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
 	    	      filledForm.data -- (List("password", "password2")), 
 	    	      Seq(new FormError("username", "This User ID is not available.")), filledForm.value)
 	    	  println ("Duplicate userid has been found!")
-	    	  BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm))
+	    	  BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm, ddNationality))
 	      } catch {
 	        case e: UserNotFoundException => {
 	        	println ("Ok, valid userid!")
@@ -148,7 +151,7 @@ trait ABLoginSignup extends TLogin with TSecured { this: Controller =>
 	        	if (errors.size>0) {
 	         	  val newErrorForm = Form(filledForm.mapping, filledForm.data -- (List("password", "password2")), 
 	        	      errors.map(_.get), filledForm.value)
-	        		BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm))
+	        		BadRequest (views.html.loginsignup(Form[FormUserPassword](formUserLoginMapping), newErrorForm, ddNationality))
 	        	} else {
 	        		val password = successForm.password
 	        		commonService.createUserAndPassword(user, password)

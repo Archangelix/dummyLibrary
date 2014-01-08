@@ -1,5 +1,4 @@
-@(loginForm: Form[form.FormUserPassword], signupForm: Form[form.FormUser])(implicit session: Session)
-@import models.common.DDCountry
+@(loginForm: Form[form.FormUserPassword], signupForm: Form[form.FormUser], ddNationality: Seq[(String, String)])(implicit session: Session)
 <!-- loginsignup.scala.html -->
 <!doctype html>
 <html>
@@ -185,7 +184,7 @@
 				<div class="form-group">
 					@helper.select(
 							signupForm("nationality"),
-							DDCountry.all,
+							ddNationality,
 							'_label -> "Nationality",
 							'_default -> "Please select"
 						)

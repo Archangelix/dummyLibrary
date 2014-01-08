@@ -49,7 +49,8 @@ class ABLoginSignupTest extends FlatSpec with Matchers with MockitoSugar {
     ))
   }
   
-  "The guest" should "have access to loginsignup page" in {
+  "The guest" should "have access to loginsignup page" in new WithApplication(
+      new FakeApplication(additionalConfiguration = Map("application.secret" -> "test"))) {
     val objABLogin = new TestController
     val res = objABLogin.loginPage().apply(FakeRequest())
     res should not be null
@@ -57,7 +58,7 @@ class ABLoginSignupTest extends FlatSpec with Matchers with MockitoSugar {
     contentAsString(res) should include("Login Information")
   }
   
-/*  it should "be able to login from the loginsignup page" in new WithApplication(
+  it should "be able to login from the loginsignup page" in new WithApplication(
       new FakeApplication(additionalConfiguration = Map("application.secret" -> "test"))) {
     val objABLogin = new TestController
     val json = Json.obj(
@@ -80,11 +81,11 @@ class ABLoginSignupTest extends FlatSpec with Matchers with MockitoSugar {
     val res = objABLogin.login().apply(req)
     res should not be null
     status(res) should be(BAD_REQUEST)
-    redirectLocation(res) should be(Some("/loginsignup"))
+    contentAsString(res) should include("Invalid user / password")
   }
   
   it should "have access to search result page" in new WithApplication(
       new FakeApplication(additionalConfiguration = Map("application.secret" -> "test"))) {
     
-  }*/
+  }
 }
